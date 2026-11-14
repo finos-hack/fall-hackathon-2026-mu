@@ -1,0 +1,39 @@
+{
+  "name": "calm-timelapse",
+  "version": "0.1.0",
+  "description": "Deterministic FINOS CALM timeline generation from Git history, offline AI diff-digest handoff, and interactive HTML architectural timelapse player",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "finos",
+    "calm",
+    "architecture-as-code",
+    "timeline",
+    "timelapse",
+    "git"
+  ],
+  "dependencies": {
+    "commander": "^14.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@vitest/coverage-v8": "^3.2.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.2.0"
+  }
+}
