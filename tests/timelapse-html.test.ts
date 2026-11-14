@@ -10,6 +10,7 @@ import { assembleCalmTimeline, formatCalmSourceDisplay } from '../src/timeline-e
 import {
   buildTimelapsePayloadFromClusters,
   buildTimelapsePayloadFromTimelineFile,
+  computeBlastRadius,
   computeSuperGraphLayout,
   extractActiveControls,
   extractGraphEdges,
@@ -747,5 +748,110 @@ describe('timelapse-html', () => {
     const fromTlPayload = buildTimelapsePayloadFromTimelineFile(tlPath);
     expect(fromTlPayload.sourceFile).toBe('vexa/architecture.calm.json');
     expect(fromTlPayload.title).toBe('CALM Architecture Timelapse — vexa/architecture.calm.json');
+  });
+
+  it('computes multi-hop CALM blast radius across connects, interacts, deployed-in, composed-of, and flows', () => {
+    const nodes = [
+      { id: 'trader', name: 'Trader', nodeType: 'actor' },
+      { id: 'ui', name: 'Web Blotter', nodeType: 'web-client' },
+      { id: 'gw', name: 'API Gateway', nodeType: 'service' },
+      { id: 'orders', name: 'Order Service', nodeType: 'service' },
+      { id: 'db', name: 'Trades DB', nodeType: 'database' },
+      { id: 'k8s', name: 'K8s Cluster', nodeType: 'infrastructure' },
+      { id: 'isolated', name: 'Offline Archive', nodeType: 'storage' },
+    ];
+    const edges = [
+      { id: 'r-actor-ui', source: 'trader', target: 'ui', label: 'HTTPS', relType: 'interacts' },
+      { id: 'r-ui-gw', source: 'ui', target: 'gw', label: 'HTTPS', relType: 'connects' },
+      { id: 'r-gw-orders', source: 'gw', target: 'orders', label: 'mTLS', relType: 'connects' },
+      { id: 'r-orders-db', source: 'orders', target: 'db', label: 'JDBC', relType: 'connects' },
+      { id: 'r-k8s-orders', source: 'k8s', target: 'orders', label: 'deployed-in', relType: 'deployed-in' },
+    ];
+    const flows = [
+      {
+        id: 'flow-order-entry',
+        name: 'Order Entry Flow',
+        description: 'End-to-end order submission',
+        transitionCount: 3,
+        relationshipIds: ['r-ui-gw', 'r-gw-orders', 'r-orders-db'],
+      },
+      {
+        id: 'flow-unrelated',
+        name: 'Unrelated Flow',
+        description: 'Unrelated',
+        transitionCount: 1,
+        relationshipIds: ['r-other'],
+      },
+    ];
+
+    const dbFailure = computeBlastRadius(nodes, edges, 'db', 'dependents', flows);
+    expect(dbFailure.originPresent).toBe(true);
+    expect(dbFailure.directNodeIds).toEqual(['orders']);
+    expect(dbFailure.transitiveNodeIds).toEqual(['gw', 'ui', 'trader']);
+    expect(dbFailure.impactedByNodeId['orders'].hop).toBe(1);
+    expect(dbFailure.impactedByNodeId['gw'].hop).toBe(2);
+    expect(dbFailure.impactedByNodeId['ui'].hop).toBe(3);
+    expect(dbFailure.impactedByNodeId['trader'].hop).toBe(4);
+    expect(dbFailure.impactedByNodeId['k8s']).toBeUndefined();
+    expect(dbFailure.impactedByNodeId['isolated']).toBeUndefined();
+    expect(dbFailure.maxHop).toBe(4);
+    expect(dbFailure.impactedCount).toBe(4);
+    expect(dbFailure.impactedFlowIds).toEqual(['flow-order-entry']);
+
+    const k8sFailure = computeBlastRadius(nodes, edges, 'k8s', 'dependents', flows);
+    expect(k8sFailure.directNodeIds).toEqual(['orders']);
+    expect(k8sFailure.transitiveNodeIds).toEqual(['gw', 'ui', 'trader']);
+
+    const gwDownstream = computeBlastRadius(nodes, edges, 'gw', 'downstream', flows);
+    expect(gwDownstream.directNodeIds).toEqual(['orders']);
+    expect(gwDownstream.transitiveNodeIds).toEqual(['db']);
+
+    const gwCombined = computeBlastRadius(nodes, edges, 'gw', 'all', flows);
+    expect(gwCombined.directNodeIds).toEqual(['orders', 'ui']);
+    expect(gwCombined.transitiveNodeIds).toContain('db');
+    expect(gwCombined.transitiveNodeIds).toContain('trader');
+    expect(gwCombined.transitiveNodeIds).toContain('k8s');
+
+    const missingOrigin = computeBlastRadius(nodes, edges, 'missing-svc', 'all', flows);
+    expect(missingOrigin.originPresent).toBe(false);
+    expect(missingOrigin.impactedCount).toBe(0);
+
+    const html = renderTimelapseHtml({
+      title: 'Blast Test',
+      generatedAt: '2026-11-14T00:00:00Z',
+      sourceFile: 'arch.json',
+      engine: 'deterministic',
+      canvasWidth: 960,
+      canvasHeight: 540,
+      positions: computeSuperGraphLayout(nodes, edges).positions,
+      frames: [
+        {
+          id: 'm1',
+          name: 'M1',
+          description: 'M1',
+          validFrom: '2026-11-14',
+          commitCount: 1,
+          commits: ['abc1234'],
+          commitMessages: ['init'],
+          adrs: [],
+          summary: 'Init',
+          changes: [],
+          nodes,
+          edges,
+          flows,
+          addedNodeIds: [],
+          modifiedNodeIds: [],
+          removedNodeIds: [],
+          addedEdgeIds: [],
+          removedEdgeIds: [],
+        },
+      ],
+    });
+    expect(html).toContain('id="btn-blast-mode"');
+    expect(html).toContain('id="blast-direction"');
+    expect(html).toContain('arrow-blast-direct');
+    expect(html).toContain('arrow-blast-transitive');
+    const scripts = [...html.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)];
+    expect(() => new vm.Script(scripts[1][1])).not.toThrow();
   });
 });
