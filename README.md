@@ -2,9 +2,9 @@
 
 **Hackathon Track:** Track 3: Features
 
-Reviewers and auditors regularly ask what an architecture—or an ecosystem of interacting architectures across repositories—looked like on a specific past date and why it changed. Answering that today means reading raw Git diffs by hand or manually pre-saving versioned JSON snapshots. In upstream `@finos/calm-cli`, `calm timeline -a` builds an implied timeline only from pre-saved versioned files on disk (such as `arch-1.0.0.json`, `arch-2.0.0.json`), and `calm diff --timeline` outputs text or Markdown tables. **CALM Timelapse** bridges **FINOS CALM** with **Git** directly: it walks `git log --follow` across one or multiple Git repositories and CALM files simultaneously, filters out pure JSON formatting and key-reordering noise, emits schema-validated `calm-timeline` (`1.2` and `1.3`, validated against `@finos/calm-schema` `1.3.0`) artifacts plus historical snapshot files, and renders a zero-dependency, single-viewport interactive HTML/SVG player—with zero runtime network calls.
+Reviewers and auditors regularly ask what an architecture—or an ecosystem of interacting architectures across repositories—looked like on a specific past date and why it changed. Answering that today means reading raw Git diffs by hand or manually pre-saving versioned JSON snapshots. In upstream `@finos/calm-cli`, `calm timeline -a` builds an implied timeline only from pre-saved versioned files on disk (such as `arch-1.0.0.json`, `arch-2.0.0.json`), and `calm diff --timeline` outputs text or Markdown tables. **CALM Timelapse** bridges **FINOS CALM** with **Git** directly: it walks `git log --follow` across one or multiple Git repositories and CALM files simultaneously, filters out pure JSON formatting and key-reordering noise, emits schema-validated `calm-timeline` (`1.2` and `1.3`, validated against `@finos/calm-schema` `1.3.0`) artifacts plus historical snapshot files, and renders a zero-dependency interactive HTML/SVG player with both a single-viewport **Timelapse Stage** and a reverse-chronological **Architecture Feed**—with zero runtime network calls.
 
-> **Interactive Demo Gallery:** Open `docs/index.html` locally (or visit `https://finos-hack.github.io/fall-hackathon-2026-mu/` when GitHub Pages is enabled on `docs/`) to step through 9 pre-built single-repo and multi-repo architecture timelapses in your browser without building from source.
+> **Interactive Demo Gallery:** Open `docs/index.html` locally (or visit `https://finos-hack.github.io/fall-hackathon-2026-mu/` when GitHub Pages is enabled on `docs/`) to explore 9 pre-built single-repo and multi-repo architectures in either **Timelapse Stage** or **Architecture Feed** (`#feed`) mode without building from source.
 
 ## Installation
 
@@ -121,7 +121,8 @@ node dist/cli.js \
 
 | Capability | Details |
 |---|---|
-| **Project & Subsystem Filtering** | Filter multi-repo graphs by repository (`Project`) or node (`Subsystem`), with optional `1-hop only` blast-radius isolation |
+| **Dual Views: Stage & Architecture Feed** | Toggle between **Timelapse Stage** (single-viewport scrubber) and **Architecture Feed** (`--feed` or `#feed`), which presents moments in **reverse chronological order** (`Latest First`, `N → 1`) as scrollable posts pairing an auto-cropped architecture diagram, narrative summary, change/ADR chips, `⬇ Save SVG`, and `Inspect in Stage →` |
+| **Project & Subsystem Filtering** | Filter multi-repo graphs and feed posts by repository (`Project`), keyword search, or node (`Subsystem`), with optional `1-hop only` blast-radius isolation |
 | **As-Of Date & Baseline Diff** | Jump to the authoritative architecture effective on any `YYYY-MM-DD` date or diff any baseline moment against the current frame |
 | **Governance & ADR Posture** | Inspect active CALM `1.3` `controls` requirements, cumulative co-changed ADRs, and `detailed-architecture` merge provenance per moment |
 | **Offline Single-File HTML** | Self-contained SVG player with zoom/pan, keyboard transport (`Space`, `←`/`→`), and zero external CDN, font, or script requests |
@@ -132,7 +133,7 @@ node dist/cli.js \
 | `--resolve-details` | Auto-discover and synchronize same-repo `details.detailed-architecture` child files |
 | `--timeline <files...>` | Validate or synchronize one or more existing `calm-timeline` JSON files |
 | `--emit-digest <file>` / `--clusters <file>` | Export deterministic diff digests and apply validated `0..N-1` phase clusters |
-| `--timelapse [html]` | Render standalone interactive HTML/SVG timelapse player |
+| `--timelapse [html]` / `--feed` | Render standalone HTML/SVG player (pass `--feed` to open in Architecture Feed mode by default) |
 | `--validate` / `--validate-snapshots` | Validate `calm-timeline` structure and every emitted CALM `1.3` snapshot |
 
 ### 5. Interactive Demo Gallery (`docs/demos/`)
