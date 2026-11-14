@@ -21,7 +21,6 @@ interface CliOptions {
   output?: string;
   snapshotsDir?: string;
   timelapse?: string | boolean;
-  feed?: boolean;
   emitDigest?: string;
   clusters?: string;
   maxCommits?: string;
@@ -74,11 +73,6 @@ export function createProgram(): Command {
     .option(
       '--timelapse [html]',
       'Generate an interactive standalone HTML timelapse player (optional output path)',
-    )
-    .option(
-      '--feed',
-      'Open generated HTML player in Architecture Feed mode by default (both Stage and Feed remain available)',
-      false,
     )
     .option(
       '--emit-digest <file>',
@@ -140,7 +134,6 @@ export function createProgram(): Command {
         outputPath,
         snapshotsDir: opts.snapshotsDir,
         timelapsePath,
-        defaultView: opts.feed ? 'feed' : undefined,
         emitDigestPath: opts.emitDigest,
         validate: opts.validate,
         validateSnapshots: opts.validateSnapshots,
@@ -196,7 +189,6 @@ export function createProgram(): Command {
         outputPath,
         snapshotsDir: opts.snapshotsDir,
         timelapsePath,
-        defaultView: opts.feed ? 'feed' : undefined,
         emitDigestPath: opts.emitDigest,
         clustersPath: opts.clusters,
         maxCommits,
@@ -296,7 +288,6 @@ export function createProgram(): Command {
         const written = renderTimelapseFromTimelineFile(
           resolvedTimelines.length === 1 ? resolvedTimelines[0] : resolvedTimelines,
           timelapsePath,
-          { defaultView: opts.feed ? 'feed' : undefined },
         );
         console.log(`Generated HTML timelapse: ${written}`);
       } else if (!opts.validate && !opts.validateSnapshots) {

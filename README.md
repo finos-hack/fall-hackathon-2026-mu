@@ -1,8 +1,9 @@
 # CALM Timelapse (`calm-timelapse`)
 
-**What it is:** Converts Git history across one or multiple repositories into `@finos/calm-cli`-validated CALM timelines (`1.2` / `1.3`), SHA-256-verified snapshots, and an offline HTML player with **Timelapse Stage**, **Architecture Feed**, and **Multi-Hop Blast Radius**.  
+**What it is:** Converts Git history across one or multiple repositories into `@finos/calm-cli`-validated CALM timelines (`1.2` / `1.3`), point-in-time snapshots, and an offline HTML player showing applicable ADRs for any snapshot in time alongside **Multi-Hop Blast Radius** analysis.  
 **Why it matters:** Reviewers and auditors can see what an architecture looked like on any past date, why it changed, and what breaks if a node fails—without pre-saving versioned JSON snapshots or reading raw Git diffs (`Track 3: Features`).  
-**Try it live (zero install):** [**Demo Gallery**](https://finos-hack.github.io/fall-hackathon-2026-mu/) · [**FINOS TraderX + FDC3 Stage**](https://finos-hack.github.io/fall-hackathon-2026-mu/demos/finos-traderx/finos-traderx.timelapse.html) · [**3-Repo Federated Stage**](https://finos-hack.github.io/fall-hackathon-2026-mu/demos/multi-repo/multi-repo.timelapse.html) · [**Architecture Feed (`#feed`)**](https://finos-hack.github.io/fall-hackathon-2026-mu/demos/finos-traderx/finos-traderx.timelapse.html#feed) · [**72s Video (`.mp4`)**](https://finos-hack.github.io/fall-hackathon-2026-mu/assets/calm-timelapse-demo.mp4)
+**In Future:** Analyze bugs, incidents, feature requests, and human resources spent on architectural changes as part of retrospectives.  
+**Try it live (zero install):** [**Demo Gallery**](https://finos-hack.github.io/fall-hackathon-2026-mu/) · [**Compliance Benchmark Stage**](https://finos-hack.github.io/fall-hackathon-2026-mu/demos/traderx/traderx.timelapse.html) · [**3-Repo Federated Stage**](https://finos-hack.github.io/fall-hackathon-2026-mu/demos/multi-repo/multi-repo.timelapse.html) · [**FINOS TraderX + FDC3 Stage**](https://finos-hack.github.io/fall-hackathon-2026-mu/demos/finos-traderx/finos-traderx.timelapse.html) · [**72s Video (`.mp4`)**](https://finos-hack.github.io/fall-hackathon-2026-mu/assets/calm-timelapse-demo.mp4)
 
 [![CALM Timelapse 72-Second Interactive Walkthrough](docs/assets/calm-timelapse-demo.gif)](https://finos-hack.github.io/fall-hackathon-2026-mu/)
 
@@ -41,6 +42,7 @@ node dist/cli.js \
 
 - Walks `git log --follow -M30%`, filters pure JSON formatting/key-reordering commits (retaining referenced flow URLs and `items` to `prefixItems` / `uniqueId` to `unique-id` pattern migrations), and emits `*.architecture.json` or `*.pattern.json` snapshots.
 - Groups same-author commits within a 14-day window until a node, flow, control, or co-changed ADR (`docs/adr/*.md`, up to 250 files/commit) is added or removed, and qualifies generic root filenames as `<repo>/<file>` without leaking host paths.
+- In the generated HTML player, selecting any moment or `As-Of Date` displays the **applicable Architecture Decision Records (ADRs)** for that snapshot in time alongside active CALM controls, flows, and Git commits.
 
 ### 2. Multi-Repo Federation (`--from-git <files...>` / `--resolve-details`)
 
@@ -70,7 +72,7 @@ node dist/cli.js --from-git architecture.calm.json --clusters timeline/clusters.
   --timelapse timeline/architecture.timelapse.html --validate --validate-snapshots
 ```
 
-`validateClusterSpecs` enforces contiguous, non-overlapping coverage across `0..N-1`, and every snapshot is written verbatim from Git blobs with its `SHA-256` hash recorded in `digest.commits[].snapshotSha256` and `moment.metadata["snapshot-sha256"]`.
+`validateClusterSpecs` enforces contiguous, non-overlapping coverage across `0..N-1`, and every snapshot is written verbatim from Git blobs rather than synthesized by an assistant.
 
 #### AI Workflow Evidence (`calm/architecture/calm-3.json` in [`docs/demos/calm-self/`](./docs/demos/calm-self/))
 
@@ -87,7 +89,6 @@ node dist/cli.js --from-git architecture.calm.json --clusters timeline/clusters.
       "shortSha": "f1486acb",
       "date": "2025-12-23",
       "subject": "docs(calm): Define CALM in CALM",
-      "snapshotSha256": "296c44d1450f024d446d9d7c211288fa254232123b80784f8f8033d25d297ee0",
       "changes": ["Added node CALM CLI (calm-cli)", "Added node CALM Hub API (calm-hub)", "..."]
     },
     {
@@ -95,7 +96,6 @@ node dist/cli.js --from-git architecture.calm.json --clusters timeline/clusters.
       "shortSha": "784858e7",
       "date": "2025-12-23",
       "subject": "docs(calm): remove unwanted hallucinations",
-      "snapshotSha256": "540708fe3de3780bb03c8f778f24d5af95f1f8747786438122694b9687929cc3",
       "changes": ["Modified node CALM CLI (calm-cli) [interfaces]", "Modified relationship cli-to-hub", "..."]
     }
   ]
@@ -126,23 +126,11 @@ $ node dist/cli.js --from-git ../finos/calm/architecture/calm-3.json --clusters 
 Error: Invalid cluster definitions (expected a non-empty JSON array covering commit indices 0..4 contiguously without gaps or overlaps): clusters[1].startIndex is 3, expected 2 (gap skipping commit index 2).
 ```
 
-### 4. Upstream FINOS TraderX Import (`--from-traderx`) — Translates FDC3 Contracts into Validated CALM
+### 4. Multi-Hop CALM Blast Radius & Monorepo Scale
 
-```sh
-node dist/cli.js \
-  --from-traderx ../traderx \
-  -o docs/demos/finos-traderx/finos-traderx.timeline.json \
-  --snapshots-dir docs/demos/finos-traderx/snapshots \
-  --timelapse docs/demos/finos-traderx/finos-traderx.timelapse.html \
-  --validate --validate-snapshots
-```
+![Multi-Hop CALM Blast Radius Analysis](docs/assets/blast-radius-sample.png)
 
-- **Translates FDC3 contracts into validated CALM:** Converts `specs/014-fdc3-intent-interoperability/contracts/contract-delta.md` and `appd.v2.json` into CALM `1.3` `interfaces` (`ViewOrders`, `TraderX.CreateTradeTicket`, `TraderX.CreateOrderTicket`, `ViewChart`, `ViewQuote` on `fdc3.instrument` / `fdc3.account`) and 3 Spectral-clean CALM `flows`.
-- **Spec-Kit governance to CALM `controls`:** Converts `system-requirements.md` and `nonfunctional-delta.md` across States `001`–`014` into 22 progressive architecture- and node-level CALM `1.3` `controls` alongside 8 ADRs and 135 commit references.
-
-### 5. Multi-Hop CALM Blast Radius & Monorepo Scale
-
-Click any node in **Timelapse Stage** (or call `computeBlastRadius` from `dist/index.js`) to inspect impact propagation at the selected commit:
+Click any node on the canvas (or call `computeBlastRadius` from `dist/index.js`) to inspect impact propagation at the selected commit:
 
 - **CALM relationship traversal:** Switch between `All Impacted` (undirected coupling), `Dependents / Failure Cascade` (reverses `connects`/`interacts` to callers, propagates `deployed-in` host-to-workload and `composed-of`), and `Downstream Flow` (`source -> destination`).
 - **Flows, controls & temporal delta:** Highlights `⚡ ORIGIN`, `1-HOP`, and `2-HOP+` nodes; lists affected CALM `flows` and at-risk node/relationship `controls` (scoping colliding inline keys as `<ownerId>:<controlId>`); supports `Isolate` zoom (`Esc` clears); and shows `±Δ vs prev` blast-radius change across moments.
@@ -152,32 +140,32 @@ Click any node in **Timelapse Stage** (or call `computeBlastRadius` from `dist/i
 
 | View / Control | Behavior |
 |---|---|
-| **Timelapse Stage & Architecture Feed** | Toggle between single-viewport **Stage** playback and reverse-chronological **Feed** (`--feed` or `#feed`, `N -> 1` cards with `Save SVG` and `Inspect in Stage`) |
-| **Blast Radius, As-Of Date & Diff** | Click any node for multi-hop blast radius, query effective architecture by `YYYY-MM-DD`, or diff any two moments |
+| **Interactive Timelapse Stage** | Single-viewport SVG scrubber showing structural diffs (`Added`, `Modified`, `Removed`), active CALM `controls`, `flows`, and applicable ADRs at each moment |
+| **Blast Radius, As-Of Date & Diff** | Click any node for multi-hop blast radius, query effective architecture by `YYYY-MM-DD`, filter by repository (`Project`), or diff any two moments |
 | **Offline Single-File HTML** | Pan/zoom (`0.04x`–`3.5x`), `Space` play/pause, `←`/`→` step, `Esc` clear selection; zero CDN, font, or script requests |
 
 | CLI Flag | Description |
 |---|---|
 | `--from-git <files...>` | Extract and synchronize one or more Git-tracked CALM files (`Label=path` supported) |
-| `--from-traderx <repoDir>` | Convert upstream [`finos/traderx`](https://github.com/finos/traderx) states, Spec-Kit controls, ADRs, and FDC3 contracts into CALM `1.3` |
+| `--from-traderx <repoDir>` | Convert upstream [`finos/traderx`](https://github.com/finos/traderx) states, Spec-Kit controls, ADRs, and FDC3 contracts into validated CALM `1.3` |
 | `--resolve-details` | Auto-discover same-repo `details.detailed-architecture` child files |
 | `--max-commits <n>` / `--first-parent` | Optional commit cap (unlimited by default) and first-parent mainline walk |
 | `--timeline <files...>` | Render or synchronize existing `calm-timeline` (`1.2` / `1.3`) JSON files |
 | `--emit-digest <file>` / `--clusters <file>` | Export deterministic diff digest and apply validated `0..N-1` phase clusters |
-| `--timelapse [html]` / `--feed` | Render standalone HTML player (`--feed` opens Architecture Feed by default) |
-| `--validate` / `--validate-snapshots` | Verify `calm-timeline` structure, `snapshot-sha256` integrity, and emitted snapshots |
+| `--timelapse [html]` | Render standalone offline HTML/SVG player |
+| `--validate` / `--validate-snapshots` | Verify `calm-timeline` structure and emitted CALM snapshots |
 
 ### Demo Gallery (`docs/demos/`)
 
 | Demo | Source | Key Evidence |
 |---|---|---|
-| [`finos-traderx`](./docs/demos/finos-traderx/) | Upstream `finos/traderx` | 13 states (`001`–`014`), 22 Spec-Kit `controls`, 8 ADRs, FDC3 translated into CALM `interfaces` + 3 `flows` |
+| [`traderx`](./docs/demos/traderx/) | `npm run demo:traderx` | Synthetic 40-commit compliance stress test (9 moments, 5 noise filtered, 5 ADRs, 4 CALM `1.3` controls) |
 | [`multi-repo`](./docs/demos/multi-repo/) | `npm run demo:multi-repo` | 3 Git repos, `detailed-architecture` boundary merge + peer `postgres-trades-db` isolation |
 | [`finos-federated`](./docs/demos/finos-federated/) | `finos/architecture-as-code` + this repo | 19 commits to 8 moments (`--resolve-details` on `calm-hub-detail.architecture.json`) |
+| [`finos-traderx`](./docs/demos/finos-traderx/) | Upstream `finos/traderx` | 13 states (`001`–`014`), 22 Spec-Kit `controls`, 8 ADRs, translates FDC3 contracts into validated CALM |
 | [`api-gateway`](./docs/demos/api-gateway/) | `finos/architecture-as-code` | 23 pattern commits to 4 moments (`*.pattern.json`, `items` to `prefixItems` migration) |
 | [`calm-manual`](./docs/demos/calm-manual/) & [`calm-self`](./docs/demos/calm-self/) | `finos/architecture-as-code` | Hand-curated `calm.timeline.json` vs. Git-derived `calm-3.json` (8 commits to 3 moments) |
 | [`osff-signup`](./docs/demos/osff-signup/), [`fluxnova`](./docs/demos/fluxnova/), [`self-dogfood`](./docs/demos/self-dogfood/) | Real Git histories | Zero-AI clustering (13 to 5 moments), CALM `1.2` controls, and this repo's own `architecture.calm.json` |
-| [`traderx`](./docs/demos/traderx/) | `npm run demo:traderx` | Synthetic 40-commit compliance stress test (9 moments, 5 noise filtered, 5 ADRs) |
 
 ### Known Limitations
 
@@ -204,12 +192,12 @@ npm run demo:multi-repo   # regenerate 3-repo federated demo
 
 ## Roadmap
 
-1. **Signed-commit verification:** Extend `snapshot-sha256` provenance with offline Git GPG/SSH/Sigstore (`git verify-commit`) signer attestation.
-2. Contribute `--from-git` timeline extraction upstream to `@finos/calm-cli` (`calm timeline`).
-3. Contribute the diff-digest skill (`skills/calm-timelapse/SKILL.md`) to `@finos/calm-ai`.
-4. Embed the SVG scrubber and Blast Radius inspector as a `calm-plugins/vscode` webview.
-5. Add as-of date playback and moment diffing to `calm-hub` and `calm-hub-ui`.
-6. Resolve remote CALM Hub `detailed-architecture` URIs via an optional local cache directory.
+1. **Retrospective correlation:** Overlay production incidents, bugs, feature requests, and engineering effort per architectural change for sprint/release retrospectives.
+2. **Signed-commit verification:** Add offline Git GPG/SSH/Sigstore (`git verify-commit`) signer attestation per moment.
+3. Contribute `--from-git` timeline extraction upstream to `@finos/calm-cli` (`calm timeline`).
+4. Contribute the diff-digest skill (`skills/calm-timelapse/SKILL.md`) to `@finos/calm-ai`.
+5. Embed the SVG scrubber and Blast Radius inspector as a `calm-plugins/vscode` webview.
+6. Add as-of date playback and moment diffing to `calm-hub` and `calm-hub-ui`.
 
 ## Contributing
 

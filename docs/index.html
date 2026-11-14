@@ -162,10 +162,7 @@
       <span class="eyebrow">FINOS Fall Hackathon 2026 · Track 3: Features</span>
       <h1>CALM Timelapse Demo Gallery</h1>
       <p class="lead">
-        Zero-network Git history extraction across single or multiple repositories, structural JSON noise filtering,
-        schema-valid <code>calm-timeline</code> 1.2 / 1.3 generation with <code>SHA-256</code> snapshot digests,
-        interactive <strong>Timelapse Stage</strong> playback (click any node for multi-hop CALM <strong>Blast Radius</strong> impact),
-        and reverse-chronological <strong>Architecture Feed</strong> stories.
+        Extracts Git history across one or multiple repositories into validated <code>calm-timeline</code> artifacts and an offline interactive player with point-in-time ADRs and multi-hop Blast Radius analysis.
       </p>
       <div class="links" style="margin-top:16px;">
         <a class="btn" href="./assets/calm-timelapse-demo.mp4">▶ Watch 72s Walkthrough Video</a>
@@ -173,7 +170,33 @@
       </div>
     </header>
 
-    <h2>Multi-Repository &amp; Multi-Architecture Synchronization</h2>
+    <h2>Simulated Compliance Benchmark (Synthetic 40-Commit Seed)</h2>
+    <div class="grid">
+      <article class="card featured">
+        <div>
+          <div class="meta-row">
+            <span class="pill teal">Synthetic Seed · scripts/seed-traderx-demo.sh</span>
+            <span class="pill">40 Git Commits → 9 Moments (5 Noise Filtered)</span>
+            <span class="pill">5 Co-Changed ADRs · 4 CALM 1.3 Controls</span>
+          </div>
+          <h3>Simulated Institutional Equities Platform Benchmark</h3>
+          <p>
+            Reproducible synthetic stress-test benchmark (<code>npm run demo:traderx</code>) modeling an 8-sprint
+            modernization from a single-region HTTP/Oracle order monolith to a zero-trust mTLS, Kafka-backed trading
+            architecture with SEC 15c3-5 pre-trade risk gating, FIX 4.4 venue execution, SEC 17a-4 WORM archiving,
+            DORA warm-standby replication, and T+1 FINRA CAT reporting.
+          </p>
+        </div>
+        <div class="links">
+          <a class="btn" href="./demos/traderx/traderx.timelapse.html">Open Interactive Player →</a>
+          <a class="btn secondary" href="./demos/traderx/traderx.timeline.json">calm-timeline.json</a>
+          <a class="btn secondary" href="./demos/traderx/traderx.digest.json">Diff Digest</a>
+          <a class="btn secondary" href="./demos/traderx/traderx.clusters.json">clusters.json</a>
+        </div>
+      </article>
+    </div>
+
+    <h2>Sample current application runs</h2>
     <div class="grid">
       <article class="card featured">
         <div>
@@ -193,7 +216,6 @@
         </div>
         <div class="links">
           <a class="btn" href="./demos/multi-repo/multi-repo.timelapse.html">Open Multi-Repo Player →</a>
-          <a class="btn secondary" href="./demos/multi-repo/multi-repo.timelapse.html#feed">☰ Architecture Feed</a>
           <a class="btn secondary" href="./demos/multi-repo/multi-repo.timeline.json">calm-timeline.json</a>
           <a class="btn secondary" href="./demos/multi-repo/multi-repo.digest.json">Diff Digest</a>
           <a class="btn secondary" href="./demos/multi-repo/multi-repo.clusters.json">clusters.json</a>
@@ -216,7 +238,6 @@
         </div>
         <div class="links">
           <a class="btn" href="./demos/finos-federated/finos-federated.timelapse.html">Open Federated FINOS Player →</a>
-          <a class="btn secondary" href="./demos/finos-federated/finos-federated.timelapse.html#feed">☰ Architecture Feed</a>
           <a class="btn secondary" href="./demos/finos-federated/finos-federated.timeline.json">calm-timeline.json</a>
           <a class="btn secondary" href="./demos/finos-federated/finos-federated.digest.json">Diff Digest</a>
         </div>
@@ -241,41 +262,13 @@
             (<code>contracts/contract-delta.md</code> + <code>appd.v2.json</code> → node <code>interfaces</code> for
             <code>ViewOrders</code>, <code>TraderX.CreateTradeTicket</code>, <code>TraderX.CreateOrderTicket</code>,
             <code>ViewChart</code>, and <code>ViewQuote</code> on <code>fdc3.instrument</code> / <code>fdc3.account</code>,
-            plus <strong>3 schema-validated CALM flows</strong>) with SHA-256 snapshot digests.
+            plus <strong>3 schema-validated CALM flows</strong>).
           </p>
         </div>
         <div class="links">
           <a class="btn" href="./demos/finos-traderx/finos-traderx.timelapse.html">Open FINOS TraderX Player →</a>
-          <a class="btn secondary" href="./demos/finos-traderx/finos-traderx.timelapse.html#feed">☰ Architecture Feed</a>
           <a class="btn secondary" href="./demos/finos-traderx/finos-traderx.timeline.json">calm-timeline.json</a>
           <a class="btn secondary" href="./demos/finos-traderx/finos-traderx.digest.json">Diff Digest</a>
-        </div>
-      </article>
-    </div>
-
-    <h2>Simulated Compliance Benchmark (Synthetic 40-Commit Seed)</h2>
-    <div class="grid">
-      <article class="card featured">
-        <div>
-          <div class="meta-row">
-            <span class="pill teal">Synthetic Seed · scripts/seed-traderx-demo.sh</span>
-            <span class="pill">40 Git Commits → 9 Moments (5 Noise Filtered)</span>
-            <span class="pill">5 Co-Changed ADRs · 4 CALM 1.3 Controls</span>
-          </div>
-          <h3>Simulated Institutional Equities Platform Benchmark</h3>
-          <p>
-            Reproducible synthetic stress-test benchmark (<code>npm run demo:traderx</code>) modeling an 8-sprint
-            modernization from a single-region HTTP/Oracle order monolith to a zero-trust mTLS, Kafka-backed trading
-            architecture with SEC 15c3-5 pre-trade risk gating, FIX 4.4 venue execution, SEC 17a-4 WORM archiving,
-            DORA warm-standby replication, and T+1 FINRA CAT reporting.
-          </p>
-        </div>
-        <div class="links">
-          <a class="btn" href="./demos/traderx/traderx.timelapse.html">Open Interactive Player →</a>
-          <a class="btn secondary" href="./demos/traderx/traderx.timelapse.html#feed">☰ Architecture Feed</a>
-          <a class="btn secondary" href="./demos/traderx/traderx.timeline.json">calm-timeline.json</a>
-          <a class="btn secondary" href="./demos/traderx/traderx.digest.json">Diff Digest</a>
-          <a class="btn secondary" href="./demos/traderx/traderx.clusters.json">clusters.json</a>
         </div>
       </article>
     </div>
@@ -296,7 +289,6 @@
         </div>
         <div class="links">
           <a class="btn" href="./demos/calm-manual/calm.timelapse.html">Open Player →</a>
-          <a class="btn secondary" href="./demos/calm-manual/calm.timelapse.html#feed">☰ Architecture Feed</a>
           <a class="btn secondary" href="./demos/calm-manual/calm.timeline.json">calm.timeline.json</a>
         </div>
       </article>
@@ -315,7 +307,6 @@
         </div>
         <div class="links">
           <a class="btn" href="./demos/calm-self/calm-self.timelapse.html">Open Player →</a>
-          <a class="btn secondary" href="./demos/calm-self/calm-self.timelapse.html#feed">☰ Architecture Feed</a>
           <a class="btn secondary" href="./demos/calm-self/calm-self.timeline.json">calm-timeline.json</a>
           <a class="btn secondary" href="./demos/calm-self/calm-self.digest.json">Diff Digest</a>
         </div>
@@ -338,7 +329,6 @@
         </div>
         <div class="links">
           <a class="btn" href="./demos/self-dogfood/self-dogfood.timelapse.html">Open Player →</a>
-          <a class="btn secondary" href="./demos/self-dogfood/self-dogfood.timelapse.html#feed">☰ Architecture Feed</a>
           <a class="btn secondary" href="./demos/self-dogfood/self-dogfood.timeline.json">calm-timeline.json</a>
           <a class="btn secondary" href="./demos/self-dogfood/self-dogfood.digest.json">Diff Digest</a>
         </div>
@@ -359,7 +349,6 @@
         </div>
         <div class="links">
           <a class="btn" href="./demos/api-gateway/api-gateway.timelapse.html">Open Player →</a>
-          <a class="btn secondary" href="./demos/api-gateway/api-gateway.timelapse.html#feed">☰ Architecture Feed</a>
           <a class="btn secondary" href="./demos/api-gateway/api-gateway.timeline.json">calm-timeline.json</a>
           <a class="btn secondary" href="./demos/api-gateway/api-gateway.digest.json">Diff Digest</a>
         </div>
@@ -379,7 +368,6 @@
         </div>
         <div class="links">
           <a class="btn" href="./demos/osff-signup/osff-signup.timelapse.html">Open Player →</a>
-          <a class="btn secondary" href="./demos/osff-signup/osff-signup.timelapse.html#feed">☰ Architecture Feed</a>
           <a class="btn secondary" href="./demos/osff-signup/osff-signup.timeline.json">calm-timeline.json</a>
         </div>
       </article>
@@ -398,7 +386,6 @@
         </div>
         <div class="links">
           <a class="btn" href="./demos/fluxnova/fluxnova.timelapse.html">Open Player →</a>
-          <a class="btn secondary" href="./demos/fluxnova/fluxnova.timelapse.html#feed">☰ Architecture Feed</a>
           <a class="btn secondary" href="./demos/fluxnova/fluxnova.timeline.json">calm-timeline.json</a>
         </div>
       </article>

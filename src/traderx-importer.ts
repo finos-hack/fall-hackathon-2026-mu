@@ -109,7 +109,6 @@ export interface GenerateTraderXTimelineOptions {
   outputPath?: string;
   snapshotsDir?: string;
   timelapsePath?: string;
-  defaultView?: 'stage' | 'feed';
   emitDigestPath?: string;
   validate?: boolean;
   validateSnapshots?: boolean;
@@ -1562,7 +1561,6 @@ export function generateTimelineFromTraderXRepo(
     const payload = buildTimelapsePayloadFromClusters(clusters, {
       title: 'CALM Architecture Timelapse — FINOS TraderX (States 001–014 + FDC3)',
       sourceFile: 'finos/traderx',
-      defaultView: options.defaultView,
       engine,
       stats: {
         totalCommitsScanned: totalCommitRefsScanned + skippedTemplateStates,
