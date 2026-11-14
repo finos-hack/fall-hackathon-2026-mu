@@ -5,12 +5,12 @@
   "stats": {
     "totalCommitsScanned": 23,
     "validSnapshotsParsed": 23,
-    "noiseCommitsFiltered": 9,
-    "structuralCommitsRetained": 14
+    "noiseCommitsFiltered": 6,
+    "structuralCommitsRetained": 17
   },
   "instructions": [
-    "Group the 14 structural commits below (indices 0..13) into cohesive architectural moments (phases).",
-    "Every commit index from 0 to 13 MUST be covered contiguously with zero gaps or overlaps: first startIndex=0, each next startIndex = previous endIndex + 1, final endIndex=13.",
+    "Group the 17 structural commits below (indices 0..16) into cohesive architectural moments (phases).",
+    "Every commit index from 0 to 16 MUST be covered contiguously with zero gaps or overlaps: first startIndex=0, each next startIndex = previous endIndex + 1, final endIndex=16.",
     "Group multi-commit sprints, node-addition + relationship-wiring sequences, protocol hardening, and coupled control/ADR rollouts into unified phases while keeping pivotal milestones distinct.",
     "Write an executive `name` (3-7 words; no leading step numbers and no conventional-commit prefixes such as \"feat:\" or \"chore:\").",
     "Write a 2-3 sentence narrative `description` explaining WHAT changed architecturally, HOW connectivity or security boundaries shifted, and WHY, citing concrete node IDs, protocols, controls, or ADRs. Do not output mechanical count strings such as \"+1 node(s)\".",
@@ -31,12 +31,12 @@
         "startIndex": {
           "type": "integer",
           "minimum": 0,
-          "maximum": 13
+          "maximum": 16
         },
         "endIndex": {
           "type": "integer",
           "minimum": 0,
-          "maximum": 13
+          "maximum": 16
         },
         "uniqueId": {
           "type": "string",
@@ -61,18 +61,7 @@
       "date": "2024-02-21",
       "author": "Matthew Bain",
       "subject": "Major refactor - migrating CALM to a specific JSON vocabulary (#15)",
-      "summaryLine": "Initial baseline with 0 node(s), 0 relationship(s)",
-      "changes": [],
-      "coChangedAdrs": []
-    },
-    {
-      "index": 1,
-      "sha": "0cf6064183856a92b60f0cc1ec2824e431aee309",
-      "shortSha": "0cf60641",
-      "date": "2024-03-26",
-      "author": "Luigi Bulanti",
-      "subject": "#74 - Updating the api-gateway.json pattern to use prefixItems (#79)",
-      "summaryLine": "+4 node(s), +3 rel(s)",
+      "summaryLine": "Initial baseline with 4 node(s), 3 relationship(s)",
       "changes": [
         "Added node API Gateway (api-gateway)",
         "Added node Python Based API Consumer (api-consumer)",
@@ -85,7 +74,75 @@
       "coChangedAdrs": []
     },
     {
+      "index": 1,
+      "sha": "53346add25b53122dd9aef38e5aa34ebb0a43b77",
+      "shortSha": "53346add",
+      "date": "2024-02-21",
+      "author": "jpgough-ms",
+      "subject": "Fixes #26 (#27)",
+      "summaryLine": "~3 rel(s)",
+      "changes": [
+        "Modified relationship api-consumer-api-gateway",
+        "Modified relationship api-gateway-idp",
+        "Modified relationship api-gateway-api-producer"
+      ],
+      "coChangedAdrs": []
+    },
+    {
       "index": 2,
+      "sha": "547e86ff5400570c86351aa6a95fd3aacb350a06",
+      "shortSha": "547e86ff",
+      "date": "2024-03-08",
+      "author": "Budlee",
+      "subject": "Issue#29 New Specification for 2024-03 (#44)",
+      "summaryLine": "~3 rel(s)",
+      "changes": [
+        "Modified relationship api-consumer-api-gateway",
+        "Modified relationship api-gateway-idp",
+        "Modified relationship api-gateway-api-producer"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 3,
+      "sha": "cc4021bdff2e8935e8576c07fe63bc04b96b278d",
+      "shortSha": "cc4021bd",
+      "date": "2024-03-08",
+      "author": "Matthew Bain",
+      "subject": "Ensure consistent naming convention in CALM (#46)",
+      "summaryLine": "~4 node(s), ~3 rel(s)",
+      "changes": [
+        "Modified node API Gateway (api-gateway) [unique-id]",
+        "Modified node Python Based API Consumer (api-consumer) [unique-id]",
+        "Modified node Java Based API Producer (api-producer) [unique-id]",
+        "Modified node Identity Provider (idp) [unique-id]",
+        "Modified relationship api-consumer-api-gateway",
+        "Modified relationship api-gateway-idp",
+        "Modified relationship api-gateway-api-producer"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 4,
+      "sha": "0cf6064183856a92b60f0cc1ec2824e431aee309",
+      "shortSha": "0cf60641",
+      "date": "2024-03-26",
+      "author": "Luigi Bulanti",
+      "subject": "#74 - Updating the api-gateway.json pattern to use prefixItems (#79)",
+      "summaryLine": "~4 node(s), ~3 rel(s)",
+      "changes": [
+        "Modified node API Gateway (api-gateway) [pattern-schema]",
+        "Modified node Python Based API Consumer (api-consumer) [pattern-schema]",
+        "Modified node Java Based API Producer (api-producer) [pattern-schema]",
+        "Modified node Identity Provider (idp) [pattern-schema]",
+        "Modified relationship api-consumer-api-gateway",
+        "Modified relationship api-gateway-idp",
+        "Modified relationship api-gateway-api-producer"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 5,
       "sha": "ba39ab4760bf7b9dc3112a4612b69550b0dac582",
       "shortSha": "ba39ab47",
       "date": "2024-04-02",
@@ -93,15 +150,15 @@
       "subject": "Pattern flag and fixing api-gateway pattern sample (#91)",
       "summaryLine": "~4 node(s)",
       "changes": [
-        "Modified node API Gateway (api-gateway) [node-type]",
-        "Modified node Python Based API Consumer (api-consumer) [node-type]",
-        "Modified node Java Based API Producer (api-producer) [node-type]",
-        "Modified node Identity Provider (idp) [node-type]"
+        "Modified node API Gateway (api-gateway) [node-type, type]",
+        "Modified node Python Based API Consumer (api-consumer) [node-type, type]",
+        "Modified node Java Based API Producer (api-producer) [node-type, type]",
+        "Modified node Identity Provider (idp) [node-type, type]"
       ],
       "coChangedAdrs": []
     },
     {
-      "index": 3,
+      "index": 6,
       "sha": "a1c8e5803296b30f39fc31269b74316b6e12f019",
       "shortSha": "a1c8e580",
       "date": "2024-04-03",
@@ -109,15 +166,15 @@
       "subject": "Update API Gateway Pattern to Add Interface (#109)",
       "summaryLine": "~2 node(s), ~2 rel(s)",
       "changes": [
-        "Modified node API Gateway (api-gateway) [interfaces]",
-        "Modified node Java Based API Producer (api-producer) [interfaces]",
+        "Modified node API Gateway (api-gateway) [interfaces, pattern-schema]",
+        "Modified node Java Based API Producer (api-producer) [interfaces, pattern-schema]",
         "Modified relationship api-consumer-api-gateway",
         "Modified relationship api-gateway-api-producer"
       ],
       "coChangedAdrs": []
     },
     {
-      "index": 4,
+      "index": 7,
       "sha": "90121e0aef9373bb8fc0ff91261d11781870498d",
       "shortSha": "90121e0a",
       "date": "2024-04-03",
@@ -130,7 +187,7 @@
       "coChangedAdrs": []
     },
     {
-      "index": 5,
+      "index": 8,
       "sha": "08fee19541e24665cfd6a2b8766797c0a972145a",
       "shortSha": "08fee195",
       "date": "2024-04-19",
@@ -143,7 +200,7 @@
       "coChangedAdrs": []
     },
     {
-      "index": 6,
+      "index": 9,
       "sha": "a4de5e95eaa5e35a64ca0509261b1a72fae6833a",
       "shortSha": "a4de5e95",
       "date": "2024-04-24",
@@ -157,7 +214,7 @@
       "coChangedAdrs": []
     },
     {
-      "index": 7,
+      "index": 10,
       "sha": "97ae376f2cecb9d1562a915542d6734f44287c16",
       "shortSha": "97ae376f",
       "date": "2024-05-20",
@@ -171,7 +228,7 @@
       "coChangedAdrs": []
     },
     {
-      "index": 8,
+      "index": 11,
       "sha": "f7f7ee7ba503c21e573695100e3e95b0fa6b0472",
       "shortSha": "f7f7ee7b",
       "date": "2024-06-10",
@@ -189,7 +246,7 @@
       "coChangedAdrs": []
     },
     {
-      "index": 9,
+      "index": 12,
       "sha": "7e2a71785057a09bd693c1d191a777554f7e96b0",
       "shortSha": "7e2a7178",
       "date": "2024-12-20",
@@ -203,7 +260,7 @@
       "coChangedAdrs": []
     },
     {
-      "index": 10,
+      "index": 13,
       "sha": "fd445f234be7f0e481bf6924b3f59adf67a91ec0",
       "shortSha": "fd445f23",
       "date": "2025-03-30",
@@ -217,7 +274,7 @@
       "coChangedAdrs": []
     },
     {
-      "index": 11,
+      "index": 14,
       "sha": "619f45a18acb24579e5698979075d8ca52343232",
       "shortSha": "619f45a1",
       "date": "2025-06-05",
@@ -231,7 +288,7 @@
       "coChangedAdrs": []
     },
     {
-      "index": 12,
+      "index": 15,
       "sha": "6d4976fe5fdcf1459eacf36d1c884d01cb001cbd",
       "shortSha": "6d4976fe",
       "date": "2026-02-01",
@@ -244,7 +301,7 @@
       "coChangedAdrs": []
     },
     {
-      "index": 13,
+      "index": 16,
       "sha": "472e5e340465ad0c806a39d2f8e923ec025c253c",
       "shortSha": "472e5e34",
       "date": "2026-10-25",

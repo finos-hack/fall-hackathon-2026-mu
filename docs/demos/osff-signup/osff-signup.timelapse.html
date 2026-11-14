@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CALM Architecture Timelapse — osff-signup.timeline.json</title>
+  <title>CALM Architecture Timelapse — conference-secure-signup-amended.arch.json</title>
   <style>
     :root {
       --bg: #0b1020;
@@ -323,6 +323,7 @@
     }
     .node-group { transition: opacity 280ms ease, transform 280ms ease; cursor: pointer; }
     .edge-group { transition: opacity 280ms ease; }
+    #viewport-layer.smooth-cam { transition: transform 240ms ease-out; }
     .audit-banner {
       background: rgba(56, 189, 248, 0.12);
       border: 1px solid rgba(56, 189, 248, 0.4);
@@ -348,11 +349,23 @@
     }
     .gov-section { margin-top: 8px; }
     .gov-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
-    @media (max-width: 980px) {
+    @media (max-width: 1180px) {
+      main {
+        grid-template-columns: minmax(0, 1fr) 310px;
+      }
+    }
+    @media (max-width: 900px) {
       body {
         height: auto;
         min-height: 100vh;
         overflow: auto;
+      }
+      header {
+        padding: 7px 12px;
+        gap: 8px;
+      }
+      #badge-keys, #badge-engine {
+        display: none !important;
       }
       main {
         grid-template-columns: 1fr;
@@ -360,15 +373,25 @@
       }
       .stage {
         height: auto;
+        padding: 8px;
+        gap: 6px;
         overflow: visible;
       }
+      .stage-toolbar {
+        padding: 5px 8px;
+        gap: 6px;
+      }
+      .toolbar-sep {
+        display: none !important;
+      }
       .canvas-wrap {
-        height: 56vh;
+        height: clamp(340px, 62dvh, 540px);
         min-height: 320px;
         flex: none;
       }
       .controls {
         flex-wrap: wrap;
+        padding: 6px 10px;
       }
       .canvas-hint, .scrubber-label {
         display: none;
@@ -581,7 +604,7 @@
     }
     .feed-svg-wrap {
       width: 100%;
-      height: 300px;
+      height: clamp(220px, 42vw, 310px);
       position: relative;
       cursor: pointer;
     }
@@ -639,7 +662,7 @@
 <body>
   <header>
     <div class="header-left">
-      <h1>CALM Architecture Timelapse — osff-signup.timeline.json</h1>
+      <h1>CALM Architecture Timelapse — conference-secure-signup-amended.arch.json</h1>
       <div class="mode-switch" role="tablist" aria-label="View mode">
         <button id="btn-mode-stage" type="button" class="mode-btn active" role="tab" aria-selected="true">▶ Timelapse Stage</button>
         <button id="btn-mode-feed" type="button" class="mode-btn" role="tab" aria-selected="false">☰ Architecture Feed</button>
@@ -648,7 +671,7 @@
     <div class="meta-badges">
       <span class="badge" id="badge-moments">0 moments</span>
       <span class="badge" id="badge-sources" style="display:none;"></span>
-      <span class="badge badge-funnel" id="badge-funnel">13 commits -&gt; 5 noise filtered -&gt; 4 moments</span>
+      <span class="badge badge-funnel" id="badge-funnel">13 commits -&gt; 4 noise filtered -&gt; 5 moments</span>
       <span class="badge" id="badge-engine">engine: deterministic</span>
       <span class="badge" id="badge-keys">Keys: Space Play/Pause · ←/→ Step</span>
     </div>
@@ -696,7 +719,7 @@
           </div>
           <span class="canvas-hint">Click node to inspect · Wheel/Drag to zoom &amp; pan</span>
         </div>
-        <svg id="graph" viewBox="0 0 1490 540" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+        <svg id="graph" viewBox="0 0 1390 392" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <marker id="arrow-normal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
               <path d="M 0 1 L 10 5 L 0 9 z" fill="#64748b" />
@@ -797,7 +820,7 @@
     <div class="feed-stream" id="feed-stream"></div>
   </section>
 
-  <script id="timelapse-data" type="application/json">{"title":"CALM Architecture Timelapse — osff-signup.timeline.json","generatedAt":"2026-11-13T23:14:03.640Z","sourceFile":"osff-signup.timeline.json","engine":"deterministic","canvasWidth":1490,"canvasHeight":540,"positions":{"conference-website":{"id":"conference-website","name":"Conference Website","nodeType":"webclient","description":"Website to sign up for a conference","x":165,"y":270,"layer":0},"k8s-cluster":{"id":"k8s-cluster","name":"Kubernetes Cluster","nodeType":"system","description":"Kubernetes Cluster with network policy rules enabled","controlCount":1,"x":455,"y":132,"layer":1},"consumer":{"id":"consumer","name":"Consumer","nodeType":"system","description":"External Consumer of the secure application","x":455,"y":270,"layer":1},"service-mesh-k8s-cluster":{"id":"service-mesh-k8s-cluster","name":"Service Mesh Enabled Kubernetes Cluster","nodeType":"system","description":"Service Mesh Deployed on a Kubernetes Cluster with network policy rules enabled","controlCount":1,"x":455,"y":408,"layer":1},"load-balancer":{"id":"load-balancer","name":"Load Balancer","nodeType":"network","description":"The attendees service, or a placeholder for another application","x":745,"y":270,"layer":2},"attendees":{"id":"attendees","name":"Attendees Service","nodeType":"service","description":"The attendees service, or a placeholder for another application","x":1035,"y":201,"layer":3},"application":{"id":"application","name":"Application","nodeType":"service","description":"User deployed application that should follow the defined interfaces","x":1035,"y":339,"layer":3},"attendees-store":{"id":"attendees-store","name":"Attendees Store","nodeType":"database","description":"Persistent storage for attendees","x":1325,"y":201,"layer":4},"postgres-database":{"id":"postgres-database","name":"Postgres Database","nodeType":"database","description":"Postgres Database configured on the postgres service, using defaults for ports","x":1325,"y":339,"layer":4}},"frames":[{"id":"2024-08-29-initial-architecture-domains-example","name":"Initial Architecture: Domains example","description":"Establishes the initial architecture baseline with Consumer (consumer), Load Balancer (load-balancer), Application (application), Postgres Database (postgres-database), and 1 more, connected via consumer-load-balancer, load-balancer-application, application-postgres-database, and deployed-in-service-mesh-k8s-cluster (1 commit: cafb27c5). Applies controls service-mesh-k8s-cluster:security, consumer-load-balancer:security, load-balancer-application:security, and application-postgres-database:security.","validFrom":"2024-08-29","commitCount":1,"commits":["cafb27c5"],"commitMessages":["Domains example (#369)"],"adrs":[],"summary":"Initial baseline with 5 node(s), 4 relationship(s), 4 control(s)","changes":[{"kind":"add","category":"node","id":"consumer","text":"Added node Consumer (consumer)"},{"kind":"add","category":"node","id":"load-balancer","text":"Added node Load Balancer (load-balancer)"},{"kind":"add","category":"node","id":"application","text":"Added node Application (application)"},{"kind":"add","category":"node","id":"postgres-database","text":"Added node Postgres Database (postgres-database)"},{"kind":"add","category":"node","id":"service-mesh-k8s-cluster","text":"Added node Service Mesh Enabled Kubernetes Cluster (service-mesh-k8s-cluster)"},{"kind":"add","category":"relationship","id":"consumer-load-balancer","text":"Added relationship consumer-load-balancer"},{"kind":"add","category":"relationship","id":"load-balancer-application","text":"Added relationship load-balancer-application"},{"kind":"add","category":"relationship","id":"application-postgres-database","text":"Added relationship application-postgres-database"},{"kind":"add","category":"relationship","id":"deployed-in-service-mesh-k8s-cluster","text":"Added relationship deployed-in-service-mesh-k8s-cluster"},{"kind":"add","category":"control","id":"service-mesh-k8s-cluster:security","text":"Added control service-mesh-k8s-cluster:security"},{"kind":"add","category":"control","id":"consumer-load-balancer:security","text":"Added control consumer-load-balancer:security"},{"kind":"add","category":"control","id":"load-balancer-application:security","text":"Added control load-balancer-application:security"},{"kind":"add","category":"control","id":"application-postgres-database:security","text":"Added control application-postgres-database:security"},{"kind":"mod","category":"metadata","id":"metadata","text":"Updated metadata"}],"nodes":[{"id":"consumer","name":"Consumer","nodeType":"system","description":"External Consumer of the secure application"},{"id":"load-balancer","name":"Load Balancer","nodeType":"system","description":"Kubernetes provided load balancer provided at the edge of the cluster"},{"id":"application","name":"Application","nodeType":"service","description":"User deployed application that should follow the defined interfaces"},{"id":"postgres-database","name":"Postgres Database","nodeType":"database","description":"Postgres Database configured on the postgres service, using defaults for ports"},{"id":"service-mesh-k8s-cluster","name":"Service Mesh Enabled Kubernetes Cluster","nodeType":"system","description":"Service Mesh Deployed on a Kubernetes Cluster with network policy rules enabled","controlCount":1}],"edges":[{"id":"consumer-load-balancer","source":"consumer","target":"load-balancer","label":"connects","relType":"connects"},{"id":"load-balancer-application","source":"load-balancer","target":"application","label":"connects","relType":"connects"},{"id":"application-postgres-database","source":"application","target":"postgres-database","label":"connects","relType":"connects"},{"id":"deployed-in-service-mesh-k8s-cluster::0","source":"service-mesh-k8s-cluster","target":"load-balancer","label":"deployed-in","relType":"deployed-in"},{"id":"deployed-in-service-mesh-k8s-cluster::1","source":"service-mesh-k8s-cluster","target":"application","label":"deployed-in","relType":"deployed-in"},{"id":"deployed-in-service-mesh-k8s-cluster::2","source":"service-mesh-k8s-cluster","target":"postgres-database","label":"deployed-in","relType":"deployed-in"}],"controls":[{"id":"security","description":"The cluster conforms to micro-segmentation control requirements","requirementCount":1}],"addedNodeIds":["consumer","load-balancer","application","postgres-database","service-mesh-k8s-cluster"],"modifiedNodeIds":[],"removedNodeIds":[],"addedEdgeIds":["consumer-load-balancer","load-balancer-application","application-postgres-database","deployed-in-service-mesh-k8s-cluster::0","deployed-in-service-mesh-k8s-cluster::1","deployed-in-service-mesh-k8s-cluster::2"],"modifiedEdgeIds":[],"removedEdgeIds":[]},{"id":"2025-04-10-fixes-calm-generate-to-support-generi","name":"Fixes `calm generate` to support generic pattern instantiation","description":"This phase introduces Conference Website (conference-website), Attendees Service (attendees), Attendees Store (attendees-store), and Kubernetes Cluster (k8s-cluster), updates Load Balancer (load-balancer), and retires Consumer (consumer), Application (application), Postgres Database (postgres-database), and Service Mesh Enabled Kubernetes Cluster (service-mesh-k8s-cluster) (5 commits: 936d86ba..a13f51d7). Connectivity shifts through new links conference-website-load-balancer, load-balancer-attendees, attendees-attendees-store, and deployed-in-k8s-cluster and retired links consumer-load-balancer, load-balancer-application, application-postgres-database, and deployed-in-service-mesh-k8s-cluster. Applies controls k8s-cluster:security, conference-website-load-balancer:security, load-balancer-attendees:security, attendees-attendees-store:security, and 4 more.","validFrom":"2025-04-10","commitCount":5,"commits":["936d86ba","4beddb01","2cfea467","ac14029a","a13f51d7"],"commitMessages":["Fixes `calm generate` to support generic pattern instantiation (#1102)","Docify Enhancements for QCon (#1109)","Add Infrastructure As Code Generation Example for QCon (#1119)","Final demo (#1153)","made conference examples consistent to fix tests"],"adrs":[],"summary":"+4 node(s), ~1 node(s), -4 node(s), +4 rel(s), -4 rel(s), controls(+4/~0/-4)","changes":[{"kind":"add","category":"node","id":"conference-website","text":"Added node Conference Website (conference-website)"},{"kind":"add","category":"node","id":"attendees","text":"Added node Attendees Service (attendees)"},{"kind":"add","category":"node","id":"attendees-store","text":"Added node Attendees Store (attendees-store)"},{"kind":"add","category":"node","id":"k8s-cluster","text":"Added node Kubernetes Cluster (k8s-cluster)"},{"kind":"del","category":"node","id":"consumer","text":"Removed node Consumer (consumer)"},{"kind":"del","category":"node","id":"application","text":"Removed node Application (application)"},{"kind":"del","category":"node","id":"postgres-database","text":"Removed node Postgres Database (postgres-database)"},{"kind":"del","category":"node","id":"service-mesh-k8s-cluster","text":"Removed node Service Mesh Enabled Kubernetes Cluster (service-mesh-k8s-cluster)"},{"kind":"mod","category":"node","id":"load-balancer","text":"Modified node Load Balancer (load-balancer) [node-type, description, interfaces]"},{"kind":"add","category":"relationship","id":"conference-website-load-balancer","text":"Added relationship conference-website-load-balancer"},{"kind":"add","category":"relationship","id":"load-balancer-attendees","text":"Added relationship load-balancer-attendees"},{"kind":"add","category":"relationship","id":"attendees-attendees-store","text":"Added relationship attendees-attendees-store"},{"kind":"add","category":"relationship","id":"deployed-in-k8s-cluster","text":"Added relationship deployed-in-k8s-cluster"},{"kind":"del","category":"relationship","id":"consumer-load-balancer","text":"Removed relationship consumer-load-balancer"},{"kind":"del","category":"relationship","id":"load-balancer-application","text":"Removed relationship load-balancer-application"},{"kind":"del","category":"relationship","id":"application-postgres-database","text":"Removed relationship application-postgres-database"},{"kind":"del","category":"relationship","id":"deployed-in-service-mesh-k8s-cluster","text":"Removed relationship deployed-in-service-mesh-k8s-cluster"},{"kind":"add","category":"control","id":"k8s-cluster:security","text":"Added control k8s-cluster:security"},{"kind":"add","category":"control","id":"conference-website-load-balancer:security","text":"Added control conference-website-load-balancer:security"},{"kind":"add","category":"control","id":"load-balancer-attendees:security","text":"Added control load-balancer-attendees:security"},{"kind":"add","category":"control","id":"attendees-attendees-store:security","text":"Added control attendees-attendees-store:security"},{"kind":"del","category":"control","id":"service-mesh-k8s-cluster:security","text":"Removed control service-mesh-k8s-cluster:security"},{"kind":"del","category":"control","id":"consumer-load-balancer:security","text":"Removed control consumer-load-balancer:security"},{"kind":"del","category":"control","id":"load-balancer-application:security","text":"Removed control load-balancer-application:security"},{"kind":"del","category":"control","id":"application-postgres-database:security","text":"Removed control application-postgres-database:security"},{"kind":"mod","category":"metadata","id":"metadata","text":"Updated metadata"}],"nodes":[{"id":"conference-website","name":"Conference Website","nodeType":"webclient","description":"Website to sign up for a conference"},{"id":"load-balancer","name":"Load Balancer","nodeType":"network","description":"The attendees service, or a placeholder for another application"},{"id":"attendees","name":"Attendees Service","nodeType":"service","description":"The attendees service, or a placeholder for another application"},{"id":"attendees-store","name":"Attendees Store","nodeType":"database","description":"Persistent storage for attendees"},{"id":"k8s-cluster","name":"Kubernetes Cluster","nodeType":"system","description":"Kubernetes Cluster with network policy rules enabled","controlCount":1}],"edges":[{"id":"conference-website-load-balancer","source":"conference-website","target":"load-balancer","label":"HTTPS","relType":"connects"},{"id":"load-balancer-attendees","source":"load-balancer","target":"attendees","label":"mTLS","relType":"connects"},{"id":"attendees-attendees-store","source":"attendees","target":"attendees-store","label":"JDBC","relType":"connects"},{"id":"deployed-in-k8s-cluster::0","source":"k8s-cluster","target":"load-balancer","label":"Components deployed on the k8s c","relType":"deployed-in"},{"id":"deployed-in-k8s-cluster::1","source":"k8s-cluster","target":"attendees","label":"Components deployed on the k8s c","relType":"deployed-in"},{"id":"deployed-in-k8s-cluster::2","source":"k8s-cluster","target":"attendees-store","label":"Components deployed on the k8s c","relType":"deployed-in"}],"controls":[{"id":"security","description":"Security requirements for the Kubernetes cluster","requirementCount":1}],"addedNodeIds":["conference-website","attendees","attendees-store","k8s-cluster"],"modifiedNodeIds":["load-balancer"],"removedNodeIds":["consumer","application","postgres-database","service-mesh-k8s-cluster"],"addedEdgeIds":["conference-website-load-balancer","load-balancer-attendees","attendees-attendees-store","deployed-in-k8s-cluster::0","deployed-in-k8s-cluster::1","deployed-in-k8s-cluster::2"],"modifiedEdgeIds":[],"removedEdgeIds":["consumer-load-balancer","load-balancer-application","application-postgres-database","deployed-in-service-mesh-k8s-cluster::0","deployed-in-service-mesh-k8s-cluster::1","deployed-in-service-mesh-k8s-cluster::2"]},{"id":"2025-07-20-update-types-models-and-tooling-to-me","name":"Update types, models and tooling to meet RC2 definition","description":"This phase updates Kubernetes Cluster (k8s-cluster) (1 commit: 717350be). Connectivity shifts through updated links conference-website-load-balancer, load-balancer-attendees, and attendees-attendees-store. Applies controls k8s-cluster:security, conference-website-load-balancer:security, load-balancer-attendees:security, and attendees-attendees-store:security.","validFrom":"2025-07-20","commitCount":1,"commits":["717350be"],"commitMessages":["Update types, models and tooling to meet RC2 definition (#1284)"],"adrs":[],"summary":"~1 node(s), ~3 rel(s), controls(+0/~4/-0)","changes":[{"kind":"mod","category":"node","id":"k8s-cluster","text":"Modified node Kubernetes Cluster (k8s-cluster) [controls]"},{"kind":"mod","category":"relationship","id":"conference-website-load-balancer","text":"Modified relationship conference-website-load-balancer"},{"kind":"mod","category":"relationship","id":"load-balancer-attendees","text":"Modified relationship load-balancer-attendees"},{"kind":"mod","category":"relationship","id":"attendees-attendees-store","text":"Modified relationship attendees-attendees-store"},{"kind":"mod","category":"control","id":"k8s-cluster:security","text":"Updated control k8s-cluster:security"},{"kind":"mod","category":"control","id":"conference-website-load-balancer:security","text":"Updated control conference-website-load-balancer:security"},{"kind":"mod","category":"control","id":"load-balancer-attendees:security","text":"Updated control load-balancer-attendees:security"},{"kind":"mod","category":"control","id":"attendees-attendees-store:security","text":"Updated control attendees-attendees-store:security"}],"nodes":[{"id":"conference-website","name":"Conference Website","nodeType":"webclient","description":"Website to sign up for a conference"},{"id":"load-balancer","name":"Load Balancer","nodeType":"network","description":"The attendees service, or a placeholder for another application"},{"id":"attendees","name":"Attendees Service","nodeType":"service","description":"The attendees service, or a placeholder for another application"},{"id":"attendees-store","name":"Attendees Store","nodeType":"database","description":"Persistent storage for attendees"},{"id":"k8s-cluster","name":"Kubernetes Cluster","nodeType":"system","description":"Kubernetes Cluster with network policy rules enabled","controlCount":1}],"edges":[{"id":"conference-website-load-balancer","source":"conference-website","target":"load-balancer","label":"HTTPS","relType":"connects"},{"id":"load-balancer-attendees","source":"load-balancer","target":"attendees","label":"mTLS","relType":"connects"},{"id":"attendees-attendees-store","source":"attendees","target":"attendees-store","label":"JDBC","relType":"connects"},{"id":"deployed-in-k8s-cluster::0","source":"k8s-cluster","target":"load-balancer","label":"Components deployed on the k8s c","relType":"deployed-in"},{"id":"deployed-in-k8s-cluster::1","source":"k8s-cluster","target":"attendees","label":"Components deployed on the k8s c","relType":"deployed-in"},{"id":"deployed-in-k8s-cluster::2","source":"k8s-cluster","target":"attendees-store","label":"Components deployed on the k8s c","relType":"deployed-in"}],"controls":[{"id":"security","description":"Security requirements for the Kubernetes cluster","requirementCount":1}],"addedNodeIds":[],"modifiedNodeIds":["k8s-cluster"],"removedNodeIds":[],"addedEdgeIds":[],"modifiedEdgeIds":["conference-website-load-balancer","load-balancer-attendees","attendees-attendees-store"],"removedEdgeIds":[]},{"id":"2025-08-04-create-new-business-model-that-allows","name":"Create new business model that allows for native dererencing via Resolvable and ResolvableAndAdaptable. Creates new CanonicalModel which is leveraged by the DefaultTransformer by default","description":"This phase updates architecture governance and runtime definitions (1 commit: e449e63d). Covers flows Conference Signup Flow.","validFrom":"2025-08-04","commitCount":1,"commits":["e449e63d"],"commitMessages":["Create new business model that allows for native dererencing via Resolvable and ResolvableAndAdaptable. Creates new CanonicalModel which is leveraged by the DefaultTransformer by default (#1471)"],"adrs":[],"summary":"flows(+1/~0/-0)","changes":[{"kind":"add","category":"flow","id":"flow-conference-signup","text":"Added flow Conference Signup Flow"}],"nodes":[{"id":"conference-website","name":"Conference Website","nodeType":"webclient","description":"Website to sign up for a conference"},{"id":"load-balancer","name":"Load Balancer","nodeType":"network","description":"The attendees service, or a placeholder for another application"},{"id":"attendees","name":"Attendees Service","nodeType":"service","description":"The attendees service, or a placeholder for another application"},{"id":"attendees-store","name":"Attendees Store","nodeType":"database","description":"Persistent storage for attendees"},{"id":"k8s-cluster","name":"Kubernetes Cluster","nodeType":"system","description":"Kubernetes Cluster with network policy rules enabled","controlCount":1}],"edges":[{"id":"conference-website-load-balancer","source":"conference-website","target":"load-balancer","label":"HTTPS","relType":"connects"},{"id":"load-balancer-attendees","source":"load-balancer","target":"attendees","label":"mTLS","relType":"connects"},{"id":"attendees-attendees-store","source":"attendees","target":"attendees-store","label":"JDBC","relType":"connects"},{"id":"deployed-in-k8s-cluster::0","source":"k8s-cluster","target":"load-balancer","label":"Components deployed on the k8s c","relType":"deployed-in"},{"id":"deployed-in-k8s-cluster::1","source":"k8s-cluster","target":"attendees","label":"Components deployed on the k8s c","relType":"deployed-in"},{"id":"deployed-in-k8s-cluster::2","source":"k8s-cluster","target":"attendees-store","label":"Components deployed on the k8s c","relType":"deployed-in"}],"controls":[{"id":"security","description":"Security requirements for the Kubernetes cluster","requirementCount":1}],"addedNodeIds":[],"modifiedNodeIds":[],"removedNodeIds":[],"addedEdgeIds":[],"modifiedEdgeIds":[],"removedEdgeIds":[]}],"stats":{"totalCommitsScanned":13,"noiseCommitsFiltered":5,"structuralCommitsRetained":8,"momentsGenerated":4}}</script>
+  <script id="timelapse-data" type="application/json">{"title":"CALM Architecture Timelapse — conference-secure-signup-amended.arch.json","generatedAt":"2026-11-14T03:17:41.970Z","sourceFile":"conference-secure-signup-amended.arch.json","engine":"deterministic","canvasWidth":1390,"canvasHeight":392,"positions":{"conference-website":{"id":"conference-website","name":"Conference Website","nodeType":"webclient","description":"Website to sign up for a conference","x":115,"y":196,"layer":0},"k8s-cluster":{"id":"k8s-cluster","name":"Kubernetes Cluster","nodeType":"system","description":"Kubernetes Cluster with network policy rules enabled","controlCount":1,"x":405,"y":64,"layer":1},"consumer":{"id":"consumer","name":"Consumer","nodeType":"system","description":"External Consumer of the secure application","x":405,"y":196,"layer":1},"service-mesh-k8s-cluster":{"id":"service-mesh-k8s-cluster","name":"Service Mesh Enabled Kubernetes Cluster","nodeType":"system","description":"Service Mesh Deployed on a Kubernetes Cluster with network policy rules enabled","controlCount":1,"x":405,"y":328,"layer":1},"load-balancer":{"id":"load-balancer","name":"Load Balancer","nodeType":"network","description":"The attendees service, or a placeholder for another application","x":695,"y":196,"layer":2},"attendees":{"id":"attendees","name":"Attendees Service","nodeType":"service","description":"The attendees service, or a placeholder for another application","x":985,"y":130,"layer":3},"application":{"id":"application","name":"Application","nodeType":"service","description":"User deployed application that should follow the defined interfaces","x":985,"y":262,"layer":3},"attendees-store":{"id":"attendees-store","name":"Attendees Store","nodeType":"database","description":"Persistent storage for attendees","x":1275,"y":130,"layer":4},"postgres-database":{"id":"postgres-database","name":"Postgres Database","nodeType":"database","description":"Postgres Database configured on the postgres service, using defaults for ports","x":1275,"y":262,"layer":4}},"frames":[{"id":"2024-08-29-initial-architecture-domains-example","name":"Initial Architecture: Domains example","description":"Establishes the initial architecture baseline with Consumer (consumer), Load Balancer (load-balancer), Application (application), Postgres Database (postgres-database), and 1 more, connected via consumer-load-balancer, load-balancer-application, application-postgres-database, and deployed-in-service-mesh-k8s-cluster (1 commit: cafb27c5). Applies controls service-mesh-k8s-cluster:security, consumer-load-balancer:security, load-balancer-application:security, and application-postgres-database:security.","validFrom":"2024-08-29","commitCount":1,"commits":["cafb27c5"],"commitMessages":["Domains example (#369)"],"adrs":[],"summary":"Initial baseline with 5 node(s), 4 relationship(s), 4 control(s)","changes":[{"kind":"add","category":"node","id":"consumer","text":"Added node Consumer (consumer)"},{"kind":"add","category":"node","id":"load-balancer","text":"Added node Load Balancer (load-balancer)"},{"kind":"add","category":"node","id":"application","text":"Added node Application (application)"},{"kind":"add","category":"node","id":"postgres-database","text":"Added node Postgres Database (postgres-database)"},{"kind":"add","category":"node","id":"service-mesh-k8s-cluster","text":"Added node Service Mesh Enabled Kubernetes Cluster (service-mesh-k8s-cluster)"},{"kind":"add","category":"relationship","id":"consumer-load-balancer","text":"Added relationship consumer-load-balancer"},{"kind":"add","category":"relationship","id":"load-balancer-application","text":"Added relationship load-balancer-application"},{"kind":"add","category":"relationship","id":"application-postgres-database","text":"Added relationship application-postgres-database"},{"kind":"add","category":"relationship","id":"deployed-in-service-mesh-k8s-cluster","text":"Added relationship deployed-in-service-mesh-k8s-cluster"},{"kind":"add","category":"control","id":"service-mesh-k8s-cluster:security","text":"Added control service-mesh-k8s-cluster:security"},{"kind":"add","category":"control","id":"consumer-load-balancer:security","text":"Added control consumer-load-balancer:security"},{"kind":"add","category":"control","id":"load-balancer-application:security","text":"Added control load-balancer-application:security"},{"kind":"add","category":"control","id":"application-postgres-database:security","text":"Added control application-postgres-database:security"}],"nodes":[{"id":"consumer","name":"Consumer","nodeType":"system","description":"External Consumer of the secure application"},{"id":"load-balancer","name":"Load Balancer","nodeType":"system","description":"Kubernetes provided load balancer provided at the edge of the cluster"},{"id":"application","name":"Application","nodeType":"service","description":"User deployed application that should follow the defined interfaces"},{"id":"postgres-database","name":"Postgres Database","nodeType":"database","description":"Postgres Database configured on the postgres service, using defaults for ports"},{"id":"service-mesh-k8s-cluster","name":"Service Mesh Enabled Kubernetes Cluster","nodeType":"system","description":"Service Mesh Deployed on a Kubernetes Cluster with network policy rules enabled","controlCount":1}],"edges":[{"id":"consumer-load-balancer","source":"consumer","target":"load-balancer","label":"connects","relType":"connects"},{"id":"load-balancer-application","source":"load-balancer","target":"application","label":"connects","relType":"connects"},{"id":"application-postgres-database","source":"application","target":"postgres-database","label":"connects","relType":"connects"},{"id":"deployed-in-service-mesh-k8s-cluster::0","source":"service-mesh-k8s-cluster","target":"load-balancer","label":"deployed-in","relType":"deployed-in"},{"id":"deployed-in-service-mesh-k8s-cluster::1","source":"service-mesh-k8s-cluster","target":"application","label":"deployed-in","relType":"deployed-in"},{"id":"deployed-in-service-mesh-k8s-cluster::2","source":"service-mesh-k8s-cluster","target":"postgres-database","label":"deployed-in","relType":"deployed-in"}],"controls":[{"id":"security","description":"The cluster conforms to micro-segmentation control requirements","requirementCount":1}],"addedNodeIds":["consumer","load-balancer","application","postgres-database","service-mesh-k8s-cluster"],"modifiedNodeIds":[],"removedNodeIds":[],"addedEdgeIds":["consumer-load-balancer","load-balancer-application","application-postgres-database","deployed-in-service-mesh-k8s-cluster::0","deployed-in-service-mesh-k8s-cluster::1","deployed-in-service-mesh-k8s-cluster::2"],"modifiedEdgeIds":[],"removedEdgeIds":[]},{"id":"2025-04-10-fixes-calm-generate-to-support-generi","name":"Fixes `calm generate` to support generic pattern instantiation","description":"This phase introduces Conference Website (conference-website), Attendees Service (attendees), Attendees Store (attendees-store), and Kubernetes Cluster (k8s-cluster), updates Load Balancer (load-balancer), and retires Consumer (consumer), Application (application), Postgres Database (postgres-database), and Service Mesh Enabled Kubernetes Cluster (service-mesh-k8s-cluster) (5 commits: 936d86ba..a13f51d7). Connectivity shifts through new links conference-website-load-balancer, load-balancer-attendees, attendees-attendees-store, and deployed-in-k8s-cluster and retired links consumer-load-balancer, load-balancer-application, application-postgres-database, and deployed-in-service-mesh-k8s-cluster. Applies controls k8s-cluster:security, conference-website-load-balancer:security, load-balancer-attendees:security, attendees-attendees-store:security, and 4 more.","validFrom":"2025-04-10","commitCount":5,"commits":["936d86ba","4beddb01","2cfea467","ac14029a","a13f51d7"],"commitMessages":["Fixes `calm generate` to support generic pattern instantiation (#1102)","Docify Enhancements for QCon (#1109)","Add Infrastructure As Code Generation Example for QCon (#1119)","Final demo (#1153)","made conference examples consistent to fix tests"],"adrs":[],"summary":"~1 node(s)","changes":[{"kind":"add","category":"node","id":"conference-website","text":"Added node Conference Website (conference-website)"},{"kind":"add","category":"node","id":"attendees","text":"Added node Attendees Service (attendees)"},{"kind":"add","category":"node","id":"attendees-store","text":"Added node Attendees Store (attendees-store)"},{"kind":"add","category":"node","id":"k8s-cluster","text":"Added node Kubernetes Cluster (k8s-cluster)"},{"kind":"del","category":"node","id":"consumer","text":"Removed node Consumer (consumer)"},{"kind":"del","category":"node","id":"application","text":"Removed node Application (application)"},{"kind":"del","category":"node","id":"postgres-database","text":"Removed node Postgres Database (postgres-database)"},{"kind":"del","category":"node","id":"service-mesh-k8s-cluster","text":"Removed node Service Mesh Enabled Kubernetes Cluster (service-mesh-k8s-cluster)"},{"kind":"mod","category":"node","id":"load-balancer","text":"Modified node Load Balancer (load-balancer) [node-type, description, interfaces]"},{"kind":"add","category":"relationship","id":"conference-website-load-balancer","text":"Added relationship conference-website-load-balancer"},{"kind":"add","category":"relationship","id":"load-balancer-attendees","text":"Added relationship load-balancer-attendees"},{"kind":"add","category":"relationship","id":"attendees-attendees-store","text":"Added relationship attendees-attendees-store"},{"kind":"add","category":"relationship","id":"deployed-in-k8s-cluster","text":"Added relationship deployed-in-k8s-cluster"},{"kind":"del","category":"relationship","id":"consumer-load-balancer","text":"Removed relationship consumer-load-balancer"},{"kind":"del","category":"relationship","id":"load-balancer-application","text":"Removed relationship load-balancer-application"},{"kind":"del","category":"relationship","id":"application-postgres-database","text":"Removed relationship application-postgres-database"},{"kind":"del","category":"relationship","id":"deployed-in-service-mesh-k8s-cluster","text":"Removed relationship deployed-in-service-mesh-k8s-cluster"},{"kind":"add","category":"control","id":"k8s-cluster:security","text":"Added control k8s-cluster:security"},{"kind":"add","category":"control","id":"conference-website-load-balancer:security","text":"Added control conference-website-load-balancer:security"},{"kind":"add","category":"control","id":"load-balancer-attendees:security","text":"Added control load-balancer-attendees:security"},{"kind":"add","category":"control","id":"attendees-attendees-store:security","text":"Added control attendees-attendees-store:security"},{"kind":"del","category":"control","id":"service-mesh-k8s-cluster:security","text":"Removed control service-mesh-k8s-cluster:security"},{"kind":"del","category":"control","id":"consumer-load-balancer:security","text":"Removed control consumer-load-balancer:security"},{"kind":"del","category":"control","id":"load-balancer-application:security","text":"Removed control load-balancer-application:security"},{"kind":"del","category":"control","id":"application-postgres-database:security","text":"Removed control application-postgres-database:security"}],"nodes":[{"id":"conference-website","name":"Conference Website","nodeType":"webclient","description":"Website to sign up for a conference"},{"id":"load-balancer","name":"Load Balancer","nodeType":"network","description":"The attendees service, or a placeholder for another application"},{"id":"attendees","name":"Attendees Service","nodeType":"service","description":"The attendees service, or a placeholder for another application"},{"id":"attendees-store","name":"Attendees Store","nodeType":"database","description":"Persistent storage for attendees"},{"id":"k8s-cluster","name":"Kubernetes Cluster","nodeType":"system","description":"Kubernetes Cluster with network policy rules enabled","controlCount":1}],"edges":[{"id":"conference-website-load-balancer","source":"conference-website","target":"load-balancer","label":"HTTPS","relType":"connects"},{"id":"load-balancer-attendees","source":"load-balancer","target":"attendees","label":"mTLS","relType":"connects"},{"id":"attendees-attendees-store","source":"attendees","target":"attendees-store","label":"JDBC","relType":"connects"},{"id":"deployed-in-k8s-cluster::0","source":"k8s-cluster","target":"load-balancer","label":"Components deployed on the k8s c","relType":"deployed-in"},{"id":"deployed-in-k8s-cluster::1","source":"k8s-cluster","target":"attendees","label":"Components deployed on the k8s c","relType":"deployed-in"},{"id":"deployed-in-k8s-cluster::2","source":"k8s-cluster","target":"attendees-store","label":"Components deployed on the k8s c","relType":"deployed-in"}],"controls":[{"id":"security","description":"Security requirements for the Kubernetes cluster","requirementCount":1}],"addedNodeIds":["conference-website","attendees","attendees-store","k8s-cluster"],"modifiedNodeIds":["load-balancer"],"removedNodeIds":["consumer","application","postgres-database","service-mesh-k8s-cluster"],"addedEdgeIds":["conference-website-load-balancer","load-balancer-attendees","attendees-attendees-store","deployed-in-k8s-cluster::0","deployed-in-k8s-cluster::1","deployed-in-k8s-cluster::2"],"modifiedEdgeIds":[],"removedEdgeIds":["consumer-load-balancer","load-balancer-application","application-postgres-database","deployed-in-service-mesh-k8s-cluster::0","deployed-in-service-mesh-k8s-cluster::1","deployed-in-service-mesh-k8s-cluster::2"]},{"id":"2025-07-20-update-types-models-and-tooling-to-me","name":"Update types, models and tooling to meet RC2 definition","description":"This phase updates Kubernetes Cluster (k8s-cluster) (1 commit: 717350be). Connectivity shifts through updated links conference-website-load-balancer, load-balancer-attendees, and attendees-attendees-store. Applies controls k8s-cluster:security, conference-website-load-balancer:security, load-balancer-attendees:security, and attendees-attendees-store:security.","validFrom":"2025-07-20","commitCount":1,"commits":["717350be"],"commitMessages":["Update types, models and tooling to meet RC2 definition (#1284)"],"adrs":[],"summary":"~1 node(s), ~3 rel(s), controls(+0/~4/-0)","changes":[{"kind":"mod","category":"node","id":"k8s-cluster","text":"Modified node Kubernetes Cluster (k8s-cluster) [controls]"},{"kind":"mod","category":"relationship","id":"conference-website-load-balancer","text":"Modified relationship conference-website-load-balancer"},{"kind":"mod","category":"relationship","id":"load-balancer-attendees","text":"Modified relationship load-balancer-attendees"},{"kind":"mod","category":"relationship","id":"attendees-attendees-store","text":"Modified relationship attendees-attendees-store"},{"kind":"mod","category":"control","id":"k8s-cluster:security","text":"Updated control k8s-cluster:security"},{"kind":"mod","category":"control","id":"conference-website-load-balancer:security","text":"Updated control conference-website-load-balancer:security"},{"kind":"mod","category":"control","id":"load-balancer-attendees:security","text":"Updated control load-balancer-attendees:security"},{"kind":"mod","category":"control","id":"attendees-attendees-store:security","text":"Updated control attendees-attendees-store:security"}],"nodes":[{"id":"conference-website","name":"Conference Website","nodeType":"webclient","description":"Website to sign up for a conference"},{"id":"load-balancer","name":"Load Balancer","nodeType":"network","description":"The attendees service, or a placeholder for another application"},{"id":"attendees","name":"Attendees Service","nodeType":"service","description":"The attendees service, or a placeholder for another application"},{"id":"attendees-store","name":"Attendees Store","nodeType":"database","description":"Persistent storage for attendees"},{"id":"k8s-cluster","name":"Kubernetes Cluster","nodeType":"system","description":"Kubernetes Cluster with network policy rules enabled","controlCount":1}],"edges":[{"id":"conference-website-load-balancer","source":"conference-website","target":"load-balancer","label":"HTTPS","relType":"connects"},{"id":"load-balancer-attendees","source":"load-balancer","target":"attendees","label":"mTLS","relType":"connects"},{"id":"attendees-attendees-store","source":"attendees","target":"attendees-store","label":"JDBC","relType":"connects"},{"id":"deployed-in-k8s-cluster::0","source":"k8s-cluster","target":"load-balancer","label":"Components deployed on the k8s c","relType":"deployed-in"},{"id":"deployed-in-k8s-cluster::1","source":"k8s-cluster","target":"attendees","label":"Components deployed on the k8s c","relType":"deployed-in"},{"id":"deployed-in-k8s-cluster::2","source":"k8s-cluster","target":"attendees-store","label":"Components deployed on the k8s c","relType":"deployed-in"}],"controls":[{"id":"security","description":"Security requirements for the Kubernetes cluster","requirementCount":1}],"addedNodeIds":[],"modifiedNodeIds":["k8s-cluster"],"removedNodeIds":[],"addedEdgeIds":[],"modifiedEdgeIds":["conference-website-load-balancer","load-balancer-attendees","attendees-attendees-store"],"removedEdgeIds":[]},{"id":"2025-07-25-add-support-for-flows-inside-pattern","name":"Add support for flows inside pattern using const to a url reference + confirm generated arch document renders flow in docify","description":"This phase updates architecture governance and runtime definitions (1 commit: fc3a4f66). Covers flows https://calm.finos.org/workshop/flows/conference-signup.flow.json.","validFrom":"2025-07-25","commitCount":1,"commits":["fc3a4f66"],"commitMessages":["Add support for flows inside pattern using const to a url reference + confirm generated arch document renders flow in docify (#1374)"],"adrs":[],"summary":"flows(+1/~0/-0)","changes":[{"kind":"add","category":"flow","id":"ref:https://calm.finos.org/workshop/flows/conference-signup.flow.json","text":"Added flow https://calm.finos.org/workshop/flows/conference-signup.flow.json"}],"nodes":[{"id":"conference-website","name":"Conference Website","nodeType":"webclient","description":"Website to sign up for a conference"},{"id":"load-balancer","name":"Load Balancer","nodeType":"network","description":"The attendees service, or a placeholder for another application"},{"id":"attendees","name":"Attendees Service","nodeType":"service","description":"The attendees service, or a placeholder for another application"},{"id":"attendees-store","name":"Attendees Store","nodeType":"database","description":"Persistent storage for attendees"},{"id":"k8s-cluster","name":"Kubernetes Cluster","nodeType":"system","description":"Kubernetes Cluster with network policy rules enabled","controlCount":1}],"edges":[{"id":"conference-website-load-balancer","source":"conference-website","target":"load-balancer","label":"HTTPS","relType":"connects"},{"id":"load-balancer-attendees","source":"load-balancer","target":"attendees","label":"mTLS","relType":"connects"},{"id":"attendees-attendees-store","source":"attendees","target":"attendees-store","label":"JDBC","relType":"connects"},{"id":"deployed-in-k8s-cluster::0","source":"k8s-cluster","target":"load-balancer","label":"Components deployed on the k8s c","relType":"deployed-in"},{"id":"deployed-in-k8s-cluster::1","source":"k8s-cluster","target":"attendees","label":"Components deployed on the k8s c","relType":"deployed-in"},{"id":"deployed-in-k8s-cluster::2","source":"k8s-cluster","target":"attendees-store","label":"Components deployed on the k8s c","relType":"deployed-in"}],"controls":[{"id":"security","description":"Security requirements for the Kubernetes cluster","requirementCount":1}],"addedNodeIds":[],"modifiedNodeIds":[],"removedNodeIds":[],"addedEdgeIds":[],"modifiedEdgeIds":[],"removedEdgeIds":[]},{"id":"2025-08-04-create-new-business-model-that-allows","name":"Create new business model that allows for native dererencing via Resolvable and ResolvableAndAdaptable. Creates new CanonicalModel which is leveraged by the DefaultTransformer by default","description":"This phase updates architecture governance and runtime definitions (1 commit: e449e63d). Covers flows Conference Signup Flow and https://calm.finos.org/workshop/flows/conference-signup.flow.json.","validFrom":"2025-08-04","commitCount":1,"commits":["e449e63d"],"commitMessages":["Create new business model that allows for native dererencing via Resolvable and ResolvableAndAdaptable. Creates new CanonicalModel which is leveraged by the DefaultTransformer by default (#1471)"],"adrs":[],"summary":"flows(+1/~0/-1)","changes":[{"kind":"add","category":"flow","id":"flow-conference-signup","text":"Added flow Conference Signup Flow"},{"kind":"del","category":"flow","id":"ref:https://calm.finos.org/workshop/flows/conference-signup.flow.json","text":"Removed flow https://calm.finos.org/workshop/flows/conference-signup.flow.json"}],"nodes":[{"id":"conference-website","name":"Conference Website","nodeType":"webclient","description":"Website to sign up for a conference"},{"id":"load-balancer","name":"Load Balancer","nodeType":"network","description":"The attendees service, or a placeholder for another application"},{"id":"attendees","name":"Attendees Service","nodeType":"service","description":"The attendees service, or a placeholder for another application"},{"id":"attendees-store","name":"Attendees Store","nodeType":"database","description":"Persistent storage for attendees"},{"id":"k8s-cluster","name":"Kubernetes Cluster","nodeType":"system","description":"Kubernetes Cluster with network policy rules enabled","controlCount":1}],"edges":[{"id":"conference-website-load-balancer","source":"conference-website","target":"load-balancer","label":"HTTPS","relType":"connects"},{"id":"load-balancer-attendees","source":"load-balancer","target":"attendees","label":"mTLS","relType":"connects"},{"id":"attendees-attendees-store","source":"attendees","target":"attendees-store","label":"JDBC","relType":"connects"},{"id":"deployed-in-k8s-cluster::0","source":"k8s-cluster","target":"load-balancer","label":"Components deployed on the k8s c","relType":"deployed-in"},{"id":"deployed-in-k8s-cluster::1","source":"k8s-cluster","target":"attendees","label":"Components deployed on the k8s c","relType":"deployed-in"},{"id":"deployed-in-k8s-cluster::2","source":"k8s-cluster","target":"attendees-store","label":"Components deployed on the k8s c","relType":"deployed-in"}],"controls":[{"id":"security","description":"Security requirements for the Kubernetes cluster","requirementCount":1}],"addedNodeIds":[],"modifiedNodeIds":[],"removedNodeIds":[],"addedEdgeIds":[],"modifiedEdgeIds":[],"removedEdgeIds":[]}],"stats":{"totalCommitsScanned":13,"noiseCommitsFiltered":4,"structuralCommitsRetained":9,"momentsGenerated":5}}</script>
   <script>
     (function () {
       const payload = JSON.parse(document.getElementById('timelapse-data').textContent);
@@ -916,9 +939,13 @@
       let timer = null;
       let focusedNodeId = '';
       let selectedProjectId = '';
+      let viewW = canvasWidth;
+      let viewH = canvasHeight;
       let zoomScale = 1;
       let panX = 0;
       let panY = 0;
+      let autoFit = true;
+      let hasInitialFit = false;
       let isPanning = false;
       let dragStartX = 0;
       let dragStartY = 0;
@@ -935,29 +962,106 @@
         return nodeOrPos.sourceId === selectedProjectId;
       }
 
-      function applyTransform() {
+      function syncSvgViewBox() {
+        if (!canvasWrap || typeof canvasWrap.getBoundingClientRect !== 'function') return;
+        const rect = canvasWrap.getBoundingClientRect();
+        if (rect && rect.width >= 120 && rect.height >= 120) {
+          viewW = Math.round(rect.width);
+          viewH = Math.round(rect.height);
+          svgGraph.setAttribute('viewBox', '0 0 ' + viewW + ' ' + viewH);
+        }
+      }
+
+      function applyTransform(animate) {
+        if (viewportLayer && viewportLayer.classList) {
+          viewportLayer.classList.toggle('smooth-cam', Boolean(animate));
+        }
         viewportLayer.setAttribute(
           'transform',
           'translate(' + panX.toFixed(2) + ',' + panY.toFixed(2) + ') scale(' + zoomScale.toFixed(4) + ')',
         );
       }
 
+      function computeActiveFrameBounds() {
+        const frame = frames[currentIndex];
+        const isolateMode = Boolean(focusIsolate && focusIsolate.checked);
+        const ids = [];
+        if (frame) {
+          const neighborhood = new Set();
+          if (focusedNodeId) {
+            neighborhood.add(focusedNodeId);
+            for (const edge of frame.edges || []) {
+              if (edge.source === focusedNodeId) neighborhood.add(edge.target);
+              if (edge.target === focusedNodeId) neighborhood.add(edge.source);
+            }
+          }
+          const candidateIds = new Set([
+            ...(frame.nodes || []).map((n) => n.id),
+            ...(frame.removedNodeIds || []),
+          ]);
+          for (const id of candidateIds) {
+            const p = positions[id];
+            if (!p) continue;
+            if (focusedNodeId && isolateMode && !neighborhood.has(id)) continue;
+            if (selectedProjectId && !nodeMatchesProject(p)) continue;
+            ids.push(id);
+          }
+        }
+        const useIds = ids.length > 0 ? ids : Object.keys(positions);
+        let minX = Infinity;
+        let minY = Infinity;
+        let maxX = -Infinity;
+        let maxY = -Infinity;
+        for (const id of useIds) {
+          const p = positions[id];
+          if (!p) continue;
+          if (p.x - 94 < minX) minX = p.x - 94;
+          if (p.y - 46 < minY) minY = p.y - 46;
+          if (p.x + 94 > maxX) maxX = p.x + 94;
+          if (p.y + 40 > maxY) maxY = p.y + 40;
+        }
+        if (!Number.isFinite(minX)) {
+          return { minX: 0, minY: 0, maxX: canvasWidth, maxY: canvasHeight };
+        }
+        return { minX, minY, maxX, maxY };
+      }
+
+      function fitCurrentFrame(animate) {
+        syncSvgViewBox();
+        const bounds = computeActiveFrameBounds();
+        const padX = Math.min(28, Math.round(viewW * 0.045));
+        const padTop = Math.min(48, Math.max(36, Math.round(viewH * 0.09)));
+        const padBottom = Math.min(44, Math.max(24, Math.round(viewH * 0.07)));
+        const availW = Math.max(100, viewW - padX * 2);
+        const availH = Math.max(100, viewH - padTop - padBottom);
+        const bw = Math.max(200, bounds.maxX - bounds.minX);
+        const bh = Math.max(96, bounds.maxY - bounds.minY);
+        const scale = Math.max(0.12, Math.min(availW / bw, availH / bh, 1.32));
+        const cx = (bounds.minX + bounds.maxX) / 2;
+        const cy = (bounds.minY + bounds.maxY) / 2;
+        zoomScale = scale;
+        panX = viewW / 2 - cx * scale;
+        panY = padTop + availH / 2 - cy * scale;
+        applyTransform(animate && hasInitialFit);
+        hasInitialFit = true;
+      }
+
       function setZoom(nextScale, anchorX, anchorY) {
-        const clamped = Math.max(0.4, Math.min(2.8, nextScale));
-        const ax = anchorX !== undefined ? anchorX : canvasWidth / 2;
-        const ay = anchorY !== undefined ? anchorY : canvasHeight / 2;
+        autoFit = false;
+        syncSvgViewBox();
+        const clamped = Math.max(0.10, Math.min(3.2, nextScale));
+        const ax = anchorX !== undefined ? anchorX : viewW / 2;
+        const ay = anchorY !== undefined ? anchorY : viewH / 2;
         const ratio = clamped / zoomScale;
         panX = ax - (ax - panX) * ratio;
         panY = ay - (ay - panY) * ratio;
         zoomScale = clamped;
-        applyTransform();
+        applyTransform(false);
       }
 
       function resetZoom() {
-        zoomScale = 1;
-        panX = 0;
-        panY = 0;
-        applyTransform();
+        autoFit = true;
+        fitCurrentFrame(true);
       }
 
       Object.values(positions)
@@ -1302,6 +1406,10 @@
           },
         });
 
+        if (autoFit) {
+          fitCurrentFrame(true);
+        }
+
         changeList.innerHTML = '';
         if (liveDiff && compareBase) {
           const bannerLi = document.createElement('li');
@@ -1413,8 +1521,8 @@
           }
         }
         const rect = svgGraph.getBoundingClientRect();
-        const scaleX = canvasWidth / (rect.width || 1);
-        const scaleY = canvasHeight / (rect.height || 1);
+        const scaleX = viewW / (rect.width || 1);
+        const scaleY = viewH / (rect.height || 1);
         return {
           x: (clientX - rect.left) * scaleX,
           y: (clientY - rect.top) * scaleY,
@@ -1436,6 +1544,7 @@
           return;
         }
         isPanning = true;
+        autoFit = false;
         dragStartX = e.clientX;
         dragStartY = e.clientY;
         panStartX = panX;
@@ -1450,7 +1559,7 @@
         const dy = e.clientY - dragStartY;
         panX = panStartX + dx * pt.scaleX;
         panY = panStartY + dy * pt.scaleY;
-        applyTransform();
+        applyTransform(false);
       });
 
       window.addEventListener('mouseup', () => {
@@ -1460,10 +1569,12 @@
       });
 
       btnZoomIn.addEventListener('click', () => {
-        setZoom(zoomScale * 1.2, canvasWidth / 2, canvasHeight / 2);
+        syncSvgViewBox();
+        setZoom(zoomScale * 1.2, viewW / 2, viewH / 2);
       });
       btnZoomOut.addEventListener('click', () => {
-        setZoom(zoomScale / 1.2, canvasWidth / 2, canvasHeight / 2);
+        syncSvgViewBox();
+        setZoom(zoomScale / 1.2, viewW / 2, viewH / 2);
       });
       btnZoomFit.addEventListener('click', () => {
         resetZoom();
@@ -1854,12 +1965,12 @@
         if (!Number.isFinite(minX)) {
           minX = 0; minY = 0; maxX = canvasWidth; maxY = canvasHeight;
         }
-        const padX = 135;
-        const padY = 72;
+        const padX = 108;
+        const padY = 52;
         const rawW = (maxX - minX) + padX * 2;
         const rawH = (maxY - minY) + padY * 2;
-        const vbW = Math.max(580, rawW);
-        const vbH = Math.max(240, rawH);
+        const vbW = Math.max(380, rawW);
+        const vbH = Math.max(175, rawH);
         const cx = (minX + maxX) / 2;
         const cy = (minY + maxY) / 2;
         const vbX = Math.round(cx - vbW / 2);
@@ -2232,6 +2343,8 @@
 
         if (isFeed) {
           renderFeed();
+        } else if (autoFit) {
+          fitCurrentFrame(false);
         }
         if (updateHash && window.history && window.history.replaceState) {
           const base = window.location.pathname + window.location.search;
@@ -2290,6 +2403,21 @@
           renderFrame(currentIndex + 1);
         }
       });
+
+      const handleViewportResize = () => {
+        if (currentViewMode !== 'stage') return;
+        syncSvgViewBox();
+        if (autoFit) {
+          fitCurrentFrame(false);
+        } else {
+          applyTransform(false);
+        }
+      };
+      window.addEventListener('resize', handleViewportResize);
+      if (typeof ResizeObserver === 'function' && canvasWrap) {
+        const ro = new ResizeObserver(() => handleViewportResize());
+        ro.observe(canvasWrap);
+      }
 
       renderFrame(0);
       const urlWantsFeed =

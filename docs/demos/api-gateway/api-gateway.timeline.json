@@ -2,39 +2,44 @@
   "$schema": "https://calm.finos.org/release/1.3/meta/calm-timeline.json",
   "moments": [
     {
-      "unique-id": "initial-gateway-topology",
+      "unique-id": "legacy-items-to-prefixitems-migration",
       "node-type": "moment",
-      "name": "Initial Gateway Pattern Topology",
-      "description": "Introduces the foundational four-node API Gateway pattern linking api-consumer through api-gateway to api-producer and idp, then standardizes node-type classifications across all services.",
-      "valid-from": "2024-04-02",
+      "name": "Legacy items Tuple, unique-id Rename & prefixItems Migration",
+      "description": "Introduces the initial four-node API Gateway pattern using legacy JSON Schema items tuples, refines relationship-type const endpoints, renames uniqueId to canonical unique-id (#46), and migrates tuple definitions to JSON Schema 2020-12 prefixItems (#79).",
+      "valid-from": "2024-03-26",
       "details": {
-        "detailed-architecture": "snapshots/01-ba39ab47-initial-gateway-topology.architecture.json"
+        "required-pattern": "snapshots/01-0cf60641-legacy-items-to-prefixitems-migration.pattern.json"
       },
       "metadata": {
         "commits": [
           "3ace47c9",
-          "0cf60641",
-          "ba39ab47"
+          "53346add",
+          "547e86ff",
+          "cc4021bd",
+          "0cf60641"
         ],
         "commit-messages": [
           "Major refactor - migrating CALM to a specific JSON vocabulary (#15)",
-          "#74 - Updating the api-gateway.json pattern to use prefixItems (#79)",
-          "Pattern flag and fixing api-gateway pattern sample (#91)"
+          "Fixes #26 (#27)",
+          "Issue#29 New Specification for 2024-03 (#44)",
+          "Ensure consistent naming convention in CALM (#46)",
+          "#74 - Updating the api-gateway.json pattern to use prefixItems (#79)"
         ],
-        "commit-count": 3
+        "commit-count": 5
       }
     },
     {
       "unique-id": "typed-interfaces-and-finos-namespace",
       "node-type": "moment",
-      "name": "Typed Interfaces and FINOS Namespace",
-      "description": "Enriches api-gateway and api-producer with explicit interface definitions, aligns relationship wiring with Spectral validation rules, and migrates schema URIs from finos-labs to canonical finos namespaces.",
+      "name": "Typed Interfaces, Spectral Wiring & FINOS Namespace",
+      "description": "Standardizes node-type classifications, adds explicit interface definitions on api-gateway and api-producer, aligns relationship wiring with Spectral rules, and migrates schema URIs from finos-labs to canonical finos namespaces.",
       "valid-from": "2024-05-20",
       "details": {
-        "detailed-architecture": "snapshots/02-97ae376f-typed-interfaces-and-finos-namespace.architecture.json"
+        "required-pattern": "snapshots/02-97ae376f-typed-interfaces-and-finos-namespace.pattern.json"
       },
       "metadata": {
         "commits": [
+          "ba39ab47",
           "a1c8e580",
           "90121e0a",
           "08fee195",
@@ -42,13 +47,14 @@
           "97ae376f"
         ],
         "commit-messages": [
+          "Pattern flag and fixing api-gateway pattern sample (#91)",
           "Update API Gateway Pattern to Add Interface (#109)",
           "Lint and insert missing properties block",
           "#100 visualizer works with patterns",
           "Update spectral rules to use new interface format",
           "replace finos-labs with finos (#195)"
         ],
-        "commit-count": 5
+        "commit-count": 6
       }
     },
     {
@@ -58,7 +64,7 @@
       "description": "Adds the api-consumer-idp relationship so consumers authenticate directly against the Identity Provider before presenting tokens to api-gateway, while generalizing language-agnostic node names.",
       "valid-from": "2024-06-10",
       "details": {
-        "detailed-architecture": "snapshots/03-f7f7ee7b-direct-consumer-identity-handshake.architecture.json"
+        "required-pattern": "snapshots/03-f7f7ee7b-direct-consumer-identity-handshake.pattern.json"
       },
       "metadata": {
         "commits": [
@@ -74,10 +80,10 @@
       "unique-id": "calm-release-schema-standardization",
       "node-type": "moment",
       "name": "CALM Release Schema Standardization",
-      "description": "Progressively upgrades interface schemas on api-gateway and api-producer from 2024-10 drafts through RC-1 candidates to stable CALM release specifications as legacy draft bundles are retired.",
+      "description": "Progressively upgrades pattern and interface schemas on api-gateway and api-producer from 2024-10 drafts through RC-1 candidates to stable CALM release specifications.",
       "valid-from": "2026-10-25",
       "details": {
-        "detailed-architecture": "snapshots/04-472e5e34-calm-release-schema-standardization.architecture.json"
+        "required-pattern": "snapshots/04-472e5e34-calm-release-schema-standardization.pattern.json"
       },
       "metadata": {
         "commits": [
@@ -104,8 +110,8 @@
     "generator": "calm-timelapse",
     "clustering-engine": "clusters-file",
     "total-commits-scanned": "23",
-    "noise-commits-filtered": "9",
-    "structural-commits-retained": "14"
+    "noise-commits-filtered": "6",
+    "structural-commits-retained": "17"
   },
   "current-moment": "calm-release-schema-standardization"
 }

@@ -2153,7 +2153,7 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
         const availH = Math.max(100, viewH - padTop - padBottom);
         const bw = Math.max(200, bounds.maxX - bounds.minX);
         const bh = Math.max(96, bounds.maxY - bounds.minY);
-        const scale = Math.max(0.28, Math.min(availW / bw, availH / bh, 1.32));
+        const scale = Math.max(0.12, Math.min(availW / bw, availH / bh, 1.32));
         const cx = (bounds.minX + bounds.maxX) / 2;
         const cy = (bounds.minY + bounds.maxY) / 2;
         zoomScale = scale;
@@ -2166,7 +2166,7 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
       function setZoom(nextScale, anchorX, anchorY) {
         autoFit = false;
         syncSvgViewBox();
-        const clamped = Math.max(0.25, Math.min(3.2, nextScale));
+        const clamped = Math.max(0.10, Math.min(3.2, nextScale));
         const ax = anchorX !== undefined ? anchorX : viewW / 2;
         const ay = anchorY !== undefined ? anchorY : viewH / 2;
         const ratio = clamped / zoomScale;

@@ -1,0 +1,331 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm.json",
+  "unique-id": "traderx-004-containerized-compose-runtime",
+  "name": "FINOS TraderX — Containerized Compose Runtime (NGINX Ingress)",
+  "description": "State 004 preserves state 002 routing semantics while moving runtime to Docker Compose and NGINX ingress.",
+  "nodes": [
+    {
+      "unique-id": "trader",
+      "node-type": "actor",
+      "name": "Trader Browser",
+      "description": "User traffic enters through ingress."
+    },
+    {
+      "unique-id": "ingress",
+      "node-type": "service",
+      "name": "NGINX Ingress",
+      "description": "Compose ingress for UI/API/WebSocket routes.",
+      "metadata": {
+        "traderx-kind": "gateway"
+      }
+    },
+    {
+      "unique-id": "web",
+      "node-type": "webclient",
+      "name": "Web Front End Angular",
+      "description": "Containerized Angular service.",
+      "metadata": {
+        "traderx-kind": "frontend"
+      }
+    },
+    {
+      "unique-id": "account",
+      "node-type": "service",
+      "name": "Account Service",
+      "description": "Containerized Spring service."
+    },
+    {
+      "unique-id": "position",
+      "node-type": "service",
+      "name": "Position Service",
+      "description": "Containerized Spring service."
+    },
+    {
+      "unique-id": "tradeService",
+      "node-type": "service",
+      "name": "Trade Service",
+      "description": "Containerized Spring service."
+    },
+    {
+      "unique-id": "referenceData",
+      "node-type": "service",
+      "name": "Reference Data",
+      "description": "Containerized Node service."
+    },
+    {
+      "unique-id": "people",
+      "node-type": "service",
+      "name": "People Service",
+      "description": "Containerized .NET service."
+    },
+    {
+      "unique-id": "tradeFeed",
+      "node-type": "service",
+      "name": "Trade Feed",
+      "description": "Containerized Socket.IO bus.",
+      "metadata": {
+        "traderx-kind": "messaging"
+      }
+    },
+    {
+      "unique-id": "tradeProcessor",
+      "node-type": "service",
+      "name": "Trade Processor",
+      "description": "Containerized Spring service."
+    },
+    {
+      "unique-id": "database",
+      "node-type": "database",
+      "name": "Database",
+      "description": "Containerized H2 persistence service."
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "rel-trader-ingress",
+      "description": "Single browser entrypoint",
+      "relationship-type": {
+        "interacts": {
+          "actor": "trader",
+          "nodes": [
+            "ingress"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "rel-ingress-web",
+      "description": "/",
+      "protocol": "HTTP",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "ingress"
+          },
+          "destination": {
+            "node": "web"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-ingress-account",
+      "description": "/account-service",
+      "protocol": "HTTP",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "ingress"
+          },
+          "destination": {
+            "node": "account"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-ingress-position",
+      "description": "/position-service",
+      "protocol": "HTTP",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "ingress"
+          },
+          "destination": {
+            "node": "position"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-ingress-tradeService",
+      "description": "/trade-service",
+      "protocol": "HTTP",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "ingress"
+          },
+          "destination": {
+            "node": "tradeService"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-ingress-referenceData",
+      "description": "/reference-data",
+      "protocol": "HTTP",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "ingress"
+          },
+          "destination": {
+            "node": "referenceData"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-ingress-people",
+      "description": "/people-service",
+      "protocol": "HTTP",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "ingress"
+          },
+          "destination": {
+            "node": "people"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-ingress-tradeFeed",
+      "description": "/trade-feed and /socket.io",
+      "protocol": "SocketIO",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "ingress"
+          },
+          "destination": {
+            "node": "tradeFeed"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-tradeService-account",
+      "description": "Validate account",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "tradeService"
+          },
+          "destination": {
+            "node": "account"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-tradeService-referenceData",
+      "description": "Validate ticker",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "tradeService"
+          },
+          "destination": {
+            "node": "referenceData"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-tradeService-tradeFeed",
+      "description": "Publish trades/new",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "tradeService"
+          },
+          "destination": {
+            "node": "tradeFeed"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-tradeProcessor-tradeFeed",
+      "description": "Consume and publish updates",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "tradeProcessor"
+          },
+          "destination": {
+            "node": "tradeFeed"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-tradeProcessor-database",
+      "description": "Persist trade/position state",
+      "protocol": "JDBC",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "tradeProcessor"
+          },
+          "destination": {
+            "node": "database"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-account-database",
+      "description": "Account persistence",
+      "protocol": "JDBC",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "account"
+          },
+          "destination": {
+            "node": "database"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-position-database",
+      "description": "Query trades/positions",
+      "protocol": "JDBC",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "position"
+          },
+          "destination": {
+            "node": "database"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-account-people",
+      "description": "Validate person for account-user mapping",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "account"
+          },
+          "destination": {
+            "node": "people"
+          }
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "source-project": "finos/traderx",
+    "state-id": "004-containerized-compose-runtime",
+    "track": "baseline",
+    "status": "implemented",
+    "inherits-from": "002-edge-proxy-uncontainerized",
+    "notes": [
+      "State 004 preserves approved baseline functional behavior while changing runtime/ops model.",
+      "Inter-service network resolution uses Docker Compose service DNS names."
+    ]
+  },
+  "adrs": [
+    "docs/adr/004-prefer-lightweight-default-infra-and-swappable-components.md"
+  ]
+}

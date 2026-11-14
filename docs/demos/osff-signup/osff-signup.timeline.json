@@ -67,13 +67,32 @@
       }
     },
     {
+      "unique-id": "2025-07-25-add-support-for-flows-inside-pattern",
+      "node-type": "moment",
+      "name": "Add support for flows inside pattern using const to a url reference + confirm generated arch document renders flow in docify",
+      "description": "This phase updates architecture governance and runtime definitions (1 commit: fc3a4f66). Covers flows https://calm.finos.org/workshop/flows/conference-signup.flow.json.",
+      "valid-from": "2025-07-25",
+      "details": {
+        "detailed-architecture": "snapshots/04-fc3a4f66-2025-07-25-add-support-for-flows-inside-pattern.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "fc3a4f66"
+        ],
+        "commit-messages": [
+          "Add support for flows inside pattern using const to a url reference + confirm generated arch document renders flow in docify (#1374)"
+        ],
+        "commit-count": 1
+      }
+    },
+    {
       "unique-id": "2025-08-04-create-new-business-model-that-allows",
       "node-type": "moment",
       "name": "Create new business model that allows for native dererencing via Resolvable and ResolvableAndAdaptable. Creates new CanonicalModel which is leveraged by the DefaultTransformer by default",
-      "description": "This phase updates architecture governance and runtime definitions (1 commit: e449e63d). Covers flows Conference Signup Flow.",
+      "description": "This phase updates architecture governance and runtime definitions (1 commit: e449e63d). Covers flows Conference Signup Flow and https://calm.finos.org/workshop/flows/conference-signup.flow.json.",
       "valid-from": "2025-08-04",
       "details": {
-        "detailed-architecture": "snapshots/04-e449e63d-2025-08-04-create-new-business-model-that-allows.architecture.json"
+        "detailed-architecture": "snapshots/05-e449e63d-2025-08-04-create-new-business-model-that-allows.architecture.json"
       },
       "metadata": {
         "commits": [
@@ -92,8 +111,8 @@
     "generator": "calm-timelapse",
     "clustering-engine": "deterministic",
     "total-commits-scanned": "13",
-    "noise-commits-filtered": "5",
-    "structural-commits-retained": "8"
+    "noise-commits-filtered": "4",
+    "structural-commits-retained": "9"
   },
   "current-moment": "2025-08-04-create-new-business-model-that-allows"
 }

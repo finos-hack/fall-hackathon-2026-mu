@@ -1,0 +1,302 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm.json",
+  "unique-id": "traderx-008-pricing-awareness-market-data",
+  "name": "FINOS TraderX — Pricing Awareness and Market Data Streaming",
+  "description": "State 008 builds on NATS-based runtime from 006 and adds synthetic market pricing, trade execution price stamping, position cost basis aggregation, and frontend valuation.",
+  "nodes": [
+    {
+      "unique-id": "trader",
+      "node-type": "actor",
+      "name": "Trader Browser",
+      "description": "Uses Angular UI and receives realtime trade, position, and pricing updates."
+    },
+    {
+      "unique-id": "ingress",
+      "node-type": "service",
+      "name": "NGINX Ingress",
+      "description": "Routes REST and websocket traffic.",
+      "metadata": {
+        "traderx-kind": "gateway"
+      }
+    },
+    {
+      "unique-id": "web",
+      "node-type": "webclient",
+      "name": "Web Front End Angular",
+      "description": "Subscribes to account and pricing streams via nats.ws.",
+      "metadata": {
+        "traderx-kind": "frontend"
+      }
+    },
+    {
+      "unique-id": "nats",
+      "node-type": "service",
+      "name": "NATS Broker",
+      "description": "Pub/sub broker for backend and browser streaming.",
+      "metadata": {
+        "traderx-kind": "messaging"
+      }
+    },
+    {
+      "unique-id": "pricePublisher",
+      "node-type": "service",
+      "name": "Price Publisher",
+      "description": "Publishes `pricing.<TICKER>` and exposes REST quote endpoint."
+    },
+    {
+      "unique-id": "tradeService",
+      "node-type": "service",
+      "name": "Trade Service",
+      "description": "Validates account/ticker and stamps execution price before publishing orders."
+    },
+    {
+      "unique-id": "tradeProcessor",
+      "node-type": "service",
+      "name": "Trade Processor",
+      "description": "Processes trades, persists price/cost basis, emits account updates."
+    },
+    {
+      "unique-id": "account",
+      "node-type": "service",
+      "name": "Account Service",
+      "description": "Account and account-user operations."
+    },
+    {
+      "unique-id": "position",
+      "node-type": "service",
+      "name": "Position Service",
+      "description": "Trades/positions query endpoints."
+    },
+    {
+      "unique-id": "referenceData",
+      "node-type": "service",
+      "name": "Reference Data",
+      "description": "Ticker lookup/list."
+    },
+    {
+      "unique-id": "people",
+      "node-type": "service",
+      "name": "People Service",
+      "description": "Identity lookup and validation."
+    },
+    {
+      "unique-id": "database",
+      "node-type": "database",
+      "name": "Database",
+      "description": "Persistent account/trade/position state."
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "rel-trader-ingress",
+      "description": "Single browser entrypoint",
+      "relationship-type": {
+        "interacts": {
+          "actor": "trader",
+          "nodes": [
+            "ingress"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "rel-ingress-web",
+      "description": "/",
+      "protocol": "HTTP",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "ingress"
+          },
+          "destination": {
+            "node": "web"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-ingress-pricePublisher",
+      "description": "/price-publisher",
+      "protocol": "HTTP",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "ingress"
+          },
+          "destination": {
+            "node": "pricePublisher"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-ingress-nats",
+      "description": "/nats-ws (WS upgrade)",
+      "protocol": "WebSocket",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "ingress"
+          },
+          "destination": {
+            "node": "nats"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-tradeService-referenceData",
+      "description": "Validate ticker",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "tradeService"
+          },
+          "destination": {
+            "node": "referenceData"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-tradeService-account",
+      "description": "Validate account",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "tradeService"
+          },
+          "destination": {
+            "node": "account"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-tradeService-pricePublisher",
+      "description": "Fetch execution price",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "tradeService"
+          },
+          "destination": {
+            "node": "pricePublisher"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-tradeService-nats",
+      "description": "Publish /trades",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "tradeService"
+          },
+          "destination": {
+            "node": "nats"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-tradeProcessor-nats",
+      "description": "Consume /trades, publish account updates",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "tradeProcessor"
+          },
+          "destination": {
+            "node": "nats"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-pricePublisher-nats",
+      "description": "Publish pricing.<TICKER>",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "pricePublisher"
+          },
+          "destination": {
+            "node": "nats"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-web-nats",
+      "description": "Subscribe account + pricing topics",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "web"
+          },
+          "destination": {
+            "node": "nats"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-tradeProcessor-database",
+      "description": "Persist trades + positions",
+      "protocol": "JDBC",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "tradeProcessor"
+          },
+          "destination": {
+            "node": "database"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-position-database",
+      "description": "Query trades + positions",
+      "protocol": "JDBC",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "position"
+          },
+          "destination": {
+            "node": "database"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-account-people",
+      "description": "Validate person",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "account"
+          },
+          "destination": {
+            "node": "people"
+          }
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "source-project": "finos/traderx",
+    "state-id": "008-pricing-awareness-market-data",
+    "track": "functional",
+    "status": "implemented",
+    "inherits-from": "007-observability-lgtm-compose",
+    "notes": [
+      "Markets are treated as always open in this simulation.",
+      "yfinance bootstrap is optional startup-only and falls back to snapshot data.",
+      "Advanced pricing/risk engines are intentionally out of scope for this state."
+    ]
+  }
+}

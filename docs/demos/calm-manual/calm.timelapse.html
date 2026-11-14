@@ -323,6 +323,7 @@
     }
     .node-group { transition: opacity 280ms ease, transform 280ms ease; cursor: pointer; }
     .edge-group { transition: opacity 280ms ease; }
+    #viewport-layer.smooth-cam { transition: transform 240ms ease-out; }
     .audit-banner {
       background: rgba(56, 189, 248, 0.12);
       border: 1px solid rgba(56, 189, 248, 0.4);
@@ -348,11 +349,23 @@
     }
     .gov-section { margin-top: 8px; }
     .gov-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
-    @media (max-width: 980px) {
+    @media (max-width: 1180px) {
+      main {
+        grid-template-columns: minmax(0, 1fr) 310px;
+      }
+    }
+    @media (max-width: 900px) {
       body {
         height: auto;
         min-height: 100vh;
         overflow: auto;
+      }
+      header {
+        padding: 7px 12px;
+        gap: 8px;
+      }
+      #badge-keys, #badge-engine {
+        display: none !important;
       }
       main {
         grid-template-columns: 1fr;
@@ -360,15 +373,25 @@
       }
       .stage {
         height: auto;
+        padding: 8px;
+        gap: 6px;
         overflow: visible;
       }
+      .stage-toolbar {
+        padding: 5px 8px;
+        gap: 6px;
+      }
+      .toolbar-sep {
+        display: none !important;
+      }
       .canvas-wrap {
-        height: 56vh;
+        height: clamp(340px, 62dvh, 540px);
         min-height: 320px;
         flex: none;
       }
       .controls {
         flex-wrap: wrap;
+        padding: 6px 10px;
       }
       .canvas-hint, .scrubber-label {
         display: none;
@@ -581,7 +604,7 @@
     }
     .feed-svg-wrap {
       width: 100%;
-      height: 300px;
+      height: clamp(220px, 42vw, 310px);
       position: relative;
       cursor: pointer;
     }
@@ -696,7 +719,7 @@
           </div>
           <span class="canvas-hint">Click node to inspect · Wheel/Drag to zoom &amp; pan</span>
         </div>
-        <svg id="graph" viewBox="0 0 1780 540" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+        <svg id="graph" viewBox="0 0 1680 392" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <marker id="arrow-normal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
               <path d="M 0 1 L 10 5 L 0 9 z" fill="#64748b" />
@@ -797,7 +820,7 @@
     <div class="feed-stream" id="feed-stream"></div>
   </section>
 
-  <script id="timelapse-data" type="application/json">{"title":"CALM Architecture Timelapse — calm.timeline.json","generatedAt":"2026-11-13T23:14:03.411Z","sourceFile":"calm.timeline.json","engine":"manual-timeline","canvasWidth":1780,"canvasHeight":540,"positions":{"calm-user":{"id":"calm-user","name":"CALM User","nodeType":"actor","description":"User working with CALM architectures through various tools and interfaces","x":165,"y":270,"layer":0},"calm-cli":{"id":"calm-cli","name":"CALM CLI","nodeType":"service","description":"Command-line interface for CALM operations including validation, generation, visualization, and documentation","x":455,"y":132,"layer":1},"calm-server":{"id":"calm-server","name":"CALM Server","nodeType":"service","description":"Standalone HTTP server exposing CALM architecture validation as a REST API, independent of the CALM Hub","x":455,"y":270,"layer":1},"calm-studio":{"id":"calm-studio","name":"CalmStudio","nodeType":"system","description":"Browser-based visual CALM architecture editor (SvelteKit) for creating and editing architectures with built-in CALM 1.2 validation","x":455,"y":408,"layer":1},"calm-hub-system":{"id":"calm-hub-system","name":"CALM Hub System","nodeType":"system","description":"Complete CALM Hub system including API backend, web UI, and database","x":745,"y":201,"layer":2},"vscode":{"id":"vscode","name":"Visual Studio Code","nodeType":"system","description":"Microsoft Visual Studio Code IDE","x":745,"y":339,"layer":2},"calm-hub-ui":{"id":"calm-hub-ui","name":"CALM Hub UI","nodeType":"system","description":"React-based web interface for browsing and managing CALM architectures, patterns, and standards","x":1035,"y":201,"layer":3},"calm-vscode":{"id":"calm-vscode","name":"VSCode Extension","nodeType":"service","description":"Visual Studio Code extension providing IDE integration for CALM architectures with syntax highlighting, validation, and visualization","x":1035,"y":339,"layer":3},"calm-hub":{"id":"calm-hub","name":"CALM Hub API","nodeType":"service","description":"Central registry and API service for CALM architectures, patterns, and standards built with Quarkus","x":1325,"y":270,"layer":4},"mongodb":{"id":"mongodb","name":"MongoDB","nodeType":"database","description":"Document database for storing CALM architectures, patterns, and standards in CALM Hub","x":1615,"y":270,"layer":5}},"frames":[{"id":"calm-1","name":"Initial CALM Architecture","description":"The FINOS CALM architecture including CLI, Hub API, and Hub UI","validFrom":"","commitCount":0,"commits":[],"commitMessages":[],"adrs":[],"summary":"Initial baseline with 6 node(s), 6 relationship(s)","changes":[{"kind":"add","category":"node","id":"calm-user","text":"Added node CALM User (calm-user)"},{"kind":"add","category":"node","id":"calm-cli","text":"Added node CALM CLI (calm-cli)"},{"kind":"add","category":"node","id":"calm-hub","text":"Added node CALM Hub API (calm-hub)"},{"kind":"add","category":"node","id":"calm-hub-ui","text":"Added node CALM Hub UI (calm-hub-ui)"},{"kind":"add","category":"node","id":"mongodb","text":"Added node MongoDB (mongodb)"},{"kind":"add","category":"node","id":"calm-hub-system","text":"Added node CALM Hub System (calm-hub-system)"},{"kind":"add","category":"relationship","id":"user-interacts-with-ui","text":"Added relationship user-interacts-with-ui"},{"kind":"add","category":"relationship","id":"user-interacts-with-cli","text":"Added relationship user-interacts-with-cli"},{"kind":"add","category":"relationship","id":"cli-to-hub","text":"Added relationship cli-to-hub"},{"kind":"add","category":"relationship","id":"hub-to-db","text":"Added relationship hub-to-db"},{"kind":"add","category":"relationship","id":"hub-ui-to-hub","text":"Added relationship hub-ui-to-hub"},{"kind":"add","category":"relationship","id":"hub-system-composition","text":"Added relationship hub-system-composition"}],"nodes":[{"id":"calm-user","name":"CALM User","nodeType":"actor","description":"User working with CALM architectures through various tools and interfaces"},{"id":"calm-cli","name":"CALM CLI","nodeType":"service","description":"Command-line interface for CALM operations including validation, generation, visualization, and documentation"},{"id":"calm-hub","name":"CALM Hub API","nodeType":"service","description":"Central registry and API service for CALM architectures, patterns, and standards built with Quarkus"},{"id":"calm-hub-ui","name":"CALM Hub UI","nodeType":"system","description":"React-based web interface for browsing and managing CALM architectures, patterns, and standards"},{"id":"mongodb","name":"MongoDB","nodeType":"database","description":"Document database for storing CALM architectures, patterns, and standards in CALM Hub"},{"id":"calm-hub-system","name":"CALM Hub System","nodeType":"system","description":"Complete CALM Hub system including API backend, web UI, and database"}],"edges":[{"id":"user-interacts-with-ui","source":"calm-user","target":"calm-hub-ui","label":"CALM user interacts with CALM Hu","relType":"interacts"},{"id":"user-interacts-with-cli","source":"calm-user","target":"calm-cli","label":"CALM user interacts with CALM CL","relType":"interacts"},{"id":"cli-to-hub","source":"calm-cli","target":"calm-hub","label":"HTTPS","relType":"connects"},{"id":"hub-to-db","source":"calm-hub","target":"mongodb","label":"TCP","relType":"connects"},{"id":"hub-ui-to-hub","source":"calm-hub-ui","target":"calm-hub","label":"HTTPS","relType":"connects"},{"id":"hub-system-composition::0","source":"calm-hub-system","target":"calm-hub","label":"CALM Hub System is composed of A","relType":"composed-of"},{"id":"hub-system-composition::1","source":"calm-hub-system","target":"calm-hub-ui","label":"CALM Hub System is composed of A","relType":"composed-of"},{"id":"hub-system-composition::2","source":"calm-hub-system","target":"mongodb","label":"CALM Hub System is composed of A","relType":"composed-of"}],"controls":[],"addedNodeIds":["calm-user","calm-cli","calm-hub","calm-hub-ui","mongodb","calm-hub-system"],"modifiedNodeIds":[],"removedNodeIds":[],"addedEdgeIds":["user-interacts-with-ui","user-interacts-with-cli","cli-to-hub","hub-to-db","hub-ui-to-hub","hub-system-composition::0","hub-system-composition::1","hub-system-composition::2"],"modifiedEdgeIds":[],"removedEdgeIds":[]},{"id":"calm-2","name":"CALM with VSCode Extension","description":"The FINOS CALM architecture including CLI, VSCode extension, Hub API, and Hub UI","validFrom":"2025-09-30","commitCount":0,"commits":[],"commitMessages":[],"adrs":[],"summary":"+2 node(s), +2 rel(s), flows(+3/~0/-0)","changes":[{"kind":"add","category":"node","id":"calm-vscode","text":"Added node VSCode Extension (calm-vscode)"},{"kind":"add","category":"node","id":"vscode","text":"Added node Visual Studio Code (vscode)"},{"kind":"add","category":"relationship","id":"user-interacts-with-vscode","text":"Added relationship user-interacts-with-vscode"},{"kind":"add","category":"relationship","id":"vscode-composition","text":"Added relationship vscode-composition"},{"kind":"add","category":"flow","id":"flow-publish-architecture","text":"Added flow Publish Architecture"},{"kind":"add","category":"flow","id":"flow-browse-architectures","text":"Added flow Browse Architectures"},{"kind":"add","category":"flow","id":"flow-validate-in-ide","text":"Added flow Validate Architecture in IDE"}],"nodes":[{"id":"calm-user","name":"CALM User","nodeType":"actor","description":"User working with CALM architectures through various tools and interfaces"},{"id":"calm-cli","name":"CALM CLI","nodeType":"service","description":"Command-line interface for CALM operations including validation, generation, visualization, and documentation"},{"id":"calm-vscode","name":"VSCode Extension","nodeType":"service","description":"Visual Studio Code extension providing IDE integration for CALM architectures with syntax highlighting, validation, and visualization"},{"id":"calm-hub","name":"CALM Hub API","nodeType":"service","description":"Central registry and API service for CALM architectures, patterns, and standards built with Quarkus"},{"id":"calm-hub-ui","name":"CALM Hub UI","nodeType":"system","description":"React-based web interface for browsing and managing CALM architectures, patterns, and standards"},{"id":"mongodb","name":"MongoDB","nodeType":"database","description":"Document database for storing CALM architectures, patterns, and standards in CALM Hub"},{"id":"calm-hub-system","name":"CALM Hub System","nodeType":"system","description":"Complete CALM Hub system including API backend, web UI, and database"},{"id":"vscode","name":"Visual Studio Code","nodeType":"system","description":"Microsoft Visual Studio Code IDE"}],"edges":[{"id":"user-interacts-with-ui","source":"calm-user","target":"calm-hub-ui","label":"CALM user interacts with CALM Hu","relType":"interacts"},{"id":"user-interacts-with-cli","source":"calm-user","target":"calm-cli","label":"CALM user interacts with CALM CL","relType":"interacts"},{"id":"user-interacts-with-vscode","source":"calm-user","target":"calm-vscode","label":"CALM user interacts with VSCode ","relType":"interacts"},{"id":"cli-to-hub","source":"calm-cli","target":"calm-hub","label":"HTTPS","relType":"connects"},{"id":"hub-to-db","source":"calm-hub","target":"mongodb","label":"TCP","relType":"connects"},{"id":"hub-ui-to-hub","source":"calm-hub-ui","target":"calm-hub","label":"HTTPS","relType":"connects"},{"id":"hub-system-composition::0","source":"calm-hub-system","target":"calm-hub","label":"CALM Hub System is composed of A","relType":"composed-of"},{"id":"hub-system-composition::1","source":"calm-hub-system","target":"calm-hub-ui","label":"CALM Hub System is composed of A","relType":"composed-of"},{"id":"hub-system-composition::2","source":"calm-hub-system","target":"mongodb","label":"CALM Hub System is composed of A","relType":"composed-of"},{"id":"vscode-composition","source":"vscode","target":"calm-vscode","label":"VSCode contains the CALM extensi","relType":"deployed-in"}],"controls":[],"addedNodeIds":["calm-vscode","vscode"],"modifiedNodeIds":[],"removedNodeIds":[],"addedEdgeIds":["user-interacts-with-vscode","vscode-composition"],"modifiedEdgeIds":[],"removedEdgeIds":[]},{"id":"calm-3","name":"CALM with CalmStudio and CALM Server","description":"The FINOS CALM architecture including CLI, VSCode extension, CalmStudio, CALM Server, Hub API, and Hub UI. The CALM Hub API now also links out to a detailed architecture of its own internal layering","validFrom":"2026-04-11","commitCount":0,"commits":[],"commitMessages":[],"adrs":[],"summary":"+2 node(s), ~1 node(s), +2 rel(s), flows(+2/~0/-0)","changes":[{"kind":"add","category":"node","id":"calm-studio","text":"Added node CalmStudio (calm-studio)"},{"kind":"add","category":"node","id":"calm-server","text":"Added node CALM Server (calm-server)"},{"kind":"mod","category":"node","id":"calm-hub","text":"Modified node CALM Hub API (calm-hub) [details]"},{"kind":"add","category":"relationship","id":"user-interacts-with-studio","text":"Added relationship user-interacts-with-studio"},{"kind":"add","category":"relationship","id":"user-interacts-with-calm-server","text":"Added relationship user-interacts-with-calm-server"},{"kind":"add","category":"flow","id":"flow-edit-in-studio","text":"Added flow Edit Architecture in CalmStudio"},{"kind":"add","category":"flow","id":"flow-validate-via-api","text":"Added flow Validate Architecture via CALM Server"}],"nodes":[{"id":"calm-user","name":"CALM User","nodeType":"actor","description":"User working with CALM architectures through various tools and interfaces"},{"id":"calm-cli","name":"CALM CLI","nodeType":"service","description":"Command-line interface for CALM operations including validation, generation, visualization, and documentation"},{"id":"calm-vscode","name":"VSCode Extension","nodeType":"service","description":"Visual Studio Code extension providing IDE integration for CALM architectures with syntax highlighting, validation, and visualization"},{"id":"calm-studio","name":"CalmStudio","nodeType":"system","description":"Browser-based visual CALM architecture editor (SvelteKit) for creating and editing architectures with built-in CALM 1.2 validation"},{"id":"calm-server","name":"CALM Server","nodeType":"service","description":"Standalone HTTP server exposing CALM architecture validation as a REST API, independent of the CALM Hub"},{"id":"calm-hub","name":"CALM Hub API","nodeType":"service","description":"Central registry and API service for CALM architectures, patterns, and standards built with Quarkus"},{"id":"calm-hub-ui","name":"CALM Hub UI","nodeType":"system","description":"React-based web interface for browsing and managing CALM architectures, patterns, and standards"},{"id":"mongodb","name":"MongoDB","nodeType":"database","description":"Document database for storing CALM architectures, patterns, and standards in CALM Hub"},{"id":"calm-hub-system","name":"CALM Hub System","nodeType":"system","description":"Complete CALM Hub system including API backend, web UI, and database"},{"id":"vscode","name":"Visual Studio Code","nodeType":"system","description":"Microsoft Visual Studio Code IDE"}],"edges":[{"id":"user-interacts-with-ui","source":"calm-user","target":"calm-hub-ui","label":"CALM user interacts with CALM Hu","relType":"interacts"},{"id":"user-interacts-with-cli","source":"calm-user","target":"calm-cli","label":"CALM user interacts with CALM CL","relType":"interacts"},{"id":"user-interacts-with-vscode","source":"calm-user","target":"calm-vscode","label":"CALM user interacts with VSCode ","relType":"interacts"},{"id":"user-interacts-with-studio","source":"calm-user","target":"calm-studio","label":"CALM user interacts with CalmStu","relType":"interacts"},{"id":"user-interacts-with-calm-server","source":"calm-user","target":"calm-server","label":"CALM user or CI pipeline invokes","relType":"interacts"},{"id":"cli-to-hub","source":"calm-cli","target":"calm-hub","label":"HTTPS","relType":"connects"},{"id":"hub-to-db","source":"calm-hub","target":"mongodb","label":"TCP","relType":"connects"},{"id":"hub-ui-to-hub","source":"calm-hub-ui","target":"calm-hub","label":"HTTPS","relType":"connects"},{"id":"hub-system-composition::0","source":"calm-hub-system","target":"calm-hub","label":"CALM Hub System is composed of A","relType":"composed-of"},{"id":"hub-system-composition::1","source":"calm-hub-system","target":"calm-hub-ui","label":"CALM Hub System is composed of A","relType":"composed-of"},{"id":"hub-system-composition::2","source":"calm-hub-system","target":"mongodb","label":"CALM Hub System is composed of A","relType":"composed-of"},{"id":"vscode-composition","source":"vscode","target":"calm-vscode","label":"VSCode contains the CALM extensi","relType":"deployed-in"}],"controls":[],"addedNodeIds":["calm-studio","calm-server"],"modifiedNodeIds":["calm-hub"],"removedNodeIds":[],"addedEdgeIds":["user-interacts-with-studio","user-interacts-with-calm-server"],"modifiedEdgeIds":[],"removedEdgeIds":[]}]}</script>
+  <script id="timelapse-data" type="application/json">{"title":"CALM Architecture Timelapse — calm.timeline.json","generatedAt":"2026-11-14T03:17:12.882Z","sourceFile":"calm.timeline.json","engine":"manual-timeline","canvasWidth":1680,"canvasHeight":392,"positions":{"calm-user":{"id":"calm-user","name":"CALM User","nodeType":"actor","description":"User working with CALM architectures through various tools and interfaces","x":115,"y":196,"layer":0},"calm-cli":{"id":"calm-cli","name":"CALM CLI","nodeType":"service","description":"Command-line interface for CALM operations including validation, generation, visualization, and documentation","x":405,"y":64,"layer":1},"calm-server":{"id":"calm-server","name":"CALM Server","nodeType":"service","description":"Standalone HTTP server exposing CALM architecture validation as a REST API, independent of the CALM Hub","x":405,"y":196,"layer":1},"calm-studio":{"id":"calm-studio","name":"CalmStudio","nodeType":"system","description":"Browser-based visual CALM architecture editor (SvelteKit) for creating and editing architectures with built-in CALM 1.2 validation","x":405,"y":328,"layer":1},"calm-hub-system":{"id":"calm-hub-system","name":"CALM Hub System","nodeType":"system","description":"Complete CALM Hub system including API backend, web UI, and database","x":695,"y":130,"layer":2},"vscode":{"id":"vscode","name":"Visual Studio Code","nodeType":"system","description":"Microsoft Visual Studio Code IDE","x":695,"y":262,"layer":2},"calm-hub-ui":{"id":"calm-hub-ui","name":"CALM Hub UI","nodeType":"system","description":"React-based web interface for browsing and managing CALM architectures, patterns, and standards","x":985,"y":130,"layer":3},"calm-vscode":{"id":"calm-vscode","name":"VSCode Extension","nodeType":"service","description":"Visual Studio Code extension providing IDE integration for CALM architectures with syntax highlighting, validation, and visualization","x":985,"y":262,"layer":3},"calm-hub":{"id":"calm-hub","name":"CALM Hub API","nodeType":"service","description":"Central registry and API service for CALM architectures, patterns, and standards built with Quarkus","x":1275,"y":196,"layer":4},"mongodb":{"id":"mongodb","name":"MongoDB","nodeType":"database","description":"Document database for storing CALM architectures, patterns, and standards in CALM Hub","x":1565,"y":196,"layer":5}},"frames":[{"id":"calm-1","name":"Initial CALM Architecture","description":"The FINOS CALM architecture including CLI, Hub API, and Hub UI","validFrom":"","commitCount":0,"commits":[],"commitMessages":[],"adrs":[],"summary":"Initial baseline with 6 node(s), 6 relationship(s)","changes":[{"kind":"add","category":"node","id":"calm-user","text":"Added node CALM User (calm-user)"},{"kind":"add","category":"node","id":"calm-cli","text":"Added node CALM CLI (calm-cli)"},{"kind":"add","category":"node","id":"calm-hub","text":"Added node CALM Hub API (calm-hub)"},{"kind":"add","category":"node","id":"calm-hub-ui","text":"Added node CALM Hub UI (calm-hub-ui)"},{"kind":"add","category":"node","id":"mongodb","text":"Added node MongoDB (mongodb)"},{"kind":"add","category":"node","id":"calm-hub-system","text":"Added node CALM Hub System (calm-hub-system)"},{"kind":"add","category":"relationship","id":"user-interacts-with-ui","text":"Added relationship user-interacts-with-ui"},{"kind":"add","category":"relationship","id":"user-interacts-with-cli","text":"Added relationship user-interacts-with-cli"},{"kind":"add","category":"relationship","id":"cli-to-hub","text":"Added relationship cli-to-hub"},{"kind":"add","category":"relationship","id":"hub-to-db","text":"Added relationship hub-to-db"},{"kind":"add","category":"relationship","id":"hub-ui-to-hub","text":"Added relationship hub-ui-to-hub"},{"kind":"add","category":"relationship","id":"hub-system-composition","text":"Added relationship hub-system-composition"}],"nodes":[{"id":"calm-user","name":"CALM User","nodeType":"actor","description":"User working with CALM architectures through various tools and interfaces"},{"id":"calm-cli","name":"CALM CLI","nodeType":"service","description":"Command-line interface for CALM operations including validation, generation, visualization, and documentation"},{"id":"calm-hub","name":"CALM Hub API","nodeType":"service","description":"Central registry and API service for CALM architectures, patterns, and standards built with Quarkus"},{"id":"calm-hub-ui","name":"CALM Hub UI","nodeType":"system","description":"React-based web interface for browsing and managing CALM architectures, patterns, and standards"},{"id":"mongodb","name":"MongoDB","nodeType":"database","description":"Document database for storing CALM architectures, patterns, and standards in CALM Hub"},{"id":"calm-hub-system","name":"CALM Hub System","nodeType":"system","description":"Complete CALM Hub system including API backend, web UI, and database"}],"edges":[{"id":"user-interacts-with-ui","source":"calm-user","target":"calm-hub-ui","label":"CALM user interacts with CALM Hu","relType":"interacts"},{"id":"user-interacts-with-cli","source":"calm-user","target":"calm-cli","label":"CALM user interacts with CALM CL","relType":"interacts"},{"id":"cli-to-hub","source":"calm-cli","target":"calm-hub","label":"HTTPS","relType":"connects"},{"id":"hub-to-db","source":"calm-hub","target":"mongodb","label":"TCP","relType":"connects"},{"id":"hub-ui-to-hub","source":"calm-hub-ui","target":"calm-hub","label":"HTTPS","relType":"connects"},{"id":"hub-system-composition::0","source":"calm-hub-system","target":"calm-hub","label":"CALM Hub System is composed of A","relType":"composed-of"},{"id":"hub-system-composition::1","source":"calm-hub-system","target":"calm-hub-ui","label":"CALM Hub System is composed of A","relType":"composed-of"},{"id":"hub-system-composition::2","source":"calm-hub-system","target":"mongodb","label":"CALM Hub System is composed of A","relType":"composed-of"}],"controls":[],"addedNodeIds":["calm-user","calm-cli","calm-hub","calm-hub-ui","mongodb","calm-hub-system"],"modifiedNodeIds":[],"removedNodeIds":[],"addedEdgeIds":["user-interacts-with-ui","user-interacts-with-cli","cli-to-hub","hub-to-db","hub-ui-to-hub","hub-system-composition::0","hub-system-composition::1","hub-system-composition::2"],"modifiedEdgeIds":[],"removedEdgeIds":[]},{"id":"calm-2","name":"CALM with VSCode Extension","description":"The FINOS CALM architecture including CLI, VSCode extension, Hub API, and Hub UI","validFrom":"2025-09-30","commitCount":0,"commits":[],"commitMessages":[],"adrs":[],"summary":"+2 node(s), +2 rel(s), flows(+3/~0/-0)","changes":[{"kind":"add","category":"node","id":"calm-vscode","text":"Added node VSCode Extension (calm-vscode)"},{"kind":"add","category":"node","id":"vscode","text":"Added node Visual Studio Code (vscode)"},{"kind":"add","category":"relationship","id":"user-interacts-with-vscode","text":"Added relationship user-interacts-with-vscode"},{"kind":"add","category":"relationship","id":"vscode-composition","text":"Added relationship vscode-composition"},{"kind":"add","category":"flow","id":"flow-publish-architecture","text":"Added flow Publish Architecture"},{"kind":"add","category":"flow","id":"flow-browse-architectures","text":"Added flow Browse Architectures"},{"kind":"add","category":"flow","id":"flow-validate-in-ide","text":"Added flow Validate Architecture in IDE"}],"nodes":[{"id":"calm-user","name":"CALM User","nodeType":"actor","description":"User working with CALM architectures through various tools and interfaces"},{"id":"calm-cli","name":"CALM CLI","nodeType":"service","description":"Command-line interface for CALM operations including validation, generation, visualization, and documentation"},{"id":"calm-vscode","name":"VSCode Extension","nodeType":"service","description":"Visual Studio Code extension providing IDE integration for CALM architectures with syntax highlighting, validation, and visualization"},{"id":"calm-hub","name":"CALM Hub API","nodeType":"service","description":"Central registry and API service for CALM architectures, patterns, and standards built with Quarkus"},{"id":"calm-hub-ui","name":"CALM Hub UI","nodeType":"system","description":"React-based web interface for browsing and managing CALM architectures, patterns, and standards"},{"id":"mongodb","name":"MongoDB","nodeType":"database","description":"Document database for storing CALM architectures, patterns, and standards in CALM Hub"},{"id":"calm-hub-system","name":"CALM Hub System","nodeType":"system","description":"Complete CALM Hub system including API backend, web UI, and database"},{"id":"vscode","name":"Visual Studio Code","nodeType":"system","description":"Microsoft Visual Studio Code IDE"}],"edges":[{"id":"user-interacts-with-ui","source":"calm-user","target":"calm-hub-ui","label":"CALM user interacts with CALM Hu","relType":"interacts"},{"id":"user-interacts-with-cli","source":"calm-user","target":"calm-cli","label":"CALM user interacts with CALM CL","relType":"interacts"},{"id":"user-interacts-with-vscode","source":"calm-user","target":"calm-vscode","label":"CALM user interacts with VSCode ","relType":"interacts"},{"id":"cli-to-hub","source":"calm-cli","target":"calm-hub","label":"HTTPS","relType":"connects"},{"id":"hub-to-db","source":"calm-hub","target":"mongodb","label":"TCP","relType":"connects"},{"id":"hub-ui-to-hub","source":"calm-hub-ui","target":"calm-hub","label":"HTTPS","relType":"connects"},{"id":"hub-system-composition::0","source":"calm-hub-system","target":"calm-hub","label":"CALM Hub System is composed of A","relType":"composed-of"},{"id":"hub-system-composition::1","source":"calm-hub-system","target":"calm-hub-ui","label":"CALM Hub System is composed of A","relType":"composed-of"},{"id":"hub-system-composition::2","source":"calm-hub-system","target":"mongodb","label":"CALM Hub System is composed of A","relType":"composed-of"},{"id":"vscode-composition","source":"vscode","target":"calm-vscode","label":"VSCode contains the CALM extensi","relType":"deployed-in"}],"controls":[],"addedNodeIds":["calm-vscode","vscode"],"modifiedNodeIds":[],"removedNodeIds":[],"addedEdgeIds":["user-interacts-with-vscode","vscode-composition"],"modifiedEdgeIds":[],"removedEdgeIds":[]},{"id":"calm-3","name":"CALM with CalmStudio and CALM Server","description":"The FINOS CALM architecture including CLI, VSCode extension, CalmStudio, CALM Server, Hub API, and Hub UI. The CALM Hub API now also links out to a detailed architecture of its own internal layering","validFrom":"2026-04-11","commitCount":0,"commits":[],"commitMessages":[],"adrs":[],"summary":"+2 node(s), ~1 node(s), +2 rel(s), flows(+2/~0/-0)","changes":[{"kind":"add","category":"node","id":"calm-studio","text":"Added node CalmStudio (calm-studio)"},{"kind":"add","category":"node","id":"calm-server","text":"Added node CALM Server (calm-server)"},{"kind":"mod","category":"node","id":"calm-hub","text":"Modified node CALM Hub API (calm-hub) [details]"},{"kind":"add","category":"relationship","id":"user-interacts-with-studio","text":"Added relationship user-interacts-with-studio"},{"kind":"add","category":"relationship","id":"user-interacts-with-calm-server","text":"Added relationship user-interacts-with-calm-server"},{"kind":"add","category":"flow","id":"flow-edit-in-studio","text":"Added flow Edit Architecture in CalmStudio"},{"kind":"add","category":"flow","id":"flow-validate-via-api","text":"Added flow Validate Architecture via CALM Server"}],"nodes":[{"id":"calm-user","name":"CALM User","nodeType":"actor","description":"User working with CALM architectures through various tools and interfaces"},{"id":"calm-cli","name":"CALM CLI","nodeType":"service","description":"Command-line interface for CALM operations including validation, generation, visualization, and documentation"},{"id":"calm-vscode","name":"VSCode Extension","nodeType":"service","description":"Visual Studio Code extension providing IDE integration for CALM architectures with syntax highlighting, validation, and visualization"},{"id":"calm-studio","name":"CalmStudio","nodeType":"system","description":"Browser-based visual CALM architecture editor (SvelteKit) for creating and editing architectures with built-in CALM 1.2 validation"},{"id":"calm-server","name":"CALM Server","nodeType":"service","description":"Standalone HTTP server exposing CALM architecture validation as a REST API, independent of the CALM Hub"},{"id":"calm-hub","name":"CALM Hub API","nodeType":"service","description":"Central registry and API service for CALM architectures, patterns, and standards built with Quarkus"},{"id":"calm-hub-ui","name":"CALM Hub UI","nodeType":"system","description":"React-based web interface for browsing and managing CALM architectures, patterns, and standards"},{"id":"mongodb","name":"MongoDB","nodeType":"database","description":"Document database for storing CALM architectures, patterns, and standards in CALM Hub"},{"id":"calm-hub-system","name":"CALM Hub System","nodeType":"system","description":"Complete CALM Hub system including API backend, web UI, and database"},{"id":"vscode","name":"Visual Studio Code","nodeType":"system","description":"Microsoft Visual Studio Code IDE"}],"edges":[{"id":"user-interacts-with-ui","source":"calm-user","target":"calm-hub-ui","label":"CALM user interacts with CALM Hu","relType":"interacts"},{"id":"user-interacts-with-cli","source":"calm-user","target":"calm-cli","label":"CALM user interacts with CALM CL","relType":"interacts"},{"id":"user-interacts-with-vscode","source":"calm-user","target":"calm-vscode","label":"CALM user interacts with VSCode ","relType":"interacts"},{"id":"user-interacts-with-studio","source":"calm-user","target":"calm-studio","label":"CALM user interacts with CalmStu","relType":"interacts"},{"id":"user-interacts-with-calm-server","source":"calm-user","target":"calm-server","label":"CALM user or CI pipeline invokes","relType":"interacts"},{"id":"cli-to-hub","source":"calm-cli","target":"calm-hub","label":"HTTPS","relType":"connects"},{"id":"hub-to-db","source":"calm-hub","target":"mongodb","label":"TCP","relType":"connects"},{"id":"hub-ui-to-hub","source":"calm-hub-ui","target":"calm-hub","label":"HTTPS","relType":"connects"},{"id":"hub-system-composition::0","source":"calm-hub-system","target":"calm-hub","label":"CALM Hub System is composed of A","relType":"composed-of"},{"id":"hub-system-composition::1","source":"calm-hub-system","target":"calm-hub-ui","label":"CALM Hub System is composed of A","relType":"composed-of"},{"id":"hub-system-composition::2","source":"calm-hub-system","target":"mongodb","label":"CALM Hub System is composed of A","relType":"composed-of"},{"id":"vscode-composition","source":"vscode","target":"calm-vscode","label":"VSCode contains the CALM extensi","relType":"deployed-in"}],"controls":[],"addedNodeIds":["calm-studio","calm-server"],"modifiedNodeIds":["calm-hub"],"removedNodeIds":[],"addedEdgeIds":["user-interacts-with-studio","user-interacts-with-calm-server"],"modifiedEdgeIds":[],"removedEdgeIds":[]}]}</script>
   <script>
     (function () {
       const payload = JSON.parse(document.getElementById('timelapse-data').textContent);
@@ -916,9 +939,13 @@
       let timer = null;
       let focusedNodeId = '';
       let selectedProjectId = '';
+      let viewW = canvasWidth;
+      let viewH = canvasHeight;
       let zoomScale = 1;
       let panX = 0;
       let panY = 0;
+      let autoFit = true;
+      let hasInitialFit = false;
       let isPanning = false;
       let dragStartX = 0;
       let dragStartY = 0;
@@ -935,29 +962,106 @@
         return nodeOrPos.sourceId === selectedProjectId;
       }
 
-      function applyTransform() {
+      function syncSvgViewBox() {
+        if (!canvasWrap || typeof canvasWrap.getBoundingClientRect !== 'function') return;
+        const rect = canvasWrap.getBoundingClientRect();
+        if (rect && rect.width >= 120 && rect.height >= 120) {
+          viewW = Math.round(rect.width);
+          viewH = Math.round(rect.height);
+          svgGraph.setAttribute('viewBox', '0 0 ' + viewW + ' ' + viewH);
+        }
+      }
+
+      function applyTransform(animate) {
+        if (viewportLayer && viewportLayer.classList) {
+          viewportLayer.classList.toggle('smooth-cam', Boolean(animate));
+        }
         viewportLayer.setAttribute(
           'transform',
           'translate(' + panX.toFixed(2) + ',' + panY.toFixed(2) + ') scale(' + zoomScale.toFixed(4) + ')',
         );
       }
 
+      function computeActiveFrameBounds() {
+        const frame = frames[currentIndex];
+        const isolateMode = Boolean(focusIsolate && focusIsolate.checked);
+        const ids = [];
+        if (frame) {
+          const neighborhood = new Set();
+          if (focusedNodeId) {
+            neighborhood.add(focusedNodeId);
+            for (const edge of frame.edges || []) {
+              if (edge.source === focusedNodeId) neighborhood.add(edge.target);
+              if (edge.target === focusedNodeId) neighborhood.add(edge.source);
+            }
+          }
+          const candidateIds = new Set([
+            ...(frame.nodes || []).map((n) => n.id),
+            ...(frame.removedNodeIds || []),
+          ]);
+          for (const id of candidateIds) {
+            const p = positions[id];
+            if (!p) continue;
+            if (focusedNodeId && isolateMode && !neighborhood.has(id)) continue;
+            if (selectedProjectId && !nodeMatchesProject(p)) continue;
+            ids.push(id);
+          }
+        }
+        const useIds = ids.length > 0 ? ids : Object.keys(positions);
+        let minX = Infinity;
+        let minY = Infinity;
+        let maxX = -Infinity;
+        let maxY = -Infinity;
+        for (const id of useIds) {
+          const p = positions[id];
+          if (!p) continue;
+          if (p.x - 94 < minX) minX = p.x - 94;
+          if (p.y - 46 < minY) minY = p.y - 46;
+          if (p.x + 94 > maxX) maxX = p.x + 94;
+          if (p.y + 40 > maxY) maxY = p.y + 40;
+        }
+        if (!Number.isFinite(minX)) {
+          return { minX: 0, minY: 0, maxX: canvasWidth, maxY: canvasHeight };
+        }
+        return { minX, minY, maxX, maxY };
+      }
+
+      function fitCurrentFrame(animate) {
+        syncSvgViewBox();
+        const bounds = computeActiveFrameBounds();
+        const padX = Math.min(28, Math.round(viewW * 0.045));
+        const padTop = Math.min(48, Math.max(36, Math.round(viewH * 0.09)));
+        const padBottom = Math.min(44, Math.max(24, Math.round(viewH * 0.07)));
+        const availW = Math.max(100, viewW - padX * 2);
+        const availH = Math.max(100, viewH - padTop - padBottom);
+        const bw = Math.max(200, bounds.maxX - bounds.minX);
+        const bh = Math.max(96, bounds.maxY - bounds.minY);
+        const scale = Math.max(0.12, Math.min(availW / bw, availH / bh, 1.32));
+        const cx = (bounds.minX + bounds.maxX) / 2;
+        const cy = (bounds.minY + bounds.maxY) / 2;
+        zoomScale = scale;
+        panX = viewW / 2 - cx * scale;
+        panY = padTop + availH / 2 - cy * scale;
+        applyTransform(animate && hasInitialFit);
+        hasInitialFit = true;
+      }
+
       function setZoom(nextScale, anchorX, anchorY) {
-        const clamped = Math.max(0.4, Math.min(2.8, nextScale));
-        const ax = anchorX !== undefined ? anchorX : canvasWidth / 2;
-        const ay = anchorY !== undefined ? anchorY : canvasHeight / 2;
+        autoFit = false;
+        syncSvgViewBox();
+        const clamped = Math.max(0.10, Math.min(3.2, nextScale));
+        const ax = anchorX !== undefined ? anchorX : viewW / 2;
+        const ay = anchorY !== undefined ? anchorY : viewH / 2;
         const ratio = clamped / zoomScale;
         panX = ax - (ax - panX) * ratio;
         panY = ay - (ay - panY) * ratio;
         zoomScale = clamped;
-        applyTransform();
+        applyTransform(false);
       }
 
       function resetZoom() {
-        zoomScale = 1;
-        panX = 0;
-        panY = 0;
-        applyTransform();
+        autoFit = true;
+        fitCurrentFrame(true);
       }
 
       Object.values(positions)
@@ -1302,6 +1406,10 @@
           },
         });
 
+        if (autoFit) {
+          fitCurrentFrame(true);
+        }
+
         changeList.innerHTML = '';
         if (liveDiff && compareBase) {
           const bannerLi = document.createElement('li');
@@ -1413,8 +1521,8 @@
           }
         }
         const rect = svgGraph.getBoundingClientRect();
-        const scaleX = canvasWidth / (rect.width || 1);
-        const scaleY = canvasHeight / (rect.height || 1);
+        const scaleX = viewW / (rect.width || 1);
+        const scaleY = viewH / (rect.height || 1);
         return {
           x: (clientX - rect.left) * scaleX,
           y: (clientY - rect.top) * scaleY,
@@ -1436,6 +1544,7 @@
           return;
         }
         isPanning = true;
+        autoFit = false;
         dragStartX = e.clientX;
         dragStartY = e.clientY;
         panStartX = panX;
@@ -1450,7 +1559,7 @@
         const dy = e.clientY - dragStartY;
         panX = panStartX + dx * pt.scaleX;
         panY = panStartY + dy * pt.scaleY;
-        applyTransform();
+        applyTransform(false);
       });
 
       window.addEventListener('mouseup', () => {
@@ -1460,10 +1569,12 @@
       });
 
       btnZoomIn.addEventListener('click', () => {
-        setZoom(zoomScale * 1.2, canvasWidth / 2, canvasHeight / 2);
+        syncSvgViewBox();
+        setZoom(zoomScale * 1.2, viewW / 2, viewH / 2);
       });
       btnZoomOut.addEventListener('click', () => {
-        setZoom(zoomScale / 1.2, canvasWidth / 2, canvasHeight / 2);
+        syncSvgViewBox();
+        setZoom(zoomScale / 1.2, viewW / 2, viewH / 2);
       });
       btnZoomFit.addEventListener('click', () => {
         resetZoom();
@@ -1854,12 +1965,12 @@
         if (!Number.isFinite(minX)) {
           minX = 0; minY = 0; maxX = canvasWidth; maxY = canvasHeight;
         }
-        const padX = 135;
-        const padY = 72;
+        const padX = 108;
+        const padY = 52;
         const rawW = (maxX - minX) + padX * 2;
         const rawH = (maxY - minY) + padY * 2;
-        const vbW = Math.max(580, rawW);
-        const vbH = Math.max(240, rawH);
+        const vbW = Math.max(380, rawW);
+        const vbH = Math.max(175, rawH);
         const cx = (minX + maxX) / 2;
         const cy = (minY + maxY) / 2;
         const vbX = Math.round(cx - vbW / 2);
@@ -2232,6 +2343,8 @@
 
         if (isFeed) {
           renderFeed();
+        } else if (autoFit) {
+          fitCurrentFrame(false);
         }
         if (updateHash && window.history && window.history.replaceState) {
           const base = window.location.pathname + window.location.search;
@@ -2290,6 +2403,21 @@
           renderFrame(currentIndex + 1);
         }
       });
+
+      const handleViewportResize = () => {
+        if (currentViewMode !== 'stage') return;
+        syncSvgViewBox();
+        if (autoFit) {
+          fitCurrentFrame(false);
+        } else {
+          applyTransform(false);
+        }
+      };
+      window.addEventListener('resize', handleViewportResize);
+      if (typeof ResizeObserver === 'function' && canvasWrap) {
+        const ro = new ResizeObserver(() => handleViewportResize());
+        ro.observe(canvasWrap);
+      }
 
       renderFrame(0);
       const urlWantsFeed =

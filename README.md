@@ -4,7 +4,7 @@
 
 Reviewers and auditors regularly ask what an architecture—or an ecosystem of interacting architectures across repositories—looked like on a specific past date and why it changed. Answering that today means reading raw Git diffs by hand or manually pre-saving versioned JSON snapshots. In upstream `@finos/calm-cli`, `calm timeline -a` builds an implied timeline only from pre-saved versioned files on disk (such as `arch-1.0.0.json`, `arch-2.0.0.json`), and `calm diff --timeline` outputs text or Markdown tables. **CALM Timelapse** bridges **FINOS CALM** with **Git** directly: it walks `git log --follow` across one or multiple Git repositories and CALM files simultaneously, filters out pure JSON formatting and key-reordering noise, emits schema-validated `calm-timeline` (`1.2` and `1.3`, validated against `@finos/calm-schema` `1.3.0`) artifacts plus historical snapshot files, and renders a zero-dependency interactive HTML/SVG player with both a single-viewport **Timelapse Stage** and a reverse-chronological **Architecture Feed**—with zero runtime network calls.
 
-> **Interactive Demo Gallery:** Open `docs/index.html` locally (or visit `https://finos-hack.github.io/fall-hackathon-2026-mu/` when GitHub Pages is enabled on `docs/`) to explore 9 pre-built single-repo and multi-repo architectures in either **Timelapse Stage** or **Architecture Feed** (`#feed`) mode without building from source.
+> **Interactive Demo Gallery:** Open `docs/index.html` locally (or visit `https://finos-hack.github.io/fall-hackathon-2026-mu/` when GitHub Pages is enabled on `docs/`) to explore 10 pre-built single-repo, multi-repo, and upstream FINOS architectures in either **Timelapse Stage** or **Architecture Feed** (`#feed`) mode without building from source.
 
 ## Installation
 
@@ -106,7 +106,22 @@ Example `clusters.json` covering structural commit indices `0..2`:
 
 **Safeguards if assistant output is malformed:** `validateClusterSpecs` enforces contiguous, non-overlapping coverage from `0` to `N - 1` (`startIndex = 0`, each next `startIndex = prev.endIndex + 1`, final `endIndex = N - 1`). Any gap, overlap, reversed range, or empty title/description aborts immediately with an explicit validation error, and every architecture snapshot is still written verbatim from Git blobs—never synthesized by an assistant.
 
-### 4. Visual Player for Existing Hand-Curated Timelines (`--timeline <files...>`)
+### 4. Upstream FINOS TraderX + FINOS FDC3 Import (`--from-traderx <repoDir>`)
+
+Import a local clone of [`finos/traderx`](https://github.com/finos/traderx) directly into CALM `1.3` snapshots, a Spectral-clean `calm-timeline`, and an interactive player—bridging **FINOS CALM**, **FINOS TraderX** (`catalog/state-catalog.json` + `specs/*/system/architecture.model.json` + `docs/adr/*.md`), and **FINOS FDC3** (State `014`):
+
+```sh
+node dist/cli.js \
+  --from-traderx ../traderx \
+  -o docs/demos/finos-traderx/finos-traderx.timeline.json \
+  --snapshots-dir docs/demos/finos-traderx/snapshots \
+  --emit-digest docs/demos/finos-traderx/finos-traderx.digest.json \
+  --timelapse docs/demos/finos-traderx/finos-traderx.timelapse.html \
+  --validate \
+  --validate-snapshots
+```
+
+### 5. Visual Player for Existing Hand-Curated Timelines (`--timeline <files...>`)
 
 Render an interactive player directly from one or multiple existing `calm-timeline` (`1.2` or `1.3`) files:
 
@@ -138,14 +153,15 @@ node dist/cli.js \
 | `--timelapse [html]` / `--feed` | Render standalone HTML/SVG player (pass `--feed` to open in Architecture Feed mode by default) |
 | `--validate` / `--validate-snapshots` | Validate `calm-timeline` structure and every emitted CALM `1.3` snapshot |
 
-### 5. Interactive Demo Gallery (`docs/demos/`)
+### 6. Interactive Demo Gallery (`docs/demos/`)
 
+- **Upstream `finos/traderx` + FINOS FDC3 (`docs/demos/finos-traderx/`):** Imported directly from [`finos/traderx`](https://github.com/finos/traderx) via `--from-traderx`—converts **13 progressive architectural states (`001`–`014`), 135 commit references, and 8 real ADRs** into CALM `1.3` snapshots, culminating in **FINOS FDC3** desktop agent intent interoperability (`014-fdc3-intent-interoperability`).
 - **Multi-Repo Trading & FINRA Surveillance (`docs/demos/multi-repo/`):** Reproducible via `npm run demo:multi-repo`—synchronizes **3 independent Git repositories** (`traderx-platform`, `traderx-execution`, `finra-surveillance`) across 5 moments, demonstrating `details.detailed-architecture` boundary merging alongside strict peer isolation.
-- **Federated FINOS CALM Core + CALM Timelapse (`docs/demos/finos-federated/`):** Synchronizes `calm-3.json` + auto-discovered `calm-hub-detail.architecture.json` (`--resolve-details`) from `finos/architecture-as-code` with this repository's own `architecture.calm.json`.
-- **TraderX Institutional Equities Simulation (`docs/demos/traderx/`):** Reproducible via `npm run demo:traderx`—**40 Git commits collapse to 9 moments** (5 formatting-only commits filtered, 5 co-changed ADRs, and 4 CALM 1.3 controls).
-- **FINOS API Gateway Pattern (`docs/demos/api-gateway/`):** Extracted from `finos/architecture-as-code`—**23 commits collapse to 4 moments** (9 formatting commits filtered).
-- **Official Hand-Curated vs. Git-Derived CALM Self-Architecture (`docs/demos/calm-manual/` & `docs/demos/calm-self/`):** Compares the upstream hand-curated `calm.timeline.json` against Git history extracted directly from `calm/architecture/calm-3.json` (FINOS CALM's own self-architecture model in `finos/architecture-as-code`, where 8 commits collapse to 3 moments).
-- **OSFF London Workshop (`docs/demos/osff-signup/`), FluxNova (`docs/demos/fluxnova/`), & Self-Dogfooding (`docs/demos/self-dogfood/`):** Demonstrates zero-AI deterministic clustering, CALM 1.2 control tracking, and this repository's own `architecture.calm.json` evolution.
+- **Federated FINOS CALM Core + CALM Timelapse (`docs/demos/finos-federated/`):** Synchronizes `calm-3.json` + auto-discovered `calm-hub-detail.architecture.json` (`--resolve-details`) from `finos/architecture-as-code` with this repository's own `architecture.calm.json` (**19 commits → 8 moments**, 4 formatting commits filtered).
+- **Simulated 40-Commit Compliance Benchmark (`docs/demos/traderx/`):** Synthetic stress-test benchmark reproducible via `npm run demo:traderx` (`scripts/seed-traderx-demo.sh`)—**40 Git commits collapse to 9 moments** (5 formatting-only commits filtered, 5 co-changed ADRs, and 4 CALM `1.3` controls).
+- **FINOS API Gateway Pattern (`docs/demos/api-gateway/`):** Extracted from `finos/architecture-as-code`—**23 pattern schema commits collapse to 4 moments** (6 formatting commits filtered, preserving `uniqueId` → `unique-id` and `items` → `prefixItems` migrations and emitting `*.pattern.json` via `details.required-pattern`).
+- **Official Hand-Curated vs. Git-Derived CALM Self-Architecture (`docs/demos/calm-manual/` & `docs/demos/calm-self/`):** Compares the upstream hand-curated `calm.timeline.json` against Git history extracted directly from `calm/architecture/calm-3.json` (`finos/architecture-as-code`, where 8 commits collapse to 3 moments).
+- **OSFF London Workshop (`docs/demos/osff-signup/`), FluxNova (`docs/demos/fluxnova/`), & Self-Dogfooding (`docs/demos/self-dogfood/`):** Demonstrates zero-AI deterministic clustering (13 commits → 5 moments, retaining referenced flow URLs), CALM `1.2` control tracking, and this repository's own 6-stage `architecture.calm.json` evolution.
 
 ### Known Limitations
 

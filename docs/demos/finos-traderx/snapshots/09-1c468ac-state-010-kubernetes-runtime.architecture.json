@@ -1,0 +1,414 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm.json",
+  "unique-id": "traderx-010-kubernetes-runtime",
+  "name": "FINOS TraderX — Kubernetes Runtime on C2",
+  "description": "State 010 preserves state 009 browser/API routing behavior while running all services on a local Kubernetes cluster.",
+  "nodes": [
+    {
+      "unique-id": "developer",
+      "node-type": "actor",
+      "name": "Developer",
+      "description": "Runs local Kind-based Kubernetes runtime."
+    },
+    {
+      "unique-id": "cluster",
+      "node-type": "network",
+      "name": "Kind Kubernetes Cluster",
+      "description": "Local cluster namespace and workloads.",
+      "metadata": {
+        "traderx-kind": "boundary"
+      }
+    },
+    {
+      "unique-id": "edge",
+      "node-type": "service",
+      "name": "NGINX Edge Proxy",
+      "description": "Single browser entrypoint for UI/API/WebSocket routes.",
+      "metadata": {
+        "traderx-kind": "gateway"
+      }
+    },
+    {
+      "unique-id": "web",
+      "node-type": "webclient",
+      "name": "Web Front End Angular",
+      "description": "Angular frontend served behind edge proxy.",
+      "metadata": {
+        "traderx-kind": "frontend"
+      }
+    },
+    {
+      "unique-id": "account",
+      "node-type": "service",
+      "name": "Account Service",
+      "description": "Account and account-user APIs."
+    },
+    {
+      "unique-id": "position",
+      "node-type": "service",
+      "name": "Position Service",
+      "description": "Positions and trades query API."
+    },
+    {
+      "unique-id": "tradeService",
+      "node-type": "service",
+      "name": "Trade Service",
+      "description": "Trade order submission and validation."
+    },
+    {
+      "unique-id": "referenceData",
+      "node-type": "service",
+      "name": "Reference Data",
+      "description": "Ticker metadata lookup."
+    },
+    {
+      "unique-id": "people",
+      "node-type": "service",
+      "name": "People Service",
+      "description": "Person lookup and matching APIs."
+    },
+    {
+      "unique-id": "nats",
+      "node-type": "service",
+      "name": "NATS Broker",
+      "description": "Messaging backbone for trade, position, pricing, and order lifecycle streams.",
+      "metadata": {
+        "traderx-kind": "messaging"
+      }
+    },
+    {
+      "unique-id": "tradeProcessor",
+      "node-type": "service",
+      "name": "Trade Processor",
+      "description": "Consumes trade events and persists settled state."
+    },
+    {
+      "unique-id": "database",
+      "node-type": "database",
+      "name": "Database",
+      "description": "PostgreSQL persistence service."
+    },
+    {
+      "unique-id": "grafana",
+      "node-type": "service",
+      "name": "Grafana",
+      "description": "Dashboard and observability visualization UI.",
+      "metadata": {
+        "traderx-kind": "observability"
+      }
+    },
+    {
+      "unique-id": "prometheus",
+      "node-type": "service",
+      "name": "Prometheus",
+      "description": "Metrics collection and query engine.",
+      "metadata": {
+        "traderx-kind": "observability"
+      }
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "rel-developer-cluster",
+      "description": "Starts runtime",
+      "relationship-type": {
+        "interacts": {
+          "actor": "developer",
+          "nodes": [
+            "cluster"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "rel-developer-edge",
+      "description": "Browser access :8080",
+      "relationship-type": {
+        "interacts": {
+          "actor": "developer",
+          "nodes": [
+            "edge"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "rel-edge-web",
+      "description": "/",
+      "protocol": "HTTP",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "edge"
+          },
+          "destination": {
+            "node": "web"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-edge-account",
+      "description": "/account-service",
+      "protocol": "HTTP",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "edge"
+          },
+          "destination": {
+            "node": "account"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-edge-position",
+      "description": "/position-service",
+      "protocol": "HTTP",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "edge"
+          },
+          "destination": {
+            "node": "position"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-edge-tradeService",
+      "description": "/trade-service",
+      "protocol": "HTTP",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "edge"
+          },
+          "destination": {
+            "node": "tradeService"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-edge-referenceData",
+      "description": "/reference-data",
+      "protocol": "HTTP",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "edge"
+          },
+          "destination": {
+            "node": "referenceData"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-edge-people",
+      "description": "/people-service",
+      "protocol": "HTTP",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "edge"
+          },
+          "destination": {
+            "node": "people"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-edge-nats",
+      "description": "/nats-ws",
+      "protocol": "WebSocket",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "edge"
+          },
+          "destination": {
+            "node": "nats"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-edge-tradeProcessor",
+      "description": "/trade-processor",
+      "protocol": "HTTP",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "edge"
+          },
+          "destination": {
+            "node": "tradeProcessor"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-edge-grafana",
+      "description": "/grafana",
+      "protocol": "HTTP",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "edge"
+          },
+          "destination": {
+            "node": "grafana"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-edge-prometheus",
+      "description": "/prometheus",
+      "protocol": "HTTP",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "edge"
+          },
+          "destination": {
+            "node": "prometheus"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-tradeService-account",
+      "description": "Validate account",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "tradeService"
+          },
+          "destination": {
+            "node": "account"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-tradeService-referenceData",
+      "description": "Validate ticker",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "tradeService"
+          },
+          "destination": {
+            "node": "referenceData"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-tradeService-nats",
+      "description": "Publish trades/new",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "tradeService"
+          },
+          "destination": {
+            "node": "nats"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-tradeProcessor-nats",
+      "description": "Consume and publish updates",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "tradeProcessor"
+          },
+          "destination": {
+            "node": "nats"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-tradeProcessor-database",
+      "description": "Persist trade/position state",
+      "protocol": "JDBC",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "tradeProcessor"
+          },
+          "destination": {
+            "node": "database"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-account-database",
+      "description": "Account persistence",
+      "protocol": "JDBC",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "account"
+          },
+          "destination": {
+            "node": "database"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-position-database",
+      "description": "Query trades/positions",
+      "protocol": "JDBC",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "position"
+          },
+          "destination": {
+            "node": "database"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-account-people",
+      "description": "Validate person for account-user mapping",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "account"
+          },
+          "destination": {
+            "node": "people"
+          }
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "source-project": "finos/traderx",
+    "state-id": "010-kubernetes-runtime",
+    "track": "devex",
+    "status": "implemented",
+    "inherits-from": "009-order-management-matcher",
+    "notes": [
+      "Functional behavior remains intentionally equivalent to state 009.",
+      "Primary delta is runtime/operations model (Compose to Kubernetes).",
+      "Edge proxy remains NGINX-based to keep route semantics stable.",
+      "Observability stack from state 009 remains available in Kubernetes runtime."
+    ]
+  }
+}

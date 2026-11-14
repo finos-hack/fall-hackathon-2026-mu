@@ -3,14 +3,14 @@
   "sourceFile": "architecture.calm.json",
   "latestCommitDate": "2026-11-13",
   "stats": {
-    "totalCommitsScanned": 5,
-    "validSnapshotsParsed": 5,
+    "totalCommitsScanned": 6,
+    "validSnapshotsParsed": 6,
     "noiseCommitsFiltered": 0,
-    "structuralCommitsRetained": 5
+    "structuralCommitsRetained": 6
   },
   "instructions": [
-    "Group the 5 structural commits below (indices 0..4) into cohesive architectural moments (phases).",
-    "Every commit index from 0 to 4 MUST be covered contiguously with zero gaps or overlaps: first startIndex=0, each next startIndex = previous endIndex + 1, final endIndex=4.",
+    "Group the 6 structural commits below (indices 0..5) into cohesive architectural moments (phases).",
+    "Every commit index from 0 to 5 MUST be covered contiguously with zero gaps or overlaps: first startIndex=0, each next startIndex = previous endIndex + 1, final endIndex=5.",
     "Group multi-commit sprints, node-addition + relationship-wiring sequences, protocol hardening, and coupled control/ADR rollouts into unified phases while keeping pivotal milestones distinct.",
     "Write an executive `name` (3-7 words; no leading step numbers and no conventional-commit prefixes such as \"feat:\" or \"chore:\").",
     "Write a 2-3 sentence narrative `description` explaining WHAT changed architecturally, HOW connectivity or security boundaries shifted, and WHY, citing concrete node IDs, protocols, controls, or ADRs. Do not output mechanical count strings such as \"+1 node(s)\".",
@@ -31,12 +31,12 @@
         "startIndex": {
           "type": "integer",
           "minimum": 0,
-          "maximum": 4
+          "maximum": 5
         },
         "endIndex": {
           "type": "integer",
           "minimum": 0,
-          "maximum": 4
+          "maximum": 5
         },
         "uniqueId": {
           "type": "string",
@@ -141,6 +141,21 @@
         "Modified node Timelapse Stage SVG Renderer (timelapse-renderer) [name, description]",
         "Added relationship rel-cluster-to-feed",
         "Modified relationship rel-user-views-timelapse"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 5,
+      "sha": "151d9e36cd73bc6bddb315f0fba53c1316608fd5",
+      "shortSha": "151d9e3",
+      "date": "2026-11-13",
+      "author": "Akshar Prabhu Desai",
+      "subject": "feat(traderx): import upstream finos/traderx progressive states and FDC3 into CALM 1.3",
+      "summaryLine": "+1 node(s), +2 rel(s)",
+      "changes": [
+        "Added node FINOS TraderX State Importer (traderx-state-importer)",
+        "Added relationship rel-traderx-importer-to-git",
+        "Added relationship rel-traderx-importer-to-diff"
       ],
       "coChangedAdrs": []
     }

@@ -1,0 +1,332 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm.json",
+  "unique-id": "traderx-005-postgres-database-replacement",
+  "name": "FINOS TraderX — PostgreSQL Database Replacement",
+  "description": "State 005 replaces H2 database runtime with PostgreSQL while preserving state 004 containerized ingress topology and baseline flows.",
+  "nodes": [
+    {
+      "unique-id": "trader",
+      "node-type": "actor",
+      "name": "Trader Browser",
+      "description": "Uses Angular UI via ingress."
+    },
+    {
+      "unique-id": "ingress",
+      "node-type": "service",
+      "name": "NGINX Ingress",
+      "description": "Single browser entrypoint for UI + API + websocket.",
+      "metadata": {
+        "traderx-kind": "gateway"
+      }
+    },
+    {
+      "unique-id": "web",
+      "node-type": "webclient",
+      "name": "Web Front End Angular",
+      "description": "TraderX UI.",
+      "metadata": {
+        "traderx-kind": "frontend"
+      }
+    },
+    {
+      "unique-id": "referenceData",
+      "node-type": "service",
+      "name": "Reference Data",
+      "description": "Ticker lookup/list."
+    },
+    {
+      "unique-id": "tradeFeed",
+      "node-type": "service",
+      "name": "Trade Feed",
+      "description": "Socket.IO pub/sub layer (unchanged from state 004).",
+      "metadata": {
+        "traderx-kind": "messaging"
+      }
+    },
+    {
+      "unique-id": "people",
+      "node-type": "service",
+      "name": "People Service",
+      "description": "Identity lookup and validation."
+    },
+    {
+      "unique-id": "account",
+      "node-type": "service",
+      "name": "Account Service",
+      "description": "Account and account-user operations using PostgreSQL."
+    },
+    {
+      "unique-id": "position",
+      "node-type": "service",
+      "name": "Position Service",
+      "description": "Trades/positions query operations using PostgreSQL."
+    },
+    {
+      "unique-id": "tradeProcessor",
+      "node-type": "service",
+      "name": "Trade Processor",
+      "description": "Trade processing and persistence using PostgreSQL."
+    },
+    {
+      "unique-id": "tradeService",
+      "node-type": "service",
+      "name": "Trade Service",
+      "description": "Trade submission and validation."
+    },
+    {
+      "unique-id": "database",
+      "node-type": "database",
+      "name": "PostgreSQL Database",
+      "description": "Persistent account/trade/position state."
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "rel-trader-ingress",
+      "description": "Single browser entrypoint",
+      "relationship-type": {
+        "interacts": {
+          "actor": "trader",
+          "nodes": [
+            "ingress"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "rel-ingress-web",
+      "description": "/",
+      "protocol": "HTTP",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "ingress"
+          },
+          "destination": {
+            "node": "web"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-ingress-account",
+      "description": "/account-service",
+      "protocol": "HTTP",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "ingress"
+          },
+          "destination": {
+            "node": "account"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-ingress-position",
+      "description": "/position-service",
+      "protocol": "HTTP",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "ingress"
+          },
+          "destination": {
+            "node": "position"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-ingress-tradeService",
+      "description": "/trade-service",
+      "protocol": "HTTP",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "ingress"
+          },
+          "destination": {
+            "node": "tradeService"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-ingress-referenceData",
+      "description": "/reference-data",
+      "protocol": "HTTP",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "ingress"
+          },
+          "destination": {
+            "node": "referenceData"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-ingress-people",
+      "description": "/people-service",
+      "protocol": "HTTP",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "ingress"
+          },
+          "destination": {
+            "node": "people"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-ingress-tradeFeed",
+      "description": "/trade-feed (WS)",
+      "protocol": "WebSocket",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "ingress"
+          },
+          "destination": {
+            "node": "tradeFeed"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-tradeService-account",
+      "description": "Validate account",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "tradeService"
+          },
+          "destination": {
+            "node": "account"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-tradeService-referenceData",
+      "description": "Validate ticker",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "tradeService"
+          },
+          "destination": {
+            "node": "referenceData"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-tradeService-tradeFeed",
+      "description": "Publish trade event",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "tradeService"
+          },
+          "destination": {
+            "node": "tradeFeed"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-tradeProcessor-tradeFeed",
+      "description": "Consume/publish account updates",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "tradeProcessor"
+          },
+          "destination": {
+            "node": "tradeFeed"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-account-people",
+      "description": "Validate person",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "account"
+          },
+          "destination": {
+            "node": "people"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-account-database",
+      "description": "Read/write account data",
+      "protocol": "JDBC",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "account"
+          },
+          "destination": {
+            "node": "database"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-position-database",
+      "description": "Read positions/trades",
+      "protocol": "JDBC",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "position"
+          },
+          "destination": {
+            "node": "database"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-tradeProcessor-database",
+      "description": "Persist processed trades/positions",
+      "protocol": "JDBC",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "tradeProcessor"
+          },
+          "destination": {
+            "node": "database"
+          }
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "source-project": "finos/traderx",
+    "state-id": "005-postgres-database-replacement",
+    "track": "architecture",
+    "status": "implemented",
+    "inherits-from": "004-containerized-compose-runtime",
+    "notes": [
+      "State 005 is an architecture-track branch from state 004.",
+      "Only database engine/runtime is replaced; functional API and messaging contracts remain stable.",
+      "H2 web console is removed from runtime expectations in this state."
+    ]
+  },
+  "adrs": [
+    "docs/adr/006-state-005-use-postgres-for-database-replacement.md"
+  ]
+}

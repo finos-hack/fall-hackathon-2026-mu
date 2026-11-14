@@ -33,5 +33,12 @@
     "uniqueId": "moment-05-architecture-feed-mode",
     "name": "Reverse-Chronological Architecture Feed Mode",
     "description": "Adds the scrollable reverse-chronological Architecture Feed (--feed / #feed), rendering each major architectural change as a story card with an auto-cropped SVG diagram and narrative summary."
+  },
+  {
+    "startIndex": 5,
+    "endIndex": 5,
+    "uniqueId": "moment-06-finos-traderx-importer",
+    "name": "Upstream FINOS TraderX & FDC3 State Importer",
+    "description": "Integrates upstream finos/traderx progressive architecture states (States 001-014 including FINOS FDC3 intent interoperability), ADRs, and Git commits into CALM 1.3."
   }
 ]
