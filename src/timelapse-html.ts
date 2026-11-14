@@ -4,7 +4,11 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { computeStructuralDelta, summarizeCounts } from './calm-diff.js';
 import { synchronizeSavedTimelines } from './federation.js';
-import { computeSnapshotSha256, serializeCalmSnapshot } from './timeline-emitter.js';
+import {
+  computeSnapshotSha256,
+  formatCalmSourceDisplay,
+  serializeCalmSnapshot,
+} from './timeline-emitter.js';
 import type {
   DeltaChangeItem,
   FederatedNodeProvenance,
@@ -178,14 +182,69 @@ function extractNodesFromPatternSchema(doc: Record<string, unknown>): GraphNode[
   return out;
 }
 
+function collectControlIds(rawControls: unknown): string[] {
+  const ctrlObj = asRecord(rawControls);
+  if (ctrlObj) {
+    return Object.keys(ctrlObj)
+      .map((k) => k.trim())
+      .filter(Boolean);
+  }
+  if (Array.isArray(rawControls)) {
+    const out: string[] = [];
+    for (const item of rawControls) {
+      if (typeof item === 'string' && item.trim()) {
+        out.push(item.trim());
+      } else {
+        const rec = asRecord(item);
+        const id =
+          typeof rec?.['id'] === 'string'
+            ? rec['id'].trim()
+            : typeof rec?.['unique-id'] === 'string'
+              ? rec['unique-id'].trim()
+              : '';
+        if (id) out.push(id);
+      }
+    }
+    return out;
+  }
+  return [];
+}
+
+function resolveControlKey(
+  rawId: string,
+  options?: {
+    ownerId?: string;
+    topLevelIds?: ReadonlySet<string>;
+    collidingInlineIds?: ReadonlySet<string>;
+  },
+): string {
+  const trimmed = rawId.trim();
+  if (!trimmed) return '';
+  const ownerId = options?.ownerId;
+  if (
+    !ownerId ||
+    options?.topLevelIds?.has(trimmed) ||
+    !options?.collidingInlineIds?.has(trimmed) ||
+    trimmed.startsWith(`${ownerId}:`)
+  ) {
+    return trimmed;
+  }
+  return `${ownerId}:${trimmed}`;
+}
+
 function readControlMapInto(
   rawControls: unknown,
   byId: Map<string, ControlInfo>,
+  options?: {
+    ownerId?: string;
+    topLevelIds?: ReadonlySet<string>;
+    collidingInlineIds?: ReadonlySet<string>;
+  },
 ): void {
   const ctrlObj = asRecord(rawControls);
   if (ctrlObj) {
     for (const [rawId, rawVal] of Object.entries(ctrlObj)) {
-      const id = rawId.trim();
+      const id = resolveControlKey(rawId, options);
       if (!id) continue;
       const val = asRecord(rawVal);
       const description =
@@ -211,18 +270,19 @@ function readControlMapInto(
   if (Array.isArray(rawControls)) {
     for (const item of rawControls) {
       if (typeof item === 'string' && item.trim()) {
-        const id = item.trim();
-        if (!byId.has(id)) {
+        const id = resolveControlKey(item, options);
+        if (id && !byId.has(id)) {
           byId.set(id, { id, description: '', requirementCount: 0 });
         }
       } else {
         const rec = asRecord(item);
-        const id =
+        const rawItemId =
           typeof rec?.['id'] === 'string'
-            ? rec['id'].trim()
+            ? rec['id']
             : typeof rec?.['unique-id'] === 'string'
-              ? rec['unique-id'].trim()
+              ? rec['unique-id']
               : '';
+        const id = resolveControlKey(rawItemId, options);
         if (!id) continue;
         const description =
           typeof rec?.['description'] === 'string' ? rec['description'].trim() : '';
@@ -248,14 +308,58 @@ export function extractActiveControls(doc: Record<string, unknown>): ControlInfo
   const byId = new Map<string, ControlInfo>();
 
   readControlMapInto(doc['controls'], byId);
+  const topLevelIds = new Set(byId.keys());
 
+  const inlineEntries: Array<{ ownerId: string; rawControls: unknown }> = [];
   const rawNodes = doc['nodes'];
   if (Array.isArray(rawNodes)) {
-    for (const rawNode of rawNodes) {
-      const node = asRecord(rawNode);
+    for (let i = 0; i < rawNodes.length; i++) {
+      const node = asRecord(rawNodes[i]);
       if (!node) continue;
-      readControlMapInto(node['controls'], byId);
+      inlineEntries.push({ ownerId: extractNodeId(node, i), rawControls: node['controls'] });
     }
+  }
+
+  const rawRels = doc['relationships'];
+  if (Array.isArray(rawRels)) {
+    for (let i = 0; i < rawRels.length; i++) {
+      const rel = asRecord(rawRels[i]);
+      if (!rel) continue;
+      const ownerId =
+        typeof rel['unique-id'] === 'string' && rel['unique-id'].trim()
+          ? rel['unique-id'].trim()
+          : typeof rel['id'] === 'string' && rel['id'].trim()
+            ? rel['id'].trim()
+            : `rel-${i}`;
+      inlineEntries.push({ ownerId, rawControls: rel['controls'] });
+    }
+  }
+
+  const ownersByControlId = new Map<string, Set<string>>();
+  for (const entry of inlineEntries) {
+    for (const ctrlId of collectControlIds(entry.rawControls)) {
+      let owners = ownersByControlId.get(ctrlId);
+      if (!owners) {
+        owners = new Set<string>();
+        ownersByControlId.set(ctrlId, owners);
+      }
+      owners.add(entry.ownerId);
+    }
+  }
+
+  const collidingInlineIds = new Set<string>();
+  for (const [ctrlId, owners] of ownersByControlId.entries()) {
+    if (owners.size > 1 && !topLevelIds.has(ctrlId)) {
+      collidingInlineIds.add(ctrlId);
+    }
+  }
+
+  for (const entry of inlineEntries) {
+    readControlMapInto(entry.rawControls, byId, {
+      ownerId: entry.ownerId,
+      topLevelIds,
+      collidingInlineIds,
+    });
   }
 
   return [...byId.values()];
@@ -797,25 +901,65 @@ export function computeSuperGraphLayout(
     }
   }
 
-  const maxRowsPerCol = 6;
-  const finalColumns: GraphNode[][] = [];
-  for (const layerNum of sortedLayerNums) {
-    const list = buckets.get(layerNum)!;
-    if (list.length <= maxRowsPerCol) {
-      finalColumns.push(list);
-    } else {
-      const subColCount = Math.ceil(list.length / maxRowsPerCol);
-      const chunkSize = Math.ceil(list.length / subColCount);
-      for (let c = 0; c < list.length; c += chunkSize) {
-        finalColumns.push(list.slice(c, c + chunkSize));
-      }
-    }
-  }
-
   const colSpacing = 290;
   const rowSpacing = 132;
   const padX = 115;
   const padY = 64;
+
+  const buildColumnsForMaxRows = (maxRows: number): GraphNode[][] => {
+    const rawCols: GraphNode[][] = [];
+    for (const layerNum of sortedLayerNums) {
+      const list = buckets.get(layerNum)!;
+      if (list.length <= maxRows) {
+        rawCols.push(list);
+      } else {
+        const subColCount = Math.ceil(list.length / maxRows);
+        const chunkSize = Math.ceil(list.length / subColCount);
+        for (let c = 0; c < list.length; c += chunkSize) {
+          rawCols.push(list.slice(c, c + chunkSize));
+        }
+      }
+    }
+
+    if (nodeMap.size <= 48 || rawCols.length <= 10) {
+      return rawCols;
+    }
+
+    const packCap = Math.max(6, Math.floor(maxRows * 0.72));
+    const packed: GraphNode[][] = [];
+    for (const col of rawCols) {
+      const prev = packed[packed.length - 1];
+      if (prev && prev.length + col.length <= packCap) {
+        packed[packed.length - 1] = [...prev, ...col];
+      } else {
+        packed.push(col);
+      }
+    }
+    return packed;
+  };
+
+  let finalColumns: GraphNode[][];
+  if (nodeMap.size <= 24) {
+    finalColumns = buildColumnsForMaxRows(6);
+  } else {
+    const targetAspect = 1.68;
+    const maxCandidate = Math.max(8, Math.min(28, Math.ceil(Math.sqrt(nodeMap.size * 2.4))));
+    let bestCols = buildColumnsForMaxRows(6);
+    let bestScore = Number.POSITIVE_INFINITY;
+
+    for (let candidate = 6; candidate <= maxCandidate; candidate++) {
+      const cols = buildColumnsForMaxRows(candidate);
+      const maxRows = Math.max(1, ...cols.map((col) => col.length));
+      const w = Math.max(520, padX * 2 + Math.max(0, cols.length - 1) * colSpacing);
+      const h = Math.max(260, padY * 2 + Math.max(0, maxRows - 1) * rowSpacing);
+      const score = Math.abs(Math.log(w / h / targetAspect));
+      if (score + 1e-6 < bestScore) {
+        bestScore = score;
+        bestCols = cols;
+      }
+    }
+    finalColumns = bestCols;
+  }
 
   const maxRowsInAnyLayer = Math.max(1, ...finalColumns.map((col) => col.length));
   const canvasWidth = Math.max(520, padX * 2 + Math.max(0, finalColumns.length - 1) * colSpacing);
@@ -856,6 +1000,7 @@ export function buildTimelapsePayloadFromClusters(
   options: {
     title?: string;
     sourceFile: string;
+    repoRoot?: string;
     sources?: FederatedSourceDescriptor[];
     defaultView?: 'stage' | 'feed';
     engine: string;
@@ -949,7 +1094,9 @@ export function buildTimelapsePayloadFromClusters(
   const isMultiSource = Boolean(options.sources && options.sources.length > 1);
   const sourceBase = isMultiSource
     ? options.sources!.map((s) => s.sourceLabel).join(' + ')
-    : path.basename(options.sourceFile);
+    : options.sources && options.sources.length === 1
+      ? options.sources[0].sourceLabel
+      : formatCalmSourceDisplay(options.sourceFile, options.repoRoot);
   return {
     title: options.title ?? `CALM Architecture Timelapse — ${sourceBase}`,
     generatedAt: new Date().toISOString(),
@@ -1114,9 +1261,11 @@ export function buildTimelapsePayloadFromTimelineFile(
   const sourceBase =
     rawSources && rawSources.length > 1
       ? rawSources.map((s) => s.sourceLabel).join(' + ')
-      : typeof rawMeta?.['source-file'] === 'string' && rawMeta['source-file'].trim()
-        ? path.basename(rawMeta['source-file'].trim())
-        : path.basename(resolved);
+      : rawSources && rawSources.length === 1
+        ? rawSources[0].sourceLabel
+        : typeof rawMeta?.['source-file'] === 'string' && rawMeta['source-file'].trim()
+          ? formatCalmSourceDisplay(rawMeta['source-file'].trim())
+          : path.basename(resolved);
   return {
     title: `CALM Architecture Timelapse — ${sourceBase}`,
     generatedAt: new Date().toISOString(),
@@ -2282,7 +2431,7 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
         const availH = Math.max(100, viewH - padTop - padBottom);
         const bw = Math.max(200, bounds.maxX - bounds.minX);
         const bh = Math.max(96, bounds.maxY - bounds.minY);
-        const scale = Math.max(0.12, Math.min(availW / bw, availH / bh, 1.32));
+        const scale = Math.max(0.04, Math.min(availW / bw, availH / bh, 1.32));
         const cx = (bounds.minX + bounds.maxX) / 2;
         const cy = (bounds.minY + bounds.maxY) / 2;
         zoomScale = scale;
@@ -2295,7 +2444,7 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
       function setZoom(nextScale, anchorX, anchorY) {
         autoFit = false;
         syncSvgViewBox();
-        const clamped = Math.max(0.10, Math.min(3.2, nextScale));
+        const clamped = Math.max(0.04, Math.min(3.2, nextScale));
         const ax = anchorX !== undefined ? anchorX : viewW / 2;
         const ay = anchorY !== undefined ? anchorY : viewH / 2;
         const ratio = clamped / zoomScale;

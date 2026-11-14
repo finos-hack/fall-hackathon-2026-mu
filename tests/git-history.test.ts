@@ -173,4 +173,41 @@ describe('extractGitHistory and filterStructuralCommits', () => {
         expect(customLogCall).toContain('-n');
         expect(customLogCall).toContain('50');
     });
+
+    it('retains co-changed ADRs on monorepo PRs (>20 files) while ignoring bulk >250-file or >10-ADR sweeps', () => {
+        const monorepoFiles = Array.from({ length: 45 }, (_, i) => `services/svc-${i}/index.ts`);
+        const bulkFiles = Array.from({ length: 260 }, (_, i) => `packages/pkg-${i}/index.ts`);
+        const manyAdrs = Array.from({ length: 12 }, (_, i) => `docs/adr/00${i + 10}-policy.md`);
+
+        const mockRunner = (args: string[]): string => {
+            if (args[0] === 'rev-parse') return tempDir;
+            if (args[0] === 'log') {
+                return [
+                    '\x1e3333333333333333\x1f3333333\x1f2026-03-03\x1fDev\x1fbulk\x1f\x1f2026-03-03T00:00:00Z\x1darchitecture.calm.json\n',
+                    '\x1e2222222222222222\x1f2222222\x1f2026-03-02\x1fDev\x1freformat adrs\x1f\x1f2026-03-02T00:00:00Z\x1darchitecture.calm.json\n',
+                    '\x1e1111111111111111\x1f1111111\x1f2026-03-01\x1fDev\x1ffeat: boundary contract\x1f\x1f2026-03-01T00:00:00Z\x1darchitecture.calm.json\n',
+                ].join('');
+            }
+            if (args[0] === 'show' && args[1] === '--format=%x1e%H') {
+                return [
+                    `\x1e1111111111111111\narchitecture.calm.json\ndocs/adr/0026-boundary-contracts.md\n${monorepoFiles.join('\n')}`,
+                    `\x1e2222222222222222\narchitecture.calm.json\n${manyAdrs.join('\n')}`,
+                    `\x1e3333333333333333\narchitecture.calm.json\ndocs/adr/0099-seed.md\n${bulkFiles.join('\n')}`,
+                ].join('\n');
+            }
+            return JSON.stringify({
+                nodes: [{ 'unique-id': 'svc', name: 'Svc', 'node-type': 'service' }],
+                relationships: [],
+            });
+        };
+
+        const dummyPath = path.join(tempDir, 'architecture.calm.json');
+        fs.writeFileSync(dummyPath, '{}');
+
+        const history = extractGitHistory(dummyPath, { gitRunner: mockRunner });
+        expect(history.commits).toHaveLength(3);
+        expect(history.commits[0].coChangedAdrs).toEqual(['docs/adr/0026-boundary-contracts.md']);
+        expect(history.commits[1].coChangedAdrs).toEqual([]);
+        expect(history.commits[2].coChangedAdrs).toEqual([]);
+    });
 });

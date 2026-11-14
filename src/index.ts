@@ -7,6 +7,7 @@ import { extractAndSynchronizeGitSources, parseSourceTargetSpec } from './federa
 import { extractGitHistory, filterStructuralCommits } from './git-history.js';
 import {
   assembleCalmTimeline,
+  formatCalmSourceDisplay,
   validateCalmArchitectureSnapshot,
   validateTimelineStructure,
 } from './timeline-emitter.js';
@@ -82,6 +83,7 @@ export async function generateTimelineFromGit(
   let noiseCommitsFiltered: number;
   let sources: FederatedSourceDescriptor[] | undefined;
   let repositoriesTracked: number | undefined;
+  let singleRepoRoot: string | undefined;
   const primaryFilePath = parseSourceTargetSpec(targets[0]).filePath;
 
   if (useFederatedMode) {
@@ -121,6 +123,7 @@ export async function generateTimelineFromGit(
     totalCommitsScanned = extracted.totalCommitsScanned;
     validSnapshotsParsed = extracted.commits.length;
     noiseCommitsFiltered = filtered.noiseCommitsFiltered;
+    singleRepoRoot = extracted.repoRoot;
   }
 
   if (deltas.length === 0) {
@@ -132,7 +135,9 @@ export async function generateTimelineFromGit(
   const digestSourceDisplay =
     sources && sources.length > 1
       ? sources.map((s) => s.sourceLabel).join(' + ')
-      : path.basename(primaryFilePath);
+      : sources && sources.length === 1
+        ? sources[0].sourceLabel
+        : formatCalmSourceDisplay(primaryFilePath, singleRepoRoot);
 
   const digest = buildCommitHistoryDigest(deltas, {
     sourceFile: digestSourceDisplay,
@@ -173,6 +178,7 @@ export async function generateTimelineFromGit(
 
   const { timeline, snapshotPaths } = assembleCalmTimeline(clusters, {
     sourceFilePath: primaryFilePath,
+    repoRoot: singleRepoRoot,
     sources,
     outputPath: options.outputPath,
     snapshotsDir: options.snapshotsDir,
@@ -214,6 +220,7 @@ export async function generateTimelineFromGit(
   if (options.timelapsePath) {
     const payload = buildTimelapsePayloadFromClusters(clusters, {
       sourceFile: primaryFilePath,
+      repoRoot: singleRepoRoot,
       sources,
       defaultView: options.defaultView,
       engine,
