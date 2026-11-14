@@ -32,7 +32,124 @@
       "unique-id": "ingress",
       "node-type": "service",
       "name": "NGINX Ingress",
-      "description": "Routes UI, API, and order admin traffic."
+      "description": "Routes UI, API, and order admin traffic.",
+      "controls": {
+        "traderx-002-ingress-contract-and-health-surface": {
+          "description": "FR-201: The state SHALL expose a single browser-facing edge endpoint for baseline UI traffic. FR-202: The edge SHALL route requests to existing backend services without changing current API contracts.",
+          "requirements": [
+            {
+              "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+              "config": {
+                "control-id": "traderx-002-ingress-contract-and-health-surface",
+                "name": "State 002 Ingress Routing & Service Health Telemetry",
+                "description": "FR-201: The state SHALL expose a single browser-facing edge endpoint for baseline UI traffic. FR-202: The edge SHALL route requests to existing backend services without changing current API contracts.",
+                "source-spec-url": "https://github.com/finos/traderx/blob/main/specs/002-edge-proxy-uncontainerized/spec.md",
+                "clauses": [
+                  "FR-201: The state SHALL expose a single browser-facing edge endpoint for baseline UI traffic.",
+                  "FR-202: The edge SHALL route requests to existing backend services without changing current API contracts.",
+                  "FR-203: Existing baseline end-to-end flows F1-F6 SHALL remain behaviorally compatible.",
+                  "FR-204: The edge endpoint SHALL expose a standalone API explorer at /api/docs, backed by state API metadata and service OpenAPI specs."
+                ]
+              }
+            }
+          ]
+        },
+        "traderx-004-ingress-contract-and-health-surface": {
+          "description": "FR-301: Baseline flows F1-F6 SHALL remain behaviorally compatible in containerized runtime. FR-302: State SHALL expose documented runtime entrypoints for UI and APIs in container mode.",
+          "requirements": [
+            {
+              "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+              "config": {
+                "control-id": "traderx-004-ingress-contract-and-health-surface",
+                "name": "State 004 Ingress Routing & Service Health Telemetry",
+                "description": "FR-301: Baseline flows F1-F6 SHALL remain behaviorally compatible in containerized runtime. FR-302: State SHALL expose documented runtime entrypoints for UI and APIs in container mode.",
+                "source-spec-url": "https://github.com/finos/traderx/blob/main/specs/004-containerized-compose-runtime/spec.md",
+                "clauses": [
+                  "FR-301: Baseline flows F1-F6 SHALL remain behaviorally compatible in containerized runtime.",
+                  "FR-302: State SHALL expose documented runtime entrypoints for UI and APIs in container mode.",
+                  "FR-303: Ingress runtime SHALL expose a standalone API explorer at /api/docs, backed by state API metadata and service OpenAPI specs.",
+                  "FR-304: GUI state-awareness requirements from state 001 (header title with active state id, About page metadata/lineage, API explorer link) SHALL be preserved."
+                ]
+              }
+            }
+          ]
+        },
+        "traderx-005-security-and-compliance": {
+          "description": "Default local development credentials are intentionally simple and state-scoped.",
+          "requirements": [
+            {
+              "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+              "config": {
+                "control-id": "traderx-005-security-and-compliance",
+                "name": "State 005 Security & Provenance Control (PostgreSQL Database Replacement)",
+                "description": "Default local development credentials are intentionally simple and state-scoped.",
+                "source-spec-url": "https://github.com/finos/traderx/blob/main/specs/005-postgres-database-replacement/requirements/nonfunctional-delta.md",
+                "clauses": [
+                  "Default local development credentials are intentionally simple and state-scoped."
+                ]
+              }
+            }
+          ]
+        },
+        "traderx-006-security-and-compliance": {
+          "description": "Subject namespace design must avoid exposing internal-only subjects to browser subscriptions. Browser-visible subjects are limited to account-scoped streams via documented naming policy.",
+          "requirements": [
+            {
+              "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+              "config": {
+                "control-id": "traderx-006-security-and-compliance",
+                "name": "State 006 Security & Provenance Control (Messaging Layer Replacement with NATS)",
+                "description": "Subject namespace design must avoid exposing internal-only subjects to browser subscriptions. Browser-visible subjects are limited to account-scoped streams via documented naming policy.",
+                "source-spec-url": "https://github.com/finos/traderx/blob/main/specs/006-messaging-nats-replacement/requirements/nonfunctional-delta.md",
+                "clauses": [
+                  "Subject namespace design must avoid exposing internal-only subjects to browser subscriptions.",
+                  "Browser-visible subjects are limited to account-scoped streams via documented naming policy."
+                ]
+              }
+            }
+          ]
+        },
+        "traderx-007-security-and-compliance": {
+          "description": "Grafana dashboards are publicly readable through ingress using anonymous Viewer access for demos. Grafana administrator credentials use state-scoped non-admin/admin defaults and remain overrideable with TRADERX_GRAFANA_ADMIN_USER and TRADERX_GRAFANA_ADMIN_PASSWORD.",
+          "requirements": [
+            {
+              "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+              "config": {
+                "control-id": "traderx-007-security-and-compliance",
+                "name": "State 007 Security & Provenance Control (Observability with LGTM on Compose)",
+                "description": "Grafana dashboards are publicly readable through ingress using anonymous Viewer access for demos. Grafana administrator credentials use state-scoped non-admin/admin defaults and remain overrideable with TRADERX_GRAFANA_ADMIN_USER and TRADERX_GRAFANA_ADMIN_PASSWORD.",
+                "source-spec-url": "https://github.com/finos/traderx/blob/main/specs/007-observability-lgtm-compose/requirements/nonfunctional-delta.md",
+                "clauses": [
+                  "Grafana dashboards are publicly readable through ingress using anonymous Viewer access for demos.",
+                  "Grafana administrator credentials use state-scoped non-admin/admin defaults and remain overrideable with TRADERX_GRAFANA_ADMIN_USER and TRADERX_GRAFANA_ADMIN_PASSWORD.",
+                  "Promtail Docker discovery uses a Docker API version exported by the generated runtime harness from the local Docker daemon, with TRADERX_PROMTAIL_DOCKER_API_VERSION as the explicit override.",
+                  "As convergence level C1, this state requires container build/publish CI with namespace ghcr.io/finos/traderx-c1/<component>."
+                ]
+              }
+            }
+          ]
+        },
+        "traderx-009-security-and-compliance": {
+          "description": "Operational actions (cancel/force-fill) must be auditable via structured logs and traceable order IDs. Order data must remain durable across order-matcher process/container restarts while the shared database remains available.",
+          "requirements": [
+            {
+              "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+              "config": {
+                "control-id": "traderx-009-security-and-compliance",
+                "name": "State 009 Security & Provenance Control (Order Management and Matcher)",
+                "description": "Operational actions (cancel/force-fill) must be auditable via structured logs and traceable order IDs. Order data must remain durable across order-matcher process/container restarts while the shared database remains available.",
+                "source-spec-url": "https://github.com/finos/traderx/blob/main/specs/009-order-management-matcher/requirements/nonfunctional-delta.md",
+                "clauses": [
+                  "Operational actions (cancel/force-fill) must be auditable via structured logs and traceable order IDs.",
+                  "Order data must remain durable across order-matcher process/container restarts while the shared database remains available.",
+                  "As convergence level C2, this state requires container build/publish CI with namespace ghcr.io/finos/traderx-c2/<component>.",
+                  "Generated artifacts must include a GHCR run bundle so users can run the C2 environment from published images."
+                ]
+              }
+            }
+          ]
+        }
+      }
     },
     {
       "unique-id": "trade_ui",
@@ -68,7 +185,105 @@
       "unique-id": "prometheus",
       "node-type": "service",
       "name": "Prometheus",
-      "description": "Scrapes order metrics and blackbox probes."
+      "description": "Scrapes order metrics and blackbox probes.",
+      "controls": {
+        "traderx-005-reliability-and-observability": {
+          "description": "Startup checks include PostgreSQL readiness to reduce race-condition failures. Smoke checks validate baseline data load and service compatibility against PostgreSQL.",
+          "requirements": [
+            {
+              "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+              "config": {
+                "control-id": "traderx-005-reliability-and-observability",
+                "name": "State 005 Reliability, Precision & Telemetry Control",
+                "description": "Startup checks include PostgreSQL readiness to reduce race-condition failures. Smoke checks validate baseline data load and service compatibility against PostgreSQL.",
+                "source-spec-url": "https://github.com/finos/traderx/blob/main/specs/005-postgres-database-replacement/requirements/nonfunctional-delta.md",
+                "clauses": [
+                  "Startup checks include PostgreSQL readiness to reduce race-condition failures.",
+                  "Smoke checks validate baseline data load and service compatibility against PostgreSQL."
+                ]
+              }
+            }
+          ]
+        },
+        "traderx-006-reliability-and-observability": {
+          "description": "Messaging topology supports request/reply and optional future JetStream durability without redesign. Broker health endpoint and connectivity checks are included in smoke/conformance expectations.",
+          "requirements": [
+            {
+              "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+              "config": {
+                "control-id": "traderx-006-reliability-and-observability",
+                "name": "State 006 Reliability, Precision & Telemetry Control",
+                "description": "Messaging topology supports request/reply and optional future JetStream durability without redesign. Broker health endpoint and connectivity checks are included in smoke/conformance expectations.",
+                "source-spec-url": "https://github.com/finos/traderx/blob/main/specs/006-messaging-nats-replacement/requirements/nonfunctional-delta.md",
+                "clauses": [
+                  "Messaging topology supports request/reply and optional future JetStream durability without redesign.",
+                  "Broker health endpoint and connectivity checks are included in smoke/conformance expectations."
+                ]
+              }
+            }
+          ]
+        },
+        "traderx-007-reliability-and-observability": {
+          "description": "Blackbox probe success and latency metrics are available for key TraderX endpoints. Spring Boot actuator Prometheus metrics are scraped for all compatible JVM services in this state.",
+          "requirements": [
+            {
+              "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+              "config": {
+                "control-id": "traderx-007-reliability-and-observability",
+                "name": "State 007 Reliability, Precision & Telemetry Control",
+                "description": "Blackbox probe success and latency metrics are available for key TraderX endpoints. Spring Boot actuator Prometheus metrics are scraped for all compatible JVM services in this state.",
+                "source-spec-url": "https://github.com/finos/traderx/blob/main/specs/007-observability-lgtm-compose/requirements/nonfunctional-delta.md",
+                "clauses": [
+                  "Blackbox probe success and latency metrics are available for key TraderX endpoints.",
+                  "Spring Boot actuator Prometheus metrics are scraped for all compatible JVM services in this state.",
+                  "Prometheus-compatible metrics exposure is a required integration point: if a service supports it, scrape targets and dashboards must be updated in the same change.",
+                  "Container logs are queryable in Grafana via Loki."
+                ]
+              }
+            }
+          ]
+        },
+        "traderx-008-reliability-and-observability": {
+          "description": "yfinance bootstrap is startup-only and falls back to snapshot/fallback values on failure. Existing baseline trade/account validation behavior remains unchanged.",
+          "requirements": [
+            {
+              "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+              "config": {
+                "control-id": "traderx-008-reliability-and-observability",
+                "name": "State 008 Reliability, Precision & Telemetry Control",
+                "description": "yfinance bootstrap is startup-only and falls back to snapshot/fallback values on failure. Existing baseline trade/account validation behavior remains unchanged.",
+                "source-spec-url": "https://github.com/finos/traderx/blob/main/specs/008-pricing-awareness-market-data/requirements/nonfunctional-delta.md",
+                "clauses": [
+                  "yfinance bootstrap is startup-only and falls back to snapshot/fallback values on failure.",
+                  "Existing baseline trade/account validation behavior remains unchanged.",
+                  "Legacy ticker compatibility is normalized at source (FB emitted as META) to avoid dual-symbol drift across clients.",
+                  "Prometheus scraping coverage from state 007 remains required for any service in this state that exposes Prometheus-compatible metrics."
+                ]
+              }
+            }
+          ]
+        },
+        "traderx-009-reliability-and-observability": {
+          "description": "Order-management components expose Prometheus metrics and /health endpoints. Prometheus scrape coverage is mandatory for all services in this state that expose Prometheus-compatible metrics (including order-matcher and compatible JVM services via /actuator/prometheus).",
+          "requirements": [
+            {
+              "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+              "config": {
+                "control-id": "traderx-009-reliability-and-observability",
+                "name": "State 009 Reliability, Precision & Telemetry Control",
+                "description": "Order-management components expose Prometheus metrics and /health endpoints. Prometheus scrape coverage is mandatory for all services in this state that expose Prometheus-compatible metrics (including order-matcher and compatible JVM services via /actuator/prometheus).",
+                "source-spec-url": "https://github.com/finos/traderx/blob/main/specs/009-order-management-matcher/requirements/nonfunctional-delta.md",
+                "clauses": [
+                  "Order-management components expose Prometheus metrics and /health endpoints.",
+                  "Prometheus scrape coverage is mandatory for all services in this state that expose Prometheus-compatible metrics (including order-matcher and compatible JVM services via /actuator/prometheus).",
+                  "traderx_orders_open_total (gauge): total open, unfilled orders.",
+                  "traderx_orders_unfilled_total (gauge): open + partially filled orders awaiting completion."
+                ]
+              }
+            }
+          ]
+        }
+      }
     },
     {
       "unique-id": "blackbox",
@@ -331,6 +546,297 @@
       }
     }
   ],
+  "flows": [
+    {
+      "unique-id": "flow-009-order-matching-execution",
+      "name": "Order Submission, Matching & Trade Execution",
+      "description": "Submits orders through ingress and Trade UI to Order API, matches contra orders in Order Matcher, and publishes fills over NATS to Trade Processor.",
+      "transitions": [
+        {
+          "relationship-unique-id": "rel-developer-ingress",
+          "sequence-number": 1,
+          "description": "Operator opens Trade UI via ingress."
+        },
+        {
+          "relationship-unique-id": "rel-ingress-trade_ui",
+          "sequence-number": 2,
+          "description": "Ingress serves Trade UI order entry workflow."
+        },
+        {
+          "relationship-unique-id": "rel-trade_ui-order_api",
+          "sequence-number": 3,
+          "description": "Trade UI submits order lifecycle request to Order API."
+        },
+        {
+          "relationship-unique-id": "rel-order_api-order_matcher",
+          "sequence-number": 4,
+          "description": "Order API routes eligible order to Order Matcher."
+        },
+        {
+          "relationship-unique-id": "rel-order_matcher-nats",
+          "sequence-number": 5,
+          "description": "Order Matcher publishes execution fills to NATS."
+        },
+        {
+          "relationship-unique-id": "rel-nats-trade_processor",
+          "sequence-number": 6,
+          "description": "Trade Processor books matched execution fills."
+        }
+      ]
+    }
+  ],
+  "controls": {
+    "traderx-001-pre-trade-and-account-validation": {
+      "description": "SYS-FR-002 The UI SHALL load all accounts at startup through account-service and render them for selection. SYS-FR-006 The trade-service SHALL validate account and ticker before publishing new trade orders.",
+      "requirements": [
+        {
+          "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+          "config": {
+            "control-id": "traderx-001-pre-trade-and-account-validation",
+            "name": "State 001 Pre-Publish Trade & Account Validation",
+            "description": "SYS-FR-002 The UI SHALL load all accounts at startup through account-service and render them for selection. SYS-FR-006 The trade-service SHALL validate account and ticker before publishing new trade orders.",
+            "source-spec-url": "https://github.com/finos/traderx/blob/main/specs/001-baseline-uncontainerized-parity/system/system-requirements.md",
+            "clauses": [
+              "SYS-FR-002 The UI SHALL load all accounts at startup through account-service and render them for selection.",
+              "SYS-FR-006 The trade-service SHALL validate account and ticker before publishing new trade orders.",
+              "SYS-FR-009 The account-service SHALL validate users with people-service before persisting account-user mappings.",
+              "SYS-FR-010 The system SHALL provide health/readiness endpoints used by startup and smoke checks."
+            ]
+          }
+        }
+      ]
+    },
+    "traderx-001-spec-kit-release-and-readiness-gate": {
+      "description": "SYS-NFR-004 The system SHALL provide deterministic smoke-testable startup and stop scripts.",
+      "requirements": [
+        {
+          "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+          "config": {
+            "control-id": "traderx-001-spec-kit-release-and-readiness-gate",
+            "name": "State 001 Spec-Kit Dependency & Readiness Gate",
+            "description": "SYS-NFR-004 The system SHALL provide deterministic smoke-testable startup and stop scripts.",
+            "source-spec-url": "https://github.com/finos/traderx/blob/main/specs/001-baseline-uncontainerized-parity/system/system-requirements.md",
+            "clauses": [
+              "SYS-NFR-004 The system SHALL provide deterministic smoke-testable startup and stop scripts.",
+              "SYS-NFR-005 Requirements SHALL be traceable to user stories, acceptance criteria, generated components, and verification commands.",
+              "SYS-NFR-009 Dependency upgrade targets SHALL be declared in canonical repository artifacts before template or patchset version changes are accepted, and MUST propagate to all generated state releases. Template smoke checks SHALL run before top-level state generation, and generated-output/branch validation gates SHALL fail before merge or publish when target versions do not propagate."
+            ]
+          }
+        }
+      ]
+    },
+    "traderx-002-ingress-contract-and-health-surface": {
+      "description": "FR-201: The state SHALL expose a single browser-facing edge endpoint for baseline UI traffic. FR-202: The edge SHALL route requests to existing backend services without changing current API contracts.",
+      "requirements": [
+        {
+          "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+          "config": {
+            "control-id": "traderx-002-ingress-contract-and-health-surface",
+            "name": "State 002 Ingress Routing & Service Health Telemetry",
+            "description": "FR-201: The state SHALL expose a single browser-facing edge endpoint for baseline UI traffic. FR-202: The edge SHALL route requests to existing backend services without changing current API contracts.",
+            "source-spec-url": "https://github.com/finos/traderx/blob/main/specs/002-edge-proxy-uncontainerized/spec.md",
+            "clauses": [
+              "FR-201: The state SHALL expose a single browser-facing edge endpoint for baseline UI traffic.",
+              "FR-202: The edge SHALL route requests to existing backend services without changing current API contracts.",
+              "FR-203: Existing baseline end-to-end flows F1-F6 SHALL remain behaviorally compatible.",
+              "FR-204: The edge endpoint SHALL expose a standalone API explorer at /api/docs, backed by state API metadata and service OpenAPI specs."
+            ]
+          }
+        }
+      ]
+    },
+    "traderx-004-ingress-contract-and-health-surface": {
+      "description": "FR-301: Baseline flows F1-F6 SHALL remain behaviorally compatible in containerized runtime. FR-302: State SHALL expose documented runtime entrypoints for UI and APIs in container mode.",
+      "requirements": [
+        {
+          "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+          "config": {
+            "control-id": "traderx-004-ingress-contract-and-health-surface",
+            "name": "State 004 Ingress Routing & Service Health Telemetry",
+            "description": "FR-301: Baseline flows F1-F6 SHALL remain behaviorally compatible in containerized runtime. FR-302: State SHALL expose documented runtime entrypoints for UI and APIs in container mode.",
+            "source-spec-url": "https://github.com/finos/traderx/blob/main/specs/004-containerized-compose-runtime/spec.md",
+            "clauses": [
+              "FR-301: Baseline flows F1-F6 SHALL remain behaviorally compatible in containerized runtime.",
+              "FR-302: State SHALL expose documented runtime entrypoints for UI and APIs in container mode.",
+              "FR-303: Ingress runtime SHALL expose a standalone API explorer at /api/docs, backed by state API metadata and service OpenAPI specs.",
+              "FR-304: GUI state-awareness requirements from state 001 (header title with active state id, About page metadata/lineage, API explorer link) SHALL be preserved."
+            ]
+          }
+        }
+      ]
+    },
+    "traderx-005-security-and-compliance": {
+      "description": "Default local development credentials are intentionally simple and state-scoped.",
+      "requirements": [
+        {
+          "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+          "config": {
+            "control-id": "traderx-005-security-and-compliance",
+            "name": "State 005 Security & Provenance Control (PostgreSQL Database Replacement)",
+            "description": "Default local development credentials are intentionally simple and state-scoped.",
+            "source-spec-url": "https://github.com/finos/traderx/blob/main/specs/005-postgres-database-replacement/requirements/nonfunctional-delta.md",
+            "clauses": [
+              "Default local development credentials are intentionally simple and state-scoped."
+            ]
+          }
+        }
+      ]
+    },
+    "traderx-005-reliability-and-observability": {
+      "description": "Startup checks include PostgreSQL readiness to reduce race-condition failures. Smoke checks validate baseline data load and service compatibility against PostgreSQL.",
+      "requirements": [
+        {
+          "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+          "config": {
+            "control-id": "traderx-005-reliability-and-observability",
+            "name": "State 005 Reliability, Precision & Telemetry Control",
+            "description": "Startup checks include PostgreSQL readiness to reduce race-condition failures. Smoke checks validate baseline data load and service compatibility against PostgreSQL.",
+            "source-spec-url": "https://github.com/finos/traderx/blob/main/specs/005-postgres-database-replacement/requirements/nonfunctional-delta.md",
+            "clauses": [
+              "Startup checks include PostgreSQL readiness to reduce race-condition failures.",
+              "Smoke checks validate baseline data load and service compatibility against PostgreSQL."
+            ]
+          }
+        }
+      ]
+    },
+    "traderx-006-security-and-compliance": {
+      "description": "Subject namespace design must avoid exposing internal-only subjects to browser subscriptions. Browser-visible subjects are limited to account-scoped streams via documented naming policy.",
+      "requirements": [
+        {
+          "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+          "config": {
+            "control-id": "traderx-006-security-and-compliance",
+            "name": "State 006 Security & Provenance Control (Messaging Layer Replacement with NATS)",
+            "description": "Subject namespace design must avoid exposing internal-only subjects to browser subscriptions. Browser-visible subjects are limited to account-scoped streams via documented naming policy.",
+            "source-spec-url": "https://github.com/finos/traderx/blob/main/specs/006-messaging-nats-replacement/requirements/nonfunctional-delta.md",
+            "clauses": [
+              "Subject namespace design must avoid exposing internal-only subjects to browser subscriptions.",
+              "Browser-visible subjects are limited to account-scoped streams via documented naming policy."
+            ]
+          }
+        }
+      ]
+    },
+    "traderx-006-reliability-and-observability": {
+      "description": "Messaging topology supports request/reply and optional future JetStream durability without redesign. Broker health endpoint and connectivity checks are included in smoke/conformance expectations.",
+      "requirements": [
+        {
+          "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+          "config": {
+            "control-id": "traderx-006-reliability-and-observability",
+            "name": "State 006 Reliability, Precision & Telemetry Control",
+            "description": "Messaging topology supports request/reply and optional future JetStream durability without redesign. Broker health endpoint and connectivity checks are included in smoke/conformance expectations.",
+            "source-spec-url": "https://github.com/finos/traderx/blob/main/specs/006-messaging-nats-replacement/requirements/nonfunctional-delta.md",
+            "clauses": [
+              "Messaging topology supports request/reply and optional future JetStream durability without redesign.",
+              "Broker health endpoint and connectivity checks are included in smoke/conformance expectations."
+            ]
+          }
+        }
+      ]
+    },
+    "traderx-007-security-and-compliance": {
+      "description": "Grafana dashboards are publicly readable through ingress using anonymous Viewer access for demos. Grafana administrator credentials use state-scoped non-admin/admin defaults and remain overrideable with TRADERX_GRAFANA_ADMIN_USER and TRADERX_GRAFANA_ADMIN_PASSWORD.",
+      "requirements": [
+        {
+          "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+          "config": {
+            "control-id": "traderx-007-security-and-compliance",
+            "name": "State 007 Security & Provenance Control (Observability with LGTM on Compose)",
+            "description": "Grafana dashboards are publicly readable through ingress using anonymous Viewer access for demos. Grafana administrator credentials use state-scoped non-admin/admin defaults and remain overrideable with TRADERX_GRAFANA_ADMIN_USER and TRADERX_GRAFANA_ADMIN_PASSWORD.",
+            "source-spec-url": "https://github.com/finos/traderx/blob/main/specs/007-observability-lgtm-compose/requirements/nonfunctional-delta.md",
+            "clauses": [
+              "Grafana dashboards are publicly readable through ingress using anonymous Viewer access for demos.",
+              "Grafana administrator credentials use state-scoped non-admin/admin defaults and remain overrideable with TRADERX_GRAFANA_ADMIN_USER and TRADERX_GRAFANA_ADMIN_PASSWORD.",
+              "Promtail Docker discovery uses a Docker API version exported by the generated runtime harness from the local Docker daemon, with TRADERX_PROMTAIL_DOCKER_API_VERSION as the explicit override.",
+              "As convergence level C1, this state requires container build/publish CI with namespace ghcr.io/finos/traderx-c1/<component>."
+            ]
+          }
+        }
+      ]
+    },
+    "traderx-007-reliability-and-observability": {
+      "description": "Blackbox probe success and latency metrics are available for key TraderX endpoints. Spring Boot actuator Prometheus metrics are scraped for all compatible JVM services in this state.",
+      "requirements": [
+        {
+          "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+          "config": {
+            "control-id": "traderx-007-reliability-and-observability",
+            "name": "State 007 Reliability, Precision & Telemetry Control",
+            "description": "Blackbox probe success and latency metrics are available for key TraderX endpoints. Spring Boot actuator Prometheus metrics are scraped for all compatible JVM services in this state.",
+            "source-spec-url": "https://github.com/finos/traderx/blob/main/specs/007-observability-lgtm-compose/requirements/nonfunctional-delta.md",
+            "clauses": [
+              "Blackbox probe success and latency metrics are available for key TraderX endpoints.",
+              "Spring Boot actuator Prometheus metrics are scraped for all compatible JVM services in this state.",
+              "Prometheus-compatible metrics exposure is a required integration point: if a service supports it, scrape targets and dashboards must be updated in the same change.",
+              "Container logs are queryable in Grafana via Loki."
+            ]
+          }
+        }
+      ]
+    },
+    "traderx-008-reliability-and-observability": {
+      "description": "yfinance bootstrap is startup-only and falls back to snapshot/fallback values on failure. Existing baseline trade/account validation behavior remains unchanged.",
+      "requirements": [
+        {
+          "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+          "config": {
+            "control-id": "traderx-008-reliability-and-observability",
+            "name": "State 008 Reliability, Precision & Telemetry Control",
+            "description": "yfinance bootstrap is startup-only and falls back to snapshot/fallback values on failure. Existing baseline trade/account validation behavior remains unchanged.",
+            "source-spec-url": "https://github.com/finos/traderx/blob/main/specs/008-pricing-awareness-market-data/requirements/nonfunctional-delta.md",
+            "clauses": [
+              "yfinance bootstrap is startup-only and falls back to snapshot/fallback values on failure.",
+              "Existing baseline trade/account validation behavior remains unchanged.",
+              "Legacy ticker compatibility is normalized at source (FB emitted as META) to avoid dual-symbol drift across clients.",
+              "Prometheus scraping coverage from state 007 remains required for any service in this state that exposes Prometheus-compatible metrics."
+            ]
+          }
+        }
+      ]
+    },
+    "traderx-009-security-and-compliance": {
+      "description": "Operational actions (cancel/force-fill) must be auditable via structured logs and traceable order IDs. Order data must remain durable across order-matcher process/container restarts while the shared database remains available.",
+      "requirements": [
+        {
+          "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+          "config": {
+            "control-id": "traderx-009-security-and-compliance",
+            "name": "State 009 Security & Provenance Control (Order Management and Matcher)",
+            "description": "Operational actions (cancel/force-fill) must be auditable via structured logs and traceable order IDs. Order data must remain durable across order-matcher process/container restarts while the shared database remains available.",
+            "source-spec-url": "https://github.com/finos/traderx/blob/main/specs/009-order-management-matcher/requirements/nonfunctional-delta.md",
+            "clauses": [
+              "Operational actions (cancel/force-fill) must be auditable via structured logs and traceable order IDs.",
+              "Order data must remain durable across order-matcher process/container restarts while the shared database remains available.",
+              "As convergence level C2, this state requires container build/publish CI with namespace ghcr.io/finos/traderx-c2/<component>.",
+              "Generated artifacts must include a GHCR run bundle so users can run the C2 environment from published images."
+            ]
+          }
+        }
+      ]
+    },
+    "traderx-009-reliability-and-observability": {
+      "description": "Order-management components expose Prometheus metrics and /health endpoints. Prometheus scrape coverage is mandatory for all services in this state that expose Prometheus-compatible metrics (including order-matcher and compatible JVM services via /actuator/prometheus).",
+      "requirements": [
+        {
+          "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+          "config": {
+            "control-id": "traderx-009-reliability-and-observability",
+            "name": "State 009 Reliability, Precision & Telemetry Control",
+            "description": "Order-management components expose Prometheus metrics and /health endpoints. Prometheus scrape coverage is mandatory for all services in this state that expose Prometheus-compatible metrics (including order-matcher and compatible JVM services via /actuator/prometheus).",
+            "source-spec-url": "https://github.com/finos/traderx/blob/main/specs/009-order-management-matcher/requirements/nonfunctional-delta.md",
+            "clauses": [
+              "Order-management components expose Prometheus metrics and /health endpoints.",
+              "Prometheus scrape coverage is mandatory for all services in this state that expose Prometheus-compatible metrics (including order-matcher and compatible JVM services via /actuator/prometheus).",
+              "traderx_orders_open_total (gauge): total open, unfilled orders.",
+              "traderx_orders_unfilled_total (gauge): open + partially filled orders awaiting completion."
+            ]
+          }
+        }
+      ]
+    }
+  },
   "metadata": {
     "source-project": "finos/traderx",
     "state-id": "009-order-management-matcher",
