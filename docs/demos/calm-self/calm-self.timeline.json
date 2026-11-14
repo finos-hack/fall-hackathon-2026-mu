@@ -11,6 +11,7 @@
         "detailed-architecture": "snapshots/01-784858e7-core-cli-hub-and-vscode-baseline.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "540708fe3de3780bb03c8f778f24d5af95f1f8747786438122694b9687929cc3",
         "commits": [
           "f1486acb",
           "784858e7"
@@ -32,6 +33,7 @@
         "detailed-architecture": "snapshots/02-78a48ab8-operational-publish-and-ide-flows.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "fc148b2ac655e107309544b4b35d211fa5b7d3d801d4eec12d8c08e610fe07fb",
         "commits": [
           "77749fa4",
           "78a48ab8"
@@ -53,6 +55,7 @@
         "detailed-architecture": "snapshots/03-d95a3bbe-calm-studio-and-validation-server.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "d2d879958040bbefdf3410463e01d4e57a0412db9a69dfa3dae51b93f0ad487c",
         "commits": [
           "d95a3bbe"
         ],

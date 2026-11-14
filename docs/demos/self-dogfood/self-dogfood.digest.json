@@ -62,6 +62,7 @@
       "author": "Akshar Prabhu Desai",
       "subject": "feat(diff): scaffold TypeScript workspace and structural CALM diff engine",
       "summaryLine": "Initial baseline with 3 node(s), 2 relationship(s)",
+      "snapshotSha256": "8632c3738d4a00507e372aaa5908c7a2f1c64d8b8f52e7a36ac0fcd66c4dd355",
       "changes": [
         "Added node Git Repository (git-repo)",
         "Added node Git History Extractor (git-history-extractor)",
@@ -79,6 +80,7 @@
       "author": "Akshar Prabhu Desai",
       "subject": "feat(timeline): add Git history walker, cluster validator, and CALM timeline emitter",
       "summaryLine": "+4 node(s), +4 rel(s), controls(+1/~0/-0)",
+      "snapshotSha256": "4d4c206d47f504864bcac627b20940816f6f8eb6ef6b819ce61e71e4bd58dee4",
       "changes": [
         "Added node Commit Diff Digest Exporter (digest-exporter)",
         "Added node Deterministic & Spec Clusterer (moment-clusterer)",
@@ -100,6 +102,7 @@
       "author": "Akshar Prabhu Desai",
       "subject": "feat(timelapse): add interactive SVG stage player, CLI, and IDE skill",
       "summaryLine": "+2 node(s), ~1 node(s), +2 rel(s), controls(+1/~0/-0)",
+      "snapshotSha256": "438b0fcd1abc6c309fb48ec54b912e58db4aa8f451e581d495ae64f3a3d0d00f",
       "changes": [
         "Added node HTML Timelapse Renderer (timelapse-renderer)",
         "Added node Architect / Reviewer (architect-user)",
@@ -118,6 +121,7 @@
       "author": "Akshar Prabhu Desai",
       "subject": "feat(federation): synchronize multi-repo timelines and resolve detailed-architecture",
       "summaryLine": "+1 node(s), ~1 node(s), +2 rel(s), -1 rel(s), controls(+1/~0/-0)",
+      "snapshotSha256": "08fc86ee0440db934be33cd6f793ede39a480bd4fb32e1157581ae22fca5d363",
       "changes": [
         "Added node Multi-Repo Federation Engine (federation-engine)",
         "Modified node Git History Extractor (git-history-extractor) [description]",
@@ -136,6 +140,7 @@
       "author": "Akshar Prabhu Desai",
       "subject": "feat(player): add reverse-chronological Architecture Feed mode (--feed / #feed)",
       "summaryLine": "+1 node(s), ~1 node(s), +1 rel(s), ~1 rel(s)",
+      "snapshotSha256": "c47c7c9ab05ba3bd979f1caf23645f1e0c661ce19a898e8b6fac2fa06d147f5d",
       "changes": [
         "Added node Architecture Feed Renderer (architecture-feed-renderer)",
         "Modified node Timelapse Stage SVG Renderer (timelapse-renderer) [name, description]",
@@ -152,6 +157,7 @@
       "author": "Akshar Prabhu Desai",
       "subject": "feat(traderx): import upstream finos/traderx progressive states and FDC3 into CALM 1.3",
       "summaryLine": "+1 node(s), +2 rel(s)",
+      "snapshotSha256": "72ed947fe1fc7a4cf4349803a27a8e578e6560297d80ba2cc0428a34f8ae2138",
       "changes": [
         "Added node FINOS TraderX State Importer (traderx-state-importer)",
         "Added relationship rel-traderx-importer-to-git",

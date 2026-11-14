@@ -85,6 +85,7 @@
       "author": "Mark Scott",
       "subject": "[FINOS CALM Core + finos/calm-hub-detail] docs(calm): Define CALM in CALM (+1 co-committed file(s))",
       "summaryLine": "[FINOS CALM Core + finos/calm-hub-detail] Initial baseline with 8 node(s), 8 relationship(s)",
+      "snapshotSha256": "35c8f9a4947c40f2a0d560e73f099c692287227ae6c834ad7a0868cd182eb9cf",
       "changes": [
         "[FINOS CALM Core + finos/calm-hub-detail] Added node CALM User (finos-calm-core--calm-user)",
         "[FINOS CALM Core + finos/calm-hub-detail] Added node CALM CLI (finos-calm-core--calm-cli)",
@@ -116,6 +117,7 @@
       "author": "Mark Scott",
       "subject": "[FINOS CALM Core + finos/calm-hub-detail] docs(calm): remove unwanted hallucinations (+1 co-committed file(s))",
       "summaryLine": "[FINOS CALM Core + finos/calm-hub-detail] ~4 node(s), ~3 rel(s)",
+      "snapshotSha256": "b9aedeab55f63cb744522ab27389d11e9e10d57a33112e58955040ba9e9a373e",
       "changes": [
         "[FINOS CALM Core + finos/calm-hub-detail] Modified node CALM CLI (finos-calm-core--calm-cli) [interfaces]",
         "[FINOS CALM Core + finos/calm-hub-detail] Modified node VSCode Extension (finos-calm-core--calm-vscode) [interfaces]",
@@ -138,6 +140,7 @@
       "author": "Thels",
       "subject": "[FINOS CALM Core] chore: hide --ants from docify help and clean up ant farm template",
       "summaryLine": "[FINOS CALM Core] flows(+3/~0/-0)",
+      "snapshotSha256": "0e46f40e35c5d3c7350095564404da8f4f75a04183addf5af0af781b60f48230",
       "changes": [
         "[FINOS CALM Core] Added flow [FINOS CALM Core] Publish Architecture",
         "[FINOS CALM Core] Added flow [FINOS CALM Core] Browse Architectures",
@@ -156,6 +159,7 @@
       "author": "Mark Scott",
       "subject": "[FINOS CALM Core] fix(calm-hub): make mongo initialization log consistent (#2286)",
       "summaryLine": "[FINOS CALM Core] flows(+0/~1/-0)",
+      "snapshotSha256": "f629195ba8d223651fad3d6318d65184314b63ca4e1dc5c0e39126e5bbca065d",
       "changes": [
         "[FINOS CALM Core] Modified flow [FINOS CALM Core] Browse Architectures"
       ],
@@ -172,6 +176,7 @@
       "author": "Mark Scott",
       "subject": "[FINOS CALM Core + finos/calm-hub-detail] docs: add third timeline moment for CalmStudio and CALM Server (#2882) (+1 co-committed file(s))",
       "summaryLine": "[FINOS CALM Core + finos/calm-hub-detail] +6 node(s), +7 rel(s), ~3 rel(s), flows(+2/~0/-0)",
+      "snapshotSha256": "58d9900bc4b8a4f13048de32d650af10b29be5c6993477c42fa300cc65eec60e",
       "changes": [
         "[FINOS CALM Core + finos/calm-hub-detail] Added node CalmStudio (finos-calm-core--calm-studio)",
         "[FINOS CALM Core + finos/calm-hub-detail] Added node CALM Server (finos-calm-core--calm-server)",
@@ -205,6 +210,7 @@
       "author": "Akshar Prabhu Desai",
       "subject": "[CALM Timelapse] feat(diff): scaffold TypeScript workspace and structural CALM diff engine",
       "summaryLine": "[CALM Timelapse] +3 node(s), +2 rel(s)",
+      "snapshotSha256": "4eb156447b0ad2afa9f2e85c0550d4e9d70bfebe208b97b6e97dc02cd56a407a",
       "changes": [
         "[CALM Timelapse] Added node Git Repository (calm-timelapse--git-repo)",
         "[CALM Timelapse] Added node Git History Extractor (calm-timelapse--git-history-extractor)",
@@ -225,6 +231,7 @@
       "author": "Akshar Prabhu Desai",
       "subject": "[CALM Timelapse] feat(timeline): add Git history walker, cluster validator, and CALM timeline emitter",
       "summaryLine": "[CALM Timelapse] +4 node(s), +4 rel(s), controls(+1/~0/-0)",
+      "snapshotSha256": "8777321c2f7a6b3a1346523a656ab859dcb87aeaa55253ff551746f14cd9f383",
       "changes": [
         "[CALM Timelapse] Added node Commit Diff Digest Exporter (calm-timelapse--digest-exporter)",
         "[CALM Timelapse] Added node Deterministic & Spec Clusterer (calm-timelapse--moment-clusterer)",
@@ -249,6 +256,7 @@
       "author": "Akshar Prabhu Desai",
       "subject": "[CALM Timelapse] feat(timelapse): add interactive SVG stage player, CLI, and IDE skill",
       "summaryLine": "[CALM Timelapse] +2 node(s), ~1 node(s), +2 rel(s), controls(+1/~0/-0)",
+      "snapshotSha256": "04a1f8616395846774952d8a8ac1fd68371522c26a0fa2179af5cfd8c448f91b",
       "changes": [
         "[CALM Timelapse] Added node HTML Timelapse Renderer (calm-timelapse--timelapse-renderer)",
         "[CALM Timelapse] Added node Architect / Reviewer (calm-timelapse--architect-user)",
@@ -270,6 +278,7 @@
       "author": "Akshar Prabhu Desai",
       "subject": "[CALM Timelapse] feat(federation): synchronize multi-repo timelines and resolve detailed-architecture",
       "summaryLine": "[CALM Timelapse] +1 node(s), ~1 node(s), +2 rel(s), -1 rel(s), controls(+1/~0/-0)",
+      "snapshotSha256": "da08948fbb0eaeb30c2cc47a2a240abaf2a81554fc6e58701f677c6b47a3bc7d",
       "changes": [
         "[CALM Timelapse] Added node Multi-Repo Federation Engine (calm-timelapse--federation-engine)",
         "[CALM Timelapse] Modified node Git History Extractor (calm-timelapse--git-history-extractor) [description]",
@@ -291,6 +300,7 @@
       "author": "Akshar Prabhu Desai",
       "subject": "[CALM Timelapse] feat(player): add reverse-chronological Architecture Feed mode (--feed / #feed)",
       "summaryLine": "[CALM Timelapse] +1 node(s), ~1 node(s), +1 rel(s), ~1 rel(s)",
+      "snapshotSha256": "ce912e18ecca0f2f9a2184b75002b4ce1c1227a952f40e4b0a7c304bfca3b6cb",
       "changes": [
         "[CALM Timelapse] Added node Architecture Feed Renderer (calm-timelapse--architecture-feed-renderer)",
         "[CALM Timelapse] Modified node Timelapse Stage SVG Renderer (calm-timelapse--timelapse-renderer) [name, description]",
@@ -310,6 +320,7 @@
       "author": "Akshar Prabhu Desai",
       "subject": "[CALM Timelapse] feat(traderx): import upstream finos/traderx progressive states and FDC3 into CALM 1.3",
       "summaryLine": "[CALM Timelapse] +1 node(s), +2 rel(s)",
+      "snapshotSha256": "3bafd1f09f1970614f86f5b05239001e9d036c356f94df1c2467d24f8b5d24c6",
       "changes": [
         "[CALM Timelapse] Added node FINOS TraderX State Importer (calm-timelapse--traderx-state-importer)",
         "[CALM Timelapse] Added relationship calm-timelapse--rel-traderx-importer-to-git",

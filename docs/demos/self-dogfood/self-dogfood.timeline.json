@@ -11,6 +11,7 @@
         "detailed-architecture": "snapshots/01-a47bcb9-moment-01-structural-diff-engine.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "8632c3738d4a00507e372aaa5908c7a2f1c64d8b8f52e7a36ac0fcd66c4dd355",
         "commits": [
           "a47bcb9"
         ],
@@ -30,6 +31,7 @@
         "detailed-architecture": "snapshots/02-08b4549-moment-02-git-timeline-emitter.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "4d4c206d47f504864bcac627b20940816f6f8eb6ef6b819ce61e71e4bd58dee4",
         "commits": [
           "08b4549"
         ],
@@ -49,6 +51,7 @@
         "detailed-architecture": "snapshots/03-85654fd-moment-03-timelapse-stage-and-cli.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "438b0fcd1abc6c309fb48ec54b912e58db4aa8f451e581d495ae64f3a3d0d00f",
         "commits": [
           "85654fd"
         ],
@@ -68,6 +71,7 @@
         "detailed-architecture": "snapshots/04-0e983b8-moment-04-multi-repo-federation.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "08fc86ee0440db934be33cd6f793ede39a480bd4fb32e1157581ae22fca5d363",
         "commits": [
           "0e983b8"
         ],
@@ -87,6 +91,7 @@
         "detailed-architecture": "snapshots/05-0f4a060-moment-05-architecture-feed-mode.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "c47c7c9ab05ba3bd979f1caf23645f1e0c661ce19a898e8b6fac2fa06d147f5d",
         "commits": [
           "0f4a060"
         ],
@@ -106,6 +111,7 @@
         "detailed-architecture": "snapshots/06-151d9e3-moment-06-finos-traderx-importer.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "72ed947fe1fc7a4cf4349803a27a8e578e6560297d80ba2cc0428a34f8ae2138",
         "commits": [
           "151d9e3"
         ],

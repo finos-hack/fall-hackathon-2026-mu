@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { isCalmPatternDocument } from './calm-diff.js';
 import type {
@@ -33,6 +34,14 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 
 function isNonEmptyString(value: unknown): value is string {
     return typeof value === 'string' && value.trim().length > 0;
+}
+
+export function serializeCalmSnapshot(doc: Record<string, unknown>): string {
+    return JSON.stringify(doc, null, 2) + '\n';
+}
+
+export function computeSnapshotSha256(content: string | Buffer): string {
+    return createHash('sha256').update(content).digest('hex');
 }
 
 export function validateCalmArchitectureSnapshot(doc: Record<string, unknown>, label?: string): string[] {
@@ -168,7 +177,10 @@ export function assembleCalmTimeline(
         const snapshotExt = isPattern ? 'pattern.json' : 'architecture.json';
         const snapshotFileName = `${paddedIdx}-${endCommit.shortSha}-${uniqueId}.${snapshotExt}`;
         const snapshotAbsPath = path.join(resolvedSnapshotsDir, snapshotFileName);
-        writeFileSync(snapshotAbsPath, JSON.stringify(cluster.snapshotDocument, null, 2) + '\n');
+        const serializedSnapshot = serializeCalmSnapshot(cluster.snapshotDocument);
+        writeFileSync(snapshotAbsPath, serializedSnapshot);
+        const snapshotSha256 = computeSnapshotSha256(serializedSnapshot);
+        cluster.snapshotSha256 = snapshotSha256;
         snapshotPaths.push(snapshotAbsPath);
 
         const relativeArchRef = path
@@ -181,7 +193,9 @@ export function assembleCalmTimeline(
             .map((c) => (c.commit.subject || c.commit.shortSha).trim())
             .filter((s) => s.length > 0);
 
-        const momentMeta: Record<string, unknown> = {};
+        const momentMeta: Record<string, unknown> = {
+            'snapshot-sha256': snapshotSha256,
+        };
         if (commitShas.length > 0) {
             momentMeta.commits = commitShas;
         }
@@ -309,10 +323,35 @@ export function validateTimelineStructure(
                 errors.push(
                     `Moment '${m['unique-id']}' must define details.detailed-architecture or details.required-pattern.`,
                 );
-            } else if (baseDir && !/^https?:\/\//i.test(archRef)) {
-                const resolvedSnapshotPath = path.resolve(baseDir, archRef);
-                if (!existsSync(resolvedSnapshotPath)) {
-                    errors.push(`Moment '${m['unique-id']}' referenced snapshot does not exist: ${archRef}`);
+            } else {
+                const rawExpectedHash = isPlainObject(m.metadata)
+                    ? m.metadata['snapshot-sha256']
+                    : undefined;
+                if (rawExpectedHash !== undefined) {
+                    if (
+                        typeof rawExpectedHash !== 'string' ||
+                        !/^[a-f0-9]{64}$/i.test(rawExpectedHash.trim())
+                    ) {
+                        errors.push(
+                            `Moment '${m['unique-id']}' metadata.snapshot-sha256 must be a 64-character hex SHA-256 digest.`,
+                        );
+                    }
+                }
+                if (baseDir && !/^https?:\/\//i.test(archRef)) {
+                    const resolvedSnapshotPath = path.resolve(baseDir, archRef);
+                    if (!existsSync(resolvedSnapshotPath)) {
+                        errors.push(`Moment '${m['unique-id']}' referenced snapshot does not exist: ${archRef}`);
+                    } else if (
+                        typeof rawExpectedHash === 'string' &&
+                        /^[a-f0-9]{64}$/i.test(rawExpectedHash.trim())
+                    ) {
+                        const actualHash = computeSnapshotSha256(readFileSync(resolvedSnapshotPath));
+                        if (actualHash !== rawExpectedHash.trim().toLowerCase()) {
+                            errors.push(
+                                `Moment '${m['unique-id']}' snapshot SHA-256 mismatch for ${archRef}: expected ${rawExpectedHash.trim().toLowerCase()}, got ${actualHash}.`,
+                            );
+                        }
+                    }
                 }
             }
         }

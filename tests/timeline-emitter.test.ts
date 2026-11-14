@@ -10,6 +10,7 @@ import {
     assembleCalmTimeline,
     CALM_ALLOWED_PROTOCOLS,
     CALM_TIMELINE_SCHEMA,
+    computeSnapshotSha256,
     validateCalmArchitectureSnapshot,
     validateTimelineStructure,
 } from '../src/timeline-emitter.js';
@@ -109,24 +110,31 @@ describe('assembleCalmTimeline and validateTimelineStructure', () => {
         };
 
         const outPath = path.join(tempDir, 'out', 'meta.timeline.json');
-        const { timeline } = assembleCalmTimeline([clusters[0], multiCommitCluster], {
+        const { timeline, snapshotPaths } = assembleCalmTimeline([clusters[0], multiCommitCluster], {
             sourceFilePath: 'arch.json',
             outputPath: outPath,
         });
 
+        const sha0 = computeSnapshotSha256(fs.readFileSync(snapshotPaths[0]));
+        const sha1 = computeSnapshotSha256(fs.readFileSync(snapshotPaths[1]));
+        expect(sha0).toMatch(/^[a-f0-9]{64}$/);
+        expect(sha1).toMatch(/^[a-f0-9]{64}$/);
+
         expect(timeline.moments[0].metadata).toEqual({
+            'snapshot-sha256': sha0,
             commits: ['111aaaa'],
             'commit-messages': ['feat: initial api'],
             'commit-count': 1,
         });
         expect(timeline.moments[1].metadata).toEqual({
+            'snapshot-sha256': sha1,
             commits: ['222bbbb', '333cccc'],
             'commit-messages': ['feat: add database', 'feat: wire api to database'],
             'commit-count': 2,
         });
     });
 
-    it('detects missing snapshot files when timelineFilePath is provided', () => {
+    it('detects missing or tampered snapshot files via snapshot-sha256 when timelineFilePath is provided', () => {
         const doc = {
             nodes: [{ 'unique-id': 'a', 'node-type': 'service', name: 'A', description: 'Service A' }],
             relationships: [],
@@ -141,6 +149,19 @@ describe('assembleCalmTimeline and validateTimelineStructure', () => {
         });
 
         expect(validateTimelineStructure(timeline, { timelineFilePath: outPath })).toEqual([]);
+
+        fs.writeFileSync(snapshotPaths[0], JSON.stringify({ ...doc, tampered: true }, null, 2) + '\n');
+        const tamperErrors = validateTimelineStructure(timeline, { timelineFilePath: outPath });
+        expect(tamperErrors).toHaveLength(1);
+        expect(tamperErrors[0]).toContain('snapshot SHA-256 mismatch');
+
+        const badHexTimeline = structuredClone(timeline);
+        badHexTimeline.moments[0].metadata = {
+            ...(badHexTimeline.moments[0].metadata ?? {}),
+            'snapshot-sha256': 'not-a-valid-sha256',
+        };
+        const hexErrors = validateTimelineStructure(badHexTimeline);
+        expect(hexErrors.some((e) => e.includes('64-character hex SHA-256'))).toBe(true);
 
         fs.unlinkSync(snapshotPaths[0]);
         const errors = validateTimelineStructure(timeline, { timelineFilePath: outPath });

@@ -11,6 +11,7 @@
         "detailed-architecture": "snapshots/01-1d6222a-state-001-baseline-uncontainerized-parity.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "b2b4eba023439f3dbf0e4b5afab15bdd073454d7a55a607fccd08a08f77ac5fd",
         "commits": [
           "9f8dda5",
           "de58b8f",
@@ -47,6 +48,7 @@
         "detailed-architecture": "snapshots/02-0f23b0b-state-002-edge-proxy-uncontainerized.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "3c8e79e742371a92ff75250de99585bff2e955787dda23571aa720a5b0113b66",
         "commits": [
           "9f8dda5",
           "de58b8f",
@@ -76,6 +78,7 @@
         "detailed-architecture": "snapshots/03-f150d69-state-004-containerized-compose-runtime.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "4eb278cda899dc9befc39de9ec00e12f06924cf77dcc0835287ed85a9f1448fd",
         "commits": [
           "9f8dda5",
           "37b993f",
@@ -140,6 +143,7 @@
         "detailed-architecture": "snapshots/04-92af021-state-005-postgres-database-replacement.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "955b0250039fd4a8b0d7c0e47d535324c2c0c25c9a3b361773f8ebec1b2df009",
         "commits": [
           "9f8dda5",
           "8490dde",
@@ -176,6 +180,7 @@
         "detailed-architecture": "snapshots/05-aaa8507-state-006-messaging-nats-replacement.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "33bb461c41407a4a7ea2d1f6535048a7dc3a1a6207c7bc0c5d0911b0887ae153",
         "commits": [
           "9f8dda5",
           "37b993f",
@@ -222,6 +227,7 @@
         "detailed-architecture": "snapshots/06-471891e-state-007-observability-lgtm-compose.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "7a70f06f82afd1fa6b98be254085867624dccdc67609f230ddf8b41933f49222",
         "commits": [
           "9f8dda5",
           "37b993f",
@@ -262,6 +268,7 @@
         "detailed-architecture": "snapshots/07-d6e7fe4-state-008-pricing-awareness-market-data.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "49cc2a38b0a300704f781c6f0ba87abac7c985240a57e611f3471f41ae151b3c",
         "commits": [
           "9f8dda5",
           "37b993f",
@@ -315,6 +322,7 @@
         "detailed-architecture": "snapshots/08-90555d9-state-009-order-management-matcher.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "313e892475a0b5e3dbd5203e49476f01392a55147fdbb4ef7d74dc7b03de9e0e",
         "commits": [
           "9f8dda5",
           "37b993f",
@@ -376,6 +384,7 @@
         "detailed-architecture": "snapshots/09-1c468ac-state-010-kubernetes-runtime.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "a37a2c6146b9de9b9f6e750945477640f83f4873be221e452fffc0f25f6762a9",
         "commits": [
           "9f8dda5",
           "d8d779c",
@@ -405,6 +414,7 @@
         "detailed-architecture": "snapshots/10-a51cf67-state-011-tilt-kubernetes-dev-loop.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "df18fa7d82a51576e9da27cf5c745b26ed60c868cee6d8a95d28c39377b879dc",
         "commits": [
           "9f8dda5",
           "d8d779c",
@@ -434,6 +444,7 @@
         "detailed-architecture": "snapshots/11-cfa6992-state-012-platform-convergence-c3.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "349fad9042025bedf1273c6115bf23b33c95fe015b4c38b1c49145e7da13e106",
         "commits": [
           "9f8dda5",
           "d8d779c",
@@ -462,6 +473,7 @@
         "detailed-architecture": "snapshots/12-1cc519e-state-013-radius-kubernetes-platform.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "0716fea52d8f54a0dd0b22a54c84780778a8ea6e36f6421007441fdc4a30c920",
         "commits": [
           "9f8dda5",
           "d8d779c",
@@ -491,6 +503,7 @@
         "detailed-architecture": "snapshots/13-c3e935b-state-014-fdc3-intent-interoperability.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "8124302d9baec6ce536083c563b77409de0305ee9ad16a084c062bdfd792b390",
         "commits": [
           "9f8dda5",
           "a23db1e",
@@ -513,7 +526,7 @@
   ],
   "metadata": {
     "title": "Git Architecture Timeline — FINOS TraderX (v2.0 Progressive States + FDC3)",
-    "description": "Extracted directly from upstream finos/traderx catalog/state-catalog.json, specs/*/system/architecture.model.json, FDC3 contract-delta.md + appd.v2.json, nonfunctional-delta.md controls, docs/adr/*.md, and Git history.",
+    "description": "Extracted directly from upstream finos/traderx catalog/state-catalog.json, specs/*/system/architecture.model.json, nonfunctional-delta.md controls, docs/adr/*.md, and Git history, and translates FDC3 contracts (contract-delta.md + appd.v2.json) into validated CALM.",
     "generator": "calm-timelapse",
     "source-repository": "https://github.com/finos/traderx",
     "clustering-engine": "traderx-state-catalog",

@@ -11,6 +11,7 @@
         "detailed-architecture": "snapshots/01-e1be461-legacy-monolith-baseline.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "47f920fb76fb7e4ee81e4866f74cd8e4172d5caee35f6719da56ff21c7621fc6",
         "commits": [
           "e1be461"
         ],
@@ -30,6 +31,7 @@
         "detailed-architecture": "snapshots/02-53fa856-zero-trust-gateway-and-oidc.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "df2f2f68f39f822a619f99cf4db98eeeca60a7c6432ffd592723b685c836c2fc",
         "commits": [
           "0f98089",
           "f9a2a6f",
@@ -58,6 +60,7 @@
         "detailed-architecture": "snapshots/03-55c7c93-kafka-backbone-and-order-router.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "7b0b343a1f9e8de3a5d9e3a0335410b656341a365bb608ba56a5d8f19688df61",
         "commits": [
           "72452dd",
           "0e07245",
@@ -86,6 +89,7 @@
         "detailed-architecture": "snapshots/04-726ca5d-pretrade-risk-and-position-cache.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "21ef4bebabec63b2e3b63d10d9948e927be554737888157d8c3fb567bf5da995",
         "commits": [
           "c152dc1",
           "cc7f9f8",
@@ -114,6 +118,7 @@
         "detailed-architecture": "snapshots/05-e78c782-fix-venue-connectivity-and-market-data.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "e0df5747db2f0e5b9846dadbc13107bff669dfd79173a66797ec27dcb2976075",
         "commits": [
           "9836851",
           "5b2d103",
@@ -141,6 +146,7 @@
         "detailed-architecture": "snapshots/06-78f7649-monolith-retirement-and-clearing-split.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "ca9752eb192dd4dae04b7d260214210156d10b83c8ac505554ec6a3962333547",
         "commits": [
           "51991fd",
           "e475f2a",
@@ -166,6 +172,7 @@
         "detailed-architecture": "snapshots/07-12a9d75-sec-17a4-immutable-worm-archive.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "38b5bcc210c144a70d083a085f7e6de480eed5cc65fbdabe4793d7775e787cce",
         "commits": [
           "94f7e9f",
           "7456e8d",
@@ -194,6 +201,7 @@
         "detailed-architecture": "snapshots/08-a664e44-dora-multi-region-resilience.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "697ee67b8cc58301851ee119845b49af78138b086df68b22e72813536265e527",
         "commits": [
           "649ed2c",
           "e6007fe",
@@ -222,6 +230,7 @@
         "detailed-architecture": "snapshots/09-1e91d00-finra-cat-regulatory-reporting.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "eed155e93f8700ceab5865e875c5836fc37bee234a2251dd304078199519eaca",
         "commits": [
           "fe21641",
           "0851a1b",

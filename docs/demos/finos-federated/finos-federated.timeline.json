@@ -11,6 +11,7 @@
         "detailed-architecture": "snapshots/01-784858e7-2025-12-23-initial-architecture-finos-calm-core.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "b9aedeab55f63cb744522ab27389d11e9e10d57a33112e58955040ba9e9a373e",
         "commits": [
           "f1486acb",
           "784858e7"
@@ -114,6 +115,7 @@
         "detailed-architecture": "snapshots/02-78a48ab8-2026-03-31-finos-calm-core-chore-hide-ants-from.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "f629195ba8d223651fad3d6318d65184314b63ca4e1dc5c0e39126e5bbca065d",
         "commits": [
           "77749fa4",
           "78a48ab8"
@@ -217,6 +219,7 @@
         "detailed-architecture": "snapshots/03-d95a3bbe-2026-07-25-finos-calm-core-finos-calm-hub-detail.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "58d9900bc4b8a4f13048de32d650af10b29be5c6993477c42fa300cc65eec60e",
         "commits": [
           "d95a3bbe"
         ],
@@ -385,6 +388,7 @@
         "detailed-architecture": "snapshots/04-a47bcb9-2026-11-13-calm-timelapse-feat-diff-scaffold-typ.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "4eb156447b0ad2afa9f2e85c0550d4e9d70bfebe208b97b6e97dc02cd56a407a",
         "commits": [
           "a47bcb9"
         ],
@@ -583,6 +587,7 @@
         "detailed-architecture": "snapshots/05-85654fd-2026-11-13-calm-timelapse-feat-timeline-add-git.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "04a1f8616395846774952d8a8ac1fd68371522c26a0fa2179af5cfd8c448f91b",
         "commits": [
           "08b4549",
           "85654fd"
@@ -843,6 +848,7 @@
         "detailed-architecture": "snapshots/06-0e983b8-2026-11-13-calm-timelapse-feat-federation-synchr.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "da08948fbb0eaeb30c2cc47a2a240abaf2a81554fc6e58701f677c6b47a3bc7d",
         "commits": [
           "0e983b8"
         ],
@@ -1111,6 +1117,7 @@
         "detailed-architecture": "snapshots/07-0f4a060-2026-11-13-calm-timelapse-feat-player-add-revers.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "ce912e18ecca0f2f9a2184b75002b4ce1c1227a952f40e4b0a7c304bfca3b6cb",
         "commits": [
           "0f4a060"
         ],
@@ -1389,6 +1396,7 @@
         "detailed-architecture": "snapshots/08-151d9e3-2026-11-13-calm-timelapse-feat-traderx-import-up.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "3bafd1f09f1970614f86f5b05239001e9d036c356f94df1c2467d24f8b5d24c6",
         "commits": [
           "151d9e3"
         ],

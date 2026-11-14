@@ -1531,7 +1531,7 @@ export function generateTimelineFromTraderXRepo(
     ...(timeline.metadata ?? {}),
     title: 'Git Architecture Timeline — FINOS TraderX (v2.0 Progressive States + FDC3)',
     description:
-      'Extracted directly from upstream finos/traderx catalog/state-catalog.json, specs/*/system/architecture.model.json, FDC3 contract-delta.md + appd.v2.json, nonfunctional-delta.md controls, docs/adr/*.md, and Git history.',
+      'Extracted directly from upstream finos/traderx catalog/state-catalog.json, specs/*/system/architecture.model.json, nonfunctional-delta.md controls, docs/adr/*.md, and Git history, and translates FDC3 contracts (contract-delta.md + appd.v2.json) into validated CALM.',
     'source-repository': 'https://github.com/finos/traderx',
     'clustering-engine': engine,
     'total-commits-scanned': String(totalCommitRefsScanned + skippedTemplateStates),

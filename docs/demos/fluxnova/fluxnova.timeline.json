@@ -11,6 +11,7 @@
         "detailed-architecture": "snapshots/01-14acb602-initial-fluxnova-bpm-platform.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "9a6ce3b83eaf62f619cfe3e45c68024e6107ea1475a2cb8199d4cf4794ac34a7",
         "commits": [
           "14acb602"
         ],
@@ -30,6 +31,7 @@
         "detailed-architecture": "snapshots/02-3b103fa9-canonical-nested-relationship-alignment.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "148408df98071d91c77f31b28402c1380d7fbc7b337eeab48b66ee7bce3314af",
         "commits": [
           "3b103fa9"
         ],
@@ -49,6 +51,7 @@
         "detailed-architecture": "snapshots/03-bf701c3e-calm-hub-curated-control-seeding.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "fce0d2104bad50b88ab3a25af9354255fd51c7f9afb5e313fe8e723ea8611205",
         "commits": [
           "bf701c3e"
         ],
