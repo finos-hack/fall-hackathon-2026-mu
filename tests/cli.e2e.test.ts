@@ -401,9 +401,70 @@ describe('calm-timelapse CLI e2e', () => {
     expect(badRes.stderr).toContain('Invalid cluster definitions');
   });
 
+  it('synchronizes multiple Git repositories via variadic --from-git and multiple --timeline files', () => {
+    const { archFile: archA } = createValidCalm13GitRepo();
+    const { archFile: archB } = createValidCalm13GitRepo();
+    const outDir = fs.mkdtempSync(path.join(os.tmpdir(), 'calm-multi-cli-out-'));
+    tempDirs.push(outDir);
+
+    const outTimeline = path.join(outDir, 'multi.timeline.json');
+    const outHtml = path.join(outDir, 'multi.timelapse.html');
+    const res = spawnSync(
+      process.execPath,
+      [
+        cliPath,
+        '--from-git',
+        `Orders=${archA}`,
+        `Settlement=${archB}`,
+        '-o',
+        outTimeline,
+        '--snapshots-dir',
+        path.join(outDir, 'snapshots'),
+        '--timelapse',
+        outHtml,
+        '--validate',
+        '--validate-snapshots',
+      ],
+      { encoding: 'utf8' },
+    );
+
+    expect(res.status).toBe(0);
+    expect(res.stdout).toContain('Synchronized 2 architecture(s) across 2 repo(s)');
+    expect(fs.existsSync(outTimeline)).toBe(true);
+    expect(fs.existsSync(outHtml)).toBe(true);
+
+    const parsed = JSON.parse(fs.readFileSync(outTimeline, 'utf8'));
+    expect(parsed.metadata['sources-tracked']).toBe('2');
+    expect(parsed.metadata['repositories-tracked']).toBe('2');
+
+    // Also verify multi-file --timeline rendering
+    const tA = path.join(outDir, 'a.timeline.json');
+    const tB = path.join(outDir, 'b.timeline.json');
+    expect(
+      spawnSync(process.execPath, [cliPath, '--from-git', archA, '-o', tA, '--validate'], {
+        encoding: 'utf8',
+      }).status,
+    ).toBe(0);
+    expect(
+      spawnSync(process.execPath, [cliPath, '--from-git', archB, '-o', tB, '--validate'], {
+        encoding: 'utf8',
+      }).status,
+    ).toBe(0);
+
+    const syncedHtml = path.join(outDir, 'synced.timelapse.html');
+    const syncRes = spawnSync(
+      process.execPath,
+      [cliPath, '--timeline', tA, tB, '--timelapse', syncedHtml, '--validate'],
+      { encoding: 'utf8' },
+    );
+    expect(syncRes.status).toBe(0);
+    expect(fs.existsSync(syncedHtml)).toBe(true);
+    expect(fs.readFileSync(syncedHtml, 'utf8')).toContain('id="project-select"');
+  });
+
   it('exits non-zero when neither --from-git nor --timeline is provided', () => {
     const res = spawnSync(process.execPath, [cliPath], { encoding: 'utf8' });
     expect(res.status).not.toBe(0);
-    expect(res.stderr).toContain('Specify either --from-git <file> or --timeline <file>');
+    expect(res.stderr).toContain('Specify either --from-git <files...> or --timeline <files...>');
   });
 });

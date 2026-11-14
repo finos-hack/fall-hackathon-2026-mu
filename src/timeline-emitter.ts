@@ -2,7 +2,12 @@
 
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import type { GeneratedGitMoment, GeneratedGitTimeline, MomentCluster } from './types.js';
+import type {
+    FederatedSourceDescriptor,
+    GeneratedGitMoment,
+    GeneratedGitTimeline,
+    MomentCluster,
+} from './types.js';
 
 export const CALM_TIMELINE_SCHEMA = 'https://calm.finos.org/release/1.3/meta/calm-timeline.json';
 
@@ -125,6 +130,7 @@ export function assembleCalmTimeline(
         sourceFilePath: string;
         outputPath?: string;
         snapshotsDir?: string;
+        sources?: FederatedSourceDescriptor[];
     },
 ): { timeline: GeneratedGitTimeline; snapshotPaths: string[] } {
     const refBaseDir = options.outputPath ? path.dirname(path.resolve(options.outputPath)) : process.cwd();
@@ -180,6 +186,7 @@ export function assembleCalmTimeline(
                 commits: cluster.commits.map((c) => c.commit.shortSha),
                 'commit-messages': cluster.commits.map((c) => c.commit.subject),
                 'commit-count': cluster.commits.length,
+                ...(cluster.nodeProvenance ? { 'node-provenance': cluster.nodeProvenance } : {}),
             },
         };
 
@@ -191,14 +198,18 @@ export function assembleCalmTimeline(
         return moment;
     });
 
-    const sourceBase = path.basename(options.sourceFilePath);
+    const sourceDisplay =
+        options.sources && options.sources.length > 1
+            ? options.sources.map((s) => s.sourceLabel).join(' + ')
+            : path.basename(options.sourceFilePath);
     const timeline: GeneratedGitTimeline = {
         $schema: CALM_TIMELINE_SCHEMA,
         moments,
         metadata: {
-            title: `Git Architecture Timeline — ${sourceBase}`,
-            description: `Automatically synthesized from Git commit history of ${sourceBase}`,
+            title: `Git Architecture Timeline — ${sourceDisplay}`,
+            description: `Automatically synthesized from Git commit history of ${sourceDisplay}`,
             generator: 'calm-timelapse',
+            ...(options.sources && options.sources.length > 1 ? { sources: options.sources } : {}),
         },
     };
 

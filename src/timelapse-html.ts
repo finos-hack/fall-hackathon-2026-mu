@@ -3,8 +3,11 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { computeStructuralDelta, summarizeCounts } from './calm-diff.js';
+import { synchronizeSavedTimelines } from './federation.js';
 import type {
   DeltaChangeItem,
+  FederatedNodeProvenance,
+  FederatedSourceDescriptor,
   GeneratedGitTimeline,
   MomentCluster,
 } from './types.js';
@@ -21,6 +24,11 @@ export interface GraphNode {
   nodeType: string;
   description?: string;
   controlCount?: number;
+  sourceId?: string;
+  sourceLabel?: string;
+  sourceIds?: string[];
+  sourceLabels?: string[];
+  mergedViaDetailedArch?: boolean;
 }
 
 export interface GraphEdge {
@@ -70,12 +78,32 @@ export interface TimelapsePayload {
   title: string;
   generatedAt: string;
   sourceFile: string;
+  sources?: FederatedSourceDescriptor[];
   engine: string;
   canvasWidth: number;
   canvasHeight: number;
   positions: Record<string, PositionedNode>;
   frames: TimelapseFrame[];
   stats?: TimelapseStats;
+}
+
+function attachProvenanceToNodes(
+  nodes: GraphNode[],
+  provenance?: Record<string, FederatedNodeProvenance>,
+): GraphNode[] {
+  if (!provenance) return nodes;
+  return nodes.map((node) => {
+    const prov = provenance[node.id];
+    if (!prov) return node;
+    return {
+      ...node,
+      sourceId: prov.primarySourceId,
+      sourceLabel: prov.primarySourceLabel,
+      sourceIds: prov.sourceIds,
+      sourceLabels: prov.sourceLabels,
+      mergedViaDetailedArch: prov.mergedViaDetailedArch,
+    };
+  });
 }
 
 function asRecord(value: unknown): Record<string, unknown> | null {
@@ -653,6 +681,7 @@ export function buildTimelapsePayloadFromClusters(
   options: {
     title?: string;
     sourceFile: string;
+    sources?: FederatedSourceDescriptor[];
     engine: string;
     stats?: TimelapseStats;
   },
@@ -667,7 +696,7 @@ export function buildTimelapsePayloadFromClusters(
   for (let i = 0; i < clusters.length; i++) {
     const cluster = clusters[i];
     const doc = cluster.snapshotDocument;
-    const nodes = extractGraphNodes(doc);
+    const nodes = attachProvenanceToNodes(extractGraphNodes(doc), cluster.nodeProvenance);
     const edges = extractGraphEdges(doc);
     const controls = extractActiveControls(doc);
 
@@ -737,11 +766,15 @@ export function buildTimelapsePayloadFromClusters(
       }
     : undefined;
 
-  const sourceBase = path.basename(options.sourceFile);
+  const isMultiSource = Boolean(options.sources && options.sources.length > 1);
+  const sourceBase = isMultiSource
+    ? options.sources!.map((s) => s.sourceLabel).join(' + ')
+    : path.basename(options.sourceFile);
   return {
     title: options.title ?? `CALM Architecture Timelapse — ${sourceBase}`,
     generatedAt: new Date().toISOString(),
     sourceFile: sourceBase,
+    ...(isMultiSource ? { sources: options.sources } : {}),
     engine: options.engine,
     canvasWidth: layout.canvasWidth,
     canvasHeight: layout.canvasHeight,
@@ -774,7 +807,11 @@ export function buildTimelapsePayloadFromTimelineFile(
     const doc = JSON.parse(fs.readFileSync(snapshotPath, 'utf8')) as Record<string, unknown>;
     const delta = computeStructuralDelta(prevDoc, doc);
 
-    const nodes = extractGraphNodes(doc);
+    const entryMeta = asRecord((entry as unknown as Record<string, unknown>)['metadata']);
+    const rawProvenance = asRecord(entryMeta?.['node-provenance']) as
+      | Record<string, FederatedNodeProvenance>
+      | null;
+    const nodes = attachProvenanceToNodes(extractGraphNodes(doc), rawProvenance ?? undefined);
     const edges = extractGraphEdges(doc);
     const controls = extractActiveControls(doc);
 
@@ -801,16 +838,16 @@ export function buildTimelapsePayloadFromTimelineFile(
       .map((c) => c.id);
     const removedEdgeIds = [...prevEdgeIds].filter((id) => !currEdgeIds.has(id));
 
-    const entryMeta = asRecord((entry as unknown as Record<string, unknown>)['metadata']);
-    const commits = Array.isArray(entryMeta?.['commits'])
-      ? entryMeta['commits'].filter((c): c is string => typeof c === 'string')
+    const entryMetaForCommits = asRecord((entry as unknown as Record<string, unknown>)['metadata']);
+    const commits = Array.isArray(entryMetaForCommits?.['commits'])
+      ? entryMetaForCommits['commits'].filter((c): c is string => typeof c === 'string')
       : [];
-    const rawMsgs = entryMeta?.['commit-messages'] ?? entryMeta?.['commitMessages'];
+    const rawMsgs = entryMetaForCommits?.['commit-messages'] ?? entryMetaForCommits?.['commitMessages'];
     const commitMessages = Array.isArray(rawMsgs)
       ? rawMsgs.filter((m): m is string => typeof m === 'string')
       : [];
     const parsedCount = parseOptionalInt(
-      entryMeta?.['commit-count'] ?? entryMeta?.['commitCount'],
+      entryMetaForCommits?.['commit-count'] ?? entryMetaForCommits?.['commitCount'],
     );
     const commitCount = parsedCount ?? commits.length;
 
@@ -869,17 +906,112 @@ export function buildTimelapsePayloadFromTimelineFile(
         }
       : undefined;
 
+  const rawSources = Array.isArray(rawMeta?.['sources'])
+    ? (rawMeta['sources'] as FederatedSourceDescriptor[])
+    : undefined;
+  const engineStr =
+    typeof rawMeta?.['clustering-engine'] === 'string'
+      ? rawMeta['clustering-engine']
+      : 'manual-timeline';
+
   const sourceBase = path.basename(resolved);
   return {
     title: `CALM Architecture Timelapse — ${sourceBase}`,
     generatedAt: new Date().toISOString(),
     sourceFile: sourceBase,
-    engine: raw.metadata?.['clustering-engine'] ?? 'manual-timeline',
+    ...(rawSources && rawSources.length > 1 ? { sources: rawSources } : {}),
+    engine: engineStr,
     canvasWidth: layout.canvasWidth,
     canvasHeight: layout.canvasHeight,
     positions: layout.positions,
     frames,
     ...(stats ? { stats } : {}),
+  };
+}
+
+export function buildTimelapsePayloadFromTimelineFiles(
+  timelinePaths: string[],
+): TimelapsePayload {
+  if (timelinePaths.length === 1) {
+    return buildTimelapsePayloadFromTimelineFile(timelinePaths[0]);
+  }
+
+  const { sources, frames: syncFrames } = synchronizeSavedTimelines(timelinePaths);
+  const unionNodes = new Map<string, GraphNode>();
+  const unionEdges = new Map<string, GraphEdge>();
+  const frames: TimelapseFrame[] = [];
+
+  let prevDoc: Record<string, unknown> | null = null;
+  let prevNodeIds = new Set<string>();
+  let prevEdgeIds = new Set<string>();
+
+  for (let i = 0; i < syncFrames.length; i++) {
+    const sf = syncFrames[i];
+    const delta = computeStructuralDelta(prevDoc, sf.document);
+    const nodes = attachProvenanceToNodes(extractGraphNodes(sf.document), sf.nodeProvenance);
+    const edges = extractGraphEdges(sf.document);
+    const controls = extractActiveControls(sf.document);
+
+    for (const node of nodes) unionNodes.set(node.id, node);
+    for (const edge of edges) {
+      if (!unionEdges.has(edge.id)) unionEdges.set(edge.id, edge);
+    }
+
+    const currNodeIds = new Set(nodes.map((n) => n.id));
+    const currEdgeIds = new Set(edges.map((e) => e.id));
+
+    frames.push({
+      id: sf.uniqueId,
+      name: sf.name,
+      description: sf.description,
+      validFrom: sf.validFrom,
+      commitCount: sf.commitCount,
+      commits: sf.commits,
+      commitMessages: sf.commitMessages,
+      adrs: sf.adrs,
+      summary: summarizeCounts(delta.counts, i === 0),
+      changes: delta.changeItems,
+      nodes,
+      edges,
+      controls,
+      addedNodeIds: nodes.filter((n) => !prevNodeIds.has(n.id)).map((n) => n.id),
+      modifiedNodeIds: [
+        ...new Set(
+          delta.changeItems
+            .filter((c) => c.category === 'node' && c.kind === 'mod' && currNodeIds.has(c.id))
+            .map((c) => c.id),
+        ),
+      ],
+      removedNodeIds: [...prevNodeIds].filter((id) => !currNodeIds.has(id)),
+      addedEdgeIds: edges.filter((e) => !prevEdgeIds.has(e.id)).map((e) => e.id),
+      modifiedEdgeIds: [
+        ...new Set(
+          delta.changeItems
+            .filter((c) => c.category === 'relationship' && c.kind === 'mod' && currEdgeIds.has(c.id))
+            .map((c) => c.id),
+        ),
+      ],
+      removedEdgeIds: [...prevEdgeIds].filter((id) => !currEdgeIds.has(id)),
+    });
+
+    prevDoc = sf.document;
+    prevNodeIds = currNodeIds;
+    prevEdgeIds = currEdgeIds;
+  }
+
+  const layout = computeSuperGraphLayout([...unionNodes.values()], [...unionEdges.values()]);
+  const sourceDisplay = sources.map((s) => s.sourceLabel).join(' + ');
+
+  return {
+    title: `CALM Architecture Timelapse — ${sourceDisplay}`,
+    generatedAt: new Date().toISOString(),
+    sourceFile: sourceDisplay,
+    sources,
+    engine: 'synchronized-timelines',
+    canvasWidth: layout.canvasWidth,
+    canvasHeight: layout.canvasHeight,
+    positions: layout.positions,
+    frames,
   };
 }
 
@@ -1298,6 +1430,7 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
     <h1>${safeTitle}</h1>
     <div class="meta-badges">
       <span class="badge" id="badge-moments">0 moments</span>
+      <span class="badge" id="badge-sources" style="display:none;"></span>
       <span class="badge badge-funnel" id="badge-funnel"${funnelText ? '' : ' style="display:none;"'}>${escapeHtml(funnelText)}</span>
       <span class="badge" id="badge-engine">engine: ${escapeHtml(payload.engine)}</span>
       <span class="badge">Keys: Space Play/Pause · ←/→ Step</span>
@@ -1307,6 +1440,13 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
   <main>
     <section class="stage">
       <div class="stage-toolbar">
+        <div class="toolbar-group" id="project-filter-group" style="display:none;">
+          <label for="project-select">Project:</label>
+          <select id="project-select" title="Filter by source repository or architecture">
+            <option value="">All Projects (Synchronized)</option>
+          </select>
+        </div>
+        <div class="toolbar-sep" id="project-filter-sep" style="display:none;"></div>
         <div class="toolbar-group">
           <label for="focus-select">Subsystem:</label>
           <select id="focus-select" title="Focus on a node and its 1-hop subsystem">
@@ -1425,6 +1565,13 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
       const payload = JSON.parse(document.getElementById('timelapse-data').textContent);
       const frames = payload.frames || [];
       const positions = payload.positions || {};
+      const sources = payload.sources || [];
+      const isMultiSource = sources.length > 1;
+      const sourcePalette = ['#38bdf8', '#a78bfa', '#2dd4bf', '#fb7185', '#818cf8', '#22d3ee'];
+      const sourceColorMap = new Map();
+      sources.forEach((src, idx) => {
+        sourceColorMap.set(src.sourceId, sourcePalette[idx % sourcePalette.length]);
+      });
       const canvasWidth = payload.canvasWidth || 960;
       const canvasHeight = payload.canvasHeight || 540;
 
@@ -1441,6 +1588,7 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
       const btnNext = document.getElementById('btn-next');
       const speedSelect = document.getElementById('speed-select');
       const badgeMoments = document.getElementById('badge-moments');
+      const badgeSources = document.getElementById('badge-sources');
       const badgeFunnel = document.getElementById('badge-funnel');
 
       const btnZoomIn = document.getElementById('btn-zoom-in');
@@ -1452,6 +1600,9 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
       const momentDesc = document.getElementById('moment-desc');
       const changeList = document.getElementById('change-list');
       const commitList = document.getElementById('commit-list');
+      const projectFilterGroup = document.getElementById('project-filter-group');
+      const projectFilterSep = document.getElementById('project-filter-sep');
+      const projectSelect = document.getElementById('project-select');
       const focusSelect = document.getElementById('focus-select');
       const focusIsolate = document.getElementById('focus-isolate');
       const btnResetFocus = document.getElementById('btn-reset-focus');
@@ -1465,6 +1616,27 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
 
       badgeMoments.textContent = frames.length + ' moment' + (frames.length === 1 ? '' : 's');
       scrubber.max = String(Math.max(0, frames.length - 1));
+
+      if (isMultiSource) {
+        const repoSet = new Set(sources.map((s) => s.repoName).filter(Boolean));
+        if (badgeSources) {
+          badgeSources.textContent =
+            sources.length +
+            ' architectures' +
+            (repoSet.size > 1 ? ' · ' + repoSet.size + ' repos' : '');
+          badgeSources.style.display = 'inline-block';
+        }
+        if (projectFilterGroup) projectFilterGroup.style.display = 'flex';
+        if (projectFilterSep) projectFilterSep.style.display = 'block';
+        if (projectSelect) {
+          sources.forEach((src) => {
+            const opt = document.createElement('option');
+            opt.value = src.sourceId;
+            opt.textContent = src.sourceLabel;
+            projectSelect.appendChild(opt);
+          });
+        }
+      }
 
       if (badgeFunnel && !badgeFunnel.textContent) {
         const totalSum = frames.reduce((acc, f) => acc + (f.commitCount || 0), 0);
@@ -1483,6 +1655,7 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
       let currentIndex = 0;
       let timer = null;
       let focusedNodeId = '';
+      let selectedProjectId = '';
       let zoomScale = 1;
       let panX = 0;
       let panY = 0;
@@ -1492,6 +1665,15 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
       let panStartX = 0;
       let panStartY = 0;
       let auditPrecedesFirst = false;
+
+      function nodeMatchesProject(nodeOrPos) {
+        if (!selectedProjectId) return true;
+        if (!nodeOrPos) return false;
+        if (Array.isArray(nodeOrPos.sourceIds) && nodeOrPos.sourceIds.includes(selectedProjectId)) {
+          return true;
+        }
+        return nodeOrPos.sourceId === selectedProjectId;
+      }
 
       function applyTransform() {
         viewportLayer.setAttribute(
@@ -1523,7 +1705,8 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
         .forEach((pos) => {
           const opt = document.createElement('option');
           opt.value = pos.id;
-          opt.textContent = pos.name + ' (' + pos.nodeType + ')';
+          const srcPrefix = isMultiSource && pos.sourceLabel ? ' [' + pos.sourceLabel + ']' : '';
+          opt.textContent = pos.name + srcPrefix + ' (' + pos.nodeType + ')';
           focusSelect.appendChild(opt);
         });
 
@@ -1809,6 +1992,19 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
           code.textContent = fNode.id;
           p1.appendChild(strong);
           p1.appendChild(code);
+          nodeInspectorBody.appendChild(p1);
+          if (fNode.sourceLabel || positions[focusedNodeId].sourceLabel) {
+            const labels = fNode.sourceLabels || positions[focusedNodeId].sourceLabels || [fNode.sourceLabel || positions[focusedNodeId].sourceLabel];
+            const isMerged = Boolean(fNode.mergedViaDetailedArch || positions[focusedNodeId].mergedViaDetailedArch);
+            const pSrc = document.createElement('div');
+            pSrc.style.color = '#38bdf8';
+            pSrc.style.margin = '4px 0 2px';
+            pSrc.textContent =
+              'Source: ' +
+              labels.join(' + ') +
+              (isMerged ? ' (merged via detailed-architecture)' : '');
+            nodeInspectorBody.appendChild(pSrc);
+          }
           const p2 = document.createElement('div');
           p2.style.color = '#93a4c7';
           p2.style.margin = '4px 0';
@@ -1817,7 +2013,6 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
           p3.textContent = 'Upstream: ' + inList;
           const p4 = document.createElement('div');
           p4.textContent = 'Downstream: ' + outList;
-          nodeInspectorBody.appendChild(p1);
           nodeInspectorBody.appendChild(p2);
           nodeInspectorBody.appendChild(p3);
           nodeInspectorBody.appendChild(p4);
@@ -1844,7 +2039,11 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
           if (!src || !dst) continue;
 
           const inFocus = !focusedNodeId || edge.source === focusedNodeId || edge.target === focusedNodeId;
+          const srcInProj = nodeMatchesProject(src);
+          const dstInProj = nodeMatchesProject(dst);
+          const inProject = !selectedProjectId || (srcInProj && dstInProj);
           if (focusedNodeId && isolateMode && !inFocus) continue;
+          if (selectedProjectId && isolateMode && !inProject) continue;
 
           const pairKey = edge.source < edge.target ? edge.source + '::' + edge.target : edge.target + '::' + edge.source;
           const pairTotal = pairCounts.get(pairKey) || 1;
@@ -1895,9 +2094,10 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
             cy2 = y2 - signY * 18;
           }
 
+          const edgeActive = inFocus && (!selectedProjectId || srcInProj || dstInProj);
           const g = createSvgEl('g', {
             class: 'edge-group',
-            opacity: inFocus ? 1 : 0.14,
+            opacity: edgeActive ? (inProject ? 1 : 0.45) : 0.12,
           });
           g.appendChild(createSvgEl('path', {
             d: 'M ' + x1 + ' ' + y1 + ' C ' + cx1 + ' ' + cy1 + ', ' + cx2 + ' ' + cy2 + ', ' + x2 + ' ' + y2,
@@ -1955,6 +2155,12 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
               name: fallbackNode?.name || positions[remId].name,
               nodeType: fallbackNode?.nodeType || positions[remId].nodeType,
               controlCount: fallbackNode?.controlCount || positions[remId].controlCount,
+              sourceId: fallbackNode?.sourceId || positions[remId].sourceId,
+              sourceLabel: fallbackNode?.sourceLabel || positions[remId].sourceLabel,
+              sourceIds: fallbackNode?.sourceIds || positions[remId].sourceIds,
+              sourceLabels: fallbackNode?.sourceLabels || positions[remId].sourceLabels,
+              mergedViaDetailedArch:
+                fallbackNode?.mergedViaDetailedArch || positions[remId].mergedViaDetailedArch,
             });
           }
         }
@@ -1964,7 +2170,10 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
           if (!pos) continue;
 
           const inFocus = !focusedNodeId || neighborhood.has(node.id);
+          const inProject = nodeMatchesProject(node.sourceId || node.sourceIds ? node : pos);
           if (focusedNodeId && isolateMode && !inFocus) continue;
+          if (selectedProjectId && isolateMode && !inProject) continue;
+          const visibleActive = inFocus && inProject;
 
           const isFocusedTarget = focusedNodeId === node.id;
           const isAdded = addedNodes.has(node.id);
@@ -1980,7 +2189,7 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
 
           const g = createSvgEl('g', {
             class: 'node-group',
-            opacity: isRemoved ? (inFocus ? 0.45 : 0.12) : (inFocus ? 1 : 0.18),
+            opacity: isRemoved ? (visibleActive ? 0.45 : 0.12) : (visibleActive ? 1 : 0.16),
           });
           g.addEventListener('click', (ev) => {
             ev.stopPropagation();
@@ -2000,6 +2209,40 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
             'stroke-width': isAdded || isModified || isRemoved ? 2.4 : 1.5,
             'stroke-dasharray': isRemoved ? '5 4' : 'none',
           }));
+
+          const effSourceId = node.sourceId || pos.sourceId;
+          const effSourceLabel = node.sourceLabel || pos.sourceLabel;
+          const effSourceLabels = node.sourceLabels || pos.sourceLabels;
+          const effMerged = Boolean(node.mergedViaDetailedArch || pos.mergedViaDetailedArch);
+          if (isMultiSource && effSourceLabel) {
+            const rawBadge = effMerged && Array.isArray(effSourceLabels) && effSourceLabels.length > 1
+              ? '⇄ ' + effSourceLabels.join('+')
+              : effSourceLabel;
+            const badgeStr = rawBadge.length > 22 ? rawBadge.slice(0, 21) + '…' : rawBadge;
+            const badgeW = Math.min(w - 12, Math.max(44, Math.round(badgeStr.length * 5.8 + 14)));
+            const badgeH = 15;
+            const badgeColor = sourceColorMap.get(effSourceId) || '#38bdf8';
+            g.appendChild(createSvgEl('rect', {
+              x: pos.x - badgeW / 2,
+              y: pos.y - h / 2 - 8,
+              width: badgeW,
+              height: badgeH,
+              rx: 7.5,
+              fill: '#0b1020',
+              stroke: badgeColor,
+              'stroke-width': 1.1,
+            }));
+            const badgeText = createSvgEl('text', {
+              x: pos.x,
+              y: pos.y - h / 2 + 2.5,
+              fill: badgeColor,
+              'font-size': 9.5,
+              'font-weight': 600,
+              'text-anchor': 'middle',
+            });
+            badgeText.textContent = badgeStr;
+            g.appendChild(badgeText);
+          }
 
           const titleText = createSvgEl('text', {
             x: pos.x,
@@ -2255,6 +2498,12 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
       speedSelect.addEventListener('change', () => {
         if (timer) startPlayback();
       });
+      if (projectSelect) {
+        projectSelect.addEventListener('change', (e) => {
+          selectedProjectId = e.target.value || '';
+          renderFrame(currentIndex);
+        });
+      }
       focusSelect.addEventListener('change', (e) => {
         setFocusNode(e.target.value);
       });
@@ -2262,6 +2511,8 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
         renderFrame(currentIndex);
       });
       btnResetFocus.addEventListener('click', () => {
+        selectedProjectId = '';
+        if (projectSelect) projectSelect.value = '';
         setFocusNode('');
       });
       window.addEventListener('keydown', (e) => {

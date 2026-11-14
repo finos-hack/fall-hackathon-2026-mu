@@ -14,7 +14,13 @@
       "unique-id": "git-history-extractor",
       "node-type": "service",
       "name": "Git History Extractor",
-      "description": "Traverses git log --follow -M30% locally and extracts valid JSON snapshots plus co-changed ADRs."
+      "description": "Traverses git log --follow -M30% locally across one or multiple Git repositories and extracts valid JSON snapshots plus co-changed ADRs."
+    },
+    {
+      "unique-id": "federation-engine",
+      "node-type": "service",
+      "name": "Multi-Repo Federation Engine",
+      "description": "Synchronizes chronological commits across repositories, enforces strict peer namespace isolation, and merges shared boundary nodes solely through details.detailed-architecture."
     },
     {
       "unique-id": "structural-diff-engine",
@@ -71,11 +77,21 @@
       }
     },
     {
-      "unique-id": "rel-extractor-to-diff",
-      "description": "Streams chronological CALM snapshots.",
+      "unique-id": "rel-extractor-to-federation",
+      "description": "Streams per-repository CALM commit histories with ISO-8601 timestamps.",
       "relationship-type": {
         "connects": {
           "source": { "node": "git-history-extractor" },
+          "destination": { "node": "federation-engine" }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-federation-to-diff",
+      "description": "Emits synchronized federated CALM snapshots with provenance metadata.",
+      "relationship-type": {
+        "connects": {
+          "source": { "node": "federation-engine" },
           "destination": { "node": "structural-diff-engine" }
         }
       }
@@ -167,6 +183,20 @@
             "name": "Contiguous Commit Coverage & Git Snapshot Integrity",
             "description": "Enforces validateClusterSpecs(0..N-1) so external AI assistants cannot drop commits, overlap ranges, or hallucinate CALM JSON snapshots.",
             "enforcedBy": "validateClusterSpecs"
+          }
+        }
+      ]
+    },
+    "strict-peer-namespace-isolation": {
+      "description": "Prevents unintended node merging across unlinked peer repositories while permitting canonical composition and boundary-node merging when explicitly linked via details.detailed-architecture.",
+      "requirements": [
+        {
+          "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+          "config": {
+            "control-id": "strict-peer-namespace-isolation",
+            "name": "Peer Namespace Isolation & Detailed-Architecture Resolution",
+            "description": "Namespaces unlinked nodes per source (<sourceId>--<id>) and merges shared nodes only across resolved details.detailed-architecture edges.",
+            "enforcedBy": "composeFederatedArchitecture"
           }
         }
       ]

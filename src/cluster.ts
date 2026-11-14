@@ -284,6 +284,7 @@ function buildClusterFromRange(
         commits: slice,
         mergedChangeItems: net.changeItems.filter((i) => i.category !== 'metadata'),
         snapshotDocument: last.commit.document,
+        ...(last.commit.nodeProvenance ? { nodeProvenance: last.commit.nodeProvenance } : {}),
     };
 }
 
@@ -407,6 +408,7 @@ export function buildCommitHistoryDigest(
     deltas: StructuralCommitDelta[],
     meta: {
         sourceFile: string;
+        sources?: import('./types.js').FederatedSourceDescriptor[];
         totalCommitsScanned: number;
         validSnapshotsParsed: number;
         noiseCommitsFiltered: number;
@@ -418,6 +420,7 @@ export function buildCommitHistoryDigest(
     return {
         schemaVersion: '1.0',
         sourceFile: meta.sourceFile,
+        ...(meta.sources && meta.sources.length > 0 ? { sources: meta.sources } : {}),
         latestCommitDate,
         stats: {
             totalCommitsScanned: meta.totalCommitsScanned,
@@ -457,6 +460,9 @@ export function buildCommitHistoryDigest(
             summaryLine: d.summaryLine,
             changes: d.changeItems.map((c) => c.text),
             coChangedAdrs: [...d.commit.coChangedAdrs],
+            ...(d.commit.sourceId ? { sourceId: d.commit.sourceId } : {}),
+            ...(d.commit.sourceLabel ? { sourceLabel: d.commit.sourceLabel } : {}),
+            ...(d.commit.repoName ? { repoName: d.commit.repoName } : {}),
         })),
     };
 }

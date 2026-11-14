@@ -3,6 +3,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { buildCommitHistoryDigest, clusterCommitsIntoMoments } from './cluster.js';
+import { extractAndSynchronizeGitSources, parseSourceTargetSpec } from './federation.js';
 import { extractGitHistory, filterStructuralCommits } from './git-history.js';
 import {
   assembleCalmTimeline,
@@ -12,19 +13,23 @@ import {
 import {
   buildTimelapsePayloadFromClusters,
   buildTimelapsePayloadFromTimelineFile,
+  buildTimelapsePayloadFromTimelineFiles,
   writeTimelapseHtml,
 } from './timelapse-html.js';
 import type {
   CommitHistoryDigest,
+  FederatedSourceDescriptor,
   GitCommandRunner,
   GitTimelineResult,
   MomentCluster,
+  StructuralCommitDelta,
 } from './types.js';
 
 export * from './types.js';
 export * from './calm-diff.js';
 export * from './git-history.js';
 export * from './cluster.js';
+export * from './federation.js';
 export * from './timeline-emitter.js';
 export * from './timelapse-html.js';
 
@@ -37,6 +42,7 @@ export interface GenerateTimelineOptions {
   clusterSpecs?: unknown;
   maxCommits?: number;
   includeMetadataChanges?: boolean;
+  resolveDetails?: boolean;
   validate?: boolean;
   validateSnapshots?: boolean;
   gitRunner?: GitCommandRunner;
@@ -46,30 +52,71 @@ export interface GenerateTimelineOptions {
 export interface FullGitTimelineResult extends GitTimelineResult {
   clusters: MomentCluster[];
   digest: CommitHistoryDigest;
+  sources?: FederatedSourceDescriptor[];
   digestPath?: string;
   timelapsePath?: string;
   validationErrors: string[];
 }
 
 export async function generateTimelineFromGit(
-  targetFilePath: string,
+  targetFileOrFiles: string | string[],
   options: GenerateTimelineOptions = {},
 ): Promise<FullGitTimelineResult> {
-  const { commits, totalCommitsScanned } = extractGitHistory(targetFilePath, {
-    maxCommits: options.maxCommits,
-    gitRunner: options.gitRunner,
-    onDebug: options.onDebug,
-  });
+  const targets = (Array.isArray(targetFileOrFiles) ? targetFileOrFiles : [targetFileOrFiles])
+    .map((t) => t.trim())
+    .filter((t) => t.length > 0);
 
-  if (commits.length === 0) {
-    throw new Error(
-      `No valid CALM JSON snapshots found in git history for "${targetFilePath}".`,
-    );
+  if (targets.length === 0) {
+    throw new Error('At least one CALM JSON target file path is required.');
   }
 
-  const { deltas, noiseCommitsFiltered } = filterStructuralCommits(commits, {
-    includeMetadataChanges: options.includeMetadataChanges,
-  });
+  const useFederatedMode =
+    targets.length > 1 || Boolean(options.resolveDetails) || targets[0].includes('=');
+
+  let deltas: StructuralCommitDelta[];
+  let totalCommitsScanned: number;
+  let validSnapshotsParsed: number;
+  let noiseCommitsFiltered: number;
+  let sources: FederatedSourceDescriptor[] | undefined;
+  let repositoriesTracked: number | undefined;
+  const primaryFilePath = parseSourceTargetSpec(targets[0]).filePath;
+
+  if (useFederatedMode) {
+    const syncResult = extractAndSynchronizeGitSources(targets, {
+      maxCommits: options.maxCommits,
+      includeMetadataChanges: options.includeMetadataChanges,
+      resolveDetails: options.resolveDetails,
+      gitRunner: options.gitRunner,
+      onDebug: options.onDebug,
+    });
+    deltas = syncResult.deltas;
+    totalCommitsScanned = syncResult.totalCommitsScanned;
+    validSnapshotsParsed = syncResult.validSnapshotsParsed;
+    noiseCommitsFiltered = syncResult.noiseCommitsFiltered;
+    sources = syncResult.sources;
+    repositoriesTracked = syncResult.repositoriesTracked;
+  } else {
+    const targetFilePath = targets[0];
+    const extracted = extractGitHistory(targetFilePath, {
+      maxCommits: options.maxCommits,
+      gitRunner: options.gitRunner,
+      onDebug: options.onDebug,
+    });
+
+    if (extracted.commits.length === 0) {
+      throw new Error(
+        `No valid CALM JSON snapshots found in git history for "${targetFilePath}".`,
+      );
+    }
+
+    const filtered = filterStructuralCommits(extracted.commits, {
+      includeMetadataChanges: options.includeMetadataChanges,
+    });
+    deltas = filtered.deltas;
+    totalCommitsScanned = extracted.totalCommitsScanned;
+    validSnapshotsParsed = extracted.commits.length;
+    noiseCommitsFiltered = filtered.noiseCommitsFiltered;
+  }
 
   if (deltas.length === 0) {
     throw new Error(
@@ -77,10 +124,16 @@ export async function generateTimelineFromGit(
     );
   }
 
+  const digestSourceDisplay =
+    sources && sources.length > 1
+      ? sources.map((s) => s.sourceLabel).join(' + ')
+      : path.basename(primaryFilePath);
+
   const digest = buildCommitHistoryDigest(deltas, {
-    sourceFile: path.basename(targetFilePath),
+    sourceFile: digestSourceDisplay,
+    sources,
     totalCommitsScanned,
-    validSnapshotsParsed: commits.length,
+    validSnapshotsParsed,
     noiseCommitsFiltered,
   });
 
@@ -114,7 +167,8 @@ export async function generateTimelineFromGit(
   });
 
   const { timeline, snapshotPaths } = assembleCalmTimeline(clusters, {
-    sourceFilePath: targetFilePath,
+    sourceFilePath: primaryFilePath,
+    sources,
     outputPath: options.outputPath,
     snapshotsDir: options.snapshotsDir,
   });
@@ -125,6 +179,12 @@ export async function generateTimelineFromGit(
     'total-commits-scanned': String(totalCommitsScanned),
     'noise-commits-filtered': String(noiseCommitsFiltered),
     'structural-commits-retained': String(deltas.length),
+    ...(sources && sources.length > 1
+      ? {
+          'sources-tracked': String(sources.length),
+          'repositories-tracked': String(repositoriesTracked ?? 1),
+        }
+      : {}),
   };
 
   if (options.outputPath) {
@@ -148,7 +208,8 @@ export async function generateTimelineFromGit(
   let writtenTimelapsePath: string | undefined;
   if (options.timelapsePath) {
     const payload = buildTimelapsePayloadFromClusters(clusters, {
-      sourceFile: targetFilePath,
+      sourceFile: primaryFilePath,
+      sources,
       engine,
       stats: {
         totalCommitsScanned,
@@ -165,24 +226,40 @@ export async function generateTimelineFromGit(
     snapshotPaths,
     clusters,
     digest,
+    ...(sources ? { sources } : {}),
     digestPath: writtenDigestPath,
     timelapsePath: writtenTimelapsePath,
     validationErrors,
     stats: {
       totalCommitsScanned,
-      validSnapshotsParsed: commits.length,
+      validSnapshotsParsed,
       noiseCommitsFiltered,
       structuralCommitsRetained: deltas.length,
       momentsGenerated: timeline.moments.length,
       clusteringEngine: engine,
+      ...(sources
+        ? {
+            sourcesTracked: sources.length,
+            repositoriesTracked: repositoriesTracked ?? 1,
+          }
+        : {}),
     },
   };
 }
 
 export function renderTimelapseFromTimelineFile(
-  timelineFilePath: string,
+  timelineFileOrFiles: string | string[],
   outputHtmlPath: string,
 ): string {
-  const payload = buildTimelapsePayloadFromTimelineFile(timelineFilePath);
+  const files = (Array.isArray(timelineFileOrFiles) ? timelineFileOrFiles : [timelineFileOrFiles])
+    .map((f) => f.trim())
+    .filter((f) => f.length > 0);
+  if (files.length === 0) {
+    throw new Error('At least one CALM timeline file path is required.');
+  }
+  const payload =
+    files.length > 1
+      ? buildTimelapsePayloadFromTimelineFiles(files)
+      : buildTimelapsePayloadFromTimelineFile(files[0]);
   return writeTimelapseHtml(outputHtmlPath, payload);
 }
