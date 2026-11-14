@@ -112,26 +112,91 @@ describe('computeStructuralDelta', () => {
         expect(summarizeCounts(delta.counts, false)).toContain('controls(+2/~1/-1)');
     });
 
-    it('supports CALM pattern schemas via prefixItems', () => {
-        const patA = {
+    it('supports CALM pattern schemas via prefixItems, legacy items arrays, uniqueId renames, and referenced flow URLs', () => {
+        const patLegacy = {
             properties: {
                 nodes: {
-                    prefixItems: [{ properties: { 'unique-id': { const: 'n1' }, 'node-type': { const: 'service' } } }],
+                    items: [
+                        {
+                            properties: {
+                                uniqueId: { const: 'api-gateway' },
+                                type: { const: 'system' },
+                                name: { const: 'API Gateway' },
+                            },
+                        },
+                    ],
                 },
-            },
-        };
-        const patB = {
-            properties: {
-                nodes: {
-                    prefixItems: [
-                        { properties: { 'unique-id': { const: 'n1' }, 'node-type': { const: 'service' } } },
-                        { properties: { 'unique-id': { const: 'n2' }, 'node-type': { const: 'database' } } },
+                relationships: {
+                    items: [
+                        {
+                            properties: {
+                                uniqueId: { const: 'rel-1' },
+                                'relationship-type': {
+                                    const: { connects: { source: 'consumer', destination: 'api-gateway' } },
+                                },
+                            },
+                        },
                     ],
                 },
             },
         };
+        const patRenamed = {
+            properties: {
+                nodes: {
+                    prefixItems: [
+                        {
+                            properties: {
+                                'unique-id': { const: 'api-gateway' },
+                                'node-type': { const: 'system' },
+                                name: { const: 'API Gateway' },
+                            },
+                        },
+                        {
+                            properties: {
+                                'unique-id': { const: 'n2' },
+                                'node-type': { const: 'database' },
+                            },
+                        },
+                    ],
+                },
+                relationships: {
+                    prefixItems: [
+                        {
+                            properties: {
+                                'unique-id': { const: 'rel-1' },
+                                'relationship-type': {
+                                    const: {
+                                        connects: {
+                                            source: { node: 'consumer' },
+                                            destination: { node: 'api-gateway' },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    ],
+                },
+                flows: {
+                    prefixItems: [{ const: 'https://calm.finos.org/workshop/flows/signup.flow.json' }],
+                },
+            },
+        };
 
-        const delta = computeStructuralDelta(patA, patB);
+        const delta = computeStructuralDelta(patLegacy, patRenamed);
         expect(delta.counts.nodesAdded).toBe(1);
+        expect(delta.counts.nodesModified).toBe(1);
+        expect(delta.counts.relationshipsModified).toBe(1);
+        expect(delta.counts.flowsAdded).toBe(1);
+        expect(delta.hasStructuralChange).toBe(true);
+
+        const archBeforeFlow = { nodes: [], relationships: [] };
+        const archWithRefFlow = {
+            nodes: [],
+            relationships: [],
+            flows: ['https://calm.finos.org/workshop/flows/conference-signup.flow.json'],
+        };
+        const flowDelta = computeStructuralDelta(archBeforeFlow, archWithRefFlow);
+        expect(flowDelta.counts.flowsAdded).toBe(1);
+        expect(flowDelta.hasStructuralChange).toBe(true);
     });
 });

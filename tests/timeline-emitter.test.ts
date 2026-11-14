@@ -13,7 +13,7 @@ import {
     validateCalmArchitectureSnapshot,
     validateTimelineStructure,
 } from '../src/timeline-emitter.js';
-import type { GitCommitSnapshot } from '../src/types.js';
+import type { GitCommitSnapshot, MomentCluster } from '../src/types.js';
 
 let tempDir: string;
 
@@ -267,5 +267,86 @@ describe('validateCalmArchitectureSnapshot', () => {
         const archDoc = JSON.parse(fs.readFileSync(archPath, 'utf-8')) as Record<string, unknown>;
         expect(validateCalmArchitectureSnapshot(archDoc, 'architecture.calm.json')).toEqual([]);
         expect(archDoc.controls).toBeDefined();
+    });
+
+    it('enforces timeline-has-no-empty-properties and emits required-pattern for CALM pattern schemas', () => {
+        const tmpOut = fs.mkdtempSync(path.join(os.tmpdir(), 'calm-pattern-tl-'));
+        const patternCluster: MomentCluster = {
+            startIndex: 0,
+            endIndex: 0,
+            uniqueId: 'api-gateway-pattern-v1',
+            name: 'API Gateway Pattern v1',
+            description: 'Initial pattern schema.',
+            validFrom: '2024-03-08',
+            adrs: [],
+            commits: [
+                {
+                    commit: {
+                        sha: '1234567890abcdef',
+                        shortSha: '1234567',
+                        date: '2024-03-08',
+                        author: 'Dev',
+                        subject: 'feat: pattern',
+                        body: '',
+                        historicalPath: 'api-gateway.json',
+                        coChangedAdrs: [],
+                        document: {},
+                    },
+                    isInitial: true,
+                    changeItems: [],
+                    counts: {
+                        nodesAdded: 1,
+                        nodesRemoved: 0,
+                        nodesModified: 0,
+                        relationshipsAdded: 0,
+                        relationshipsRemoved: 0,
+                        relationshipsModified: 0,
+                        controlsAdded: 0,
+                        controlsRemoved: 0,
+                        controlsModified: 0,
+                        flowsAdded: 0,
+                        flowsRemoved: 0,
+                        flowsModified: 0,
+                        adrsAdded: 0,
+                        adrsRemoved: 0,
+                        metadataChanged: 0,
+                    },
+                    summaryLine: '1 node',
+                },
+            ],
+            mergedChangeItems: [],
+            snapshotDocument: {
+                $schema: 'https://calm.finos.org/release/1.3/meta/calm.json',
+                type: 'object',
+                properties: {
+                    nodes: {
+                        prefixItems: [
+                            { properties: { 'unique-id': { const: 'gw' }, 'node-type': { const: 'system' } } },
+                        ],
+                    },
+                },
+            },
+        };
+
+        const outPath = path.join(tmpOut, 'pattern.timeline.json');
+        const { timeline, snapshotPaths } = assembleCalmTimeline([patternCluster], {
+            sourceFilePath: 'api-gateway.json',
+            outputPath: outPath,
+        });
+        expect(snapshotPaths[0].endsWith('.pattern.json')).toBe(true);
+        expect(timeline.moments[0].details['required-pattern']).toContain('.pattern.json');
+        expect(timeline.moments[0].details['detailed-architecture']).toBeUndefined();
+        expect(validateTimelineStructure(timeline, { timelineFilePath: outPath })).toEqual([]);
+
+        const broken = structuredClone(timeline);
+        broken.moments[0].metadata = {
+            ...(broken.moments[0].metadata ?? {}),
+            'node-provenance': {
+                gw: { mergedViaDetailedArch: false },
+            },
+        };
+        const errs = validateTimelineStructure(broken, { timelineFilePath: outPath });
+        expect(errs.some((e) => e.includes('timeline-has-no-empty-properties'))).toBe(true);
+        fs.rmSync(tmpOut, { recursive: true, force: true });
     });
 });

@@ -35,6 +35,29 @@ function unwrapSchemaProps(item: Record<string, unknown>): Record<string, unknow
     return asRecord(item['properties']) ?? item;
 }
 
+export function isCalmPatternDocument(doc: Record<string, unknown>): boolean {
+    if (Array.isArray(doc['nodes'])) return false;
+    const props = asRecord(doc['properties']);
+    return Boolean(props && (asRecord(props['nodes']) || asRecord(props['relationships'])));
+}
+
+function readPatternTupleItems(
+    patternProp: Record<string, unknown> | null,
+): { items: unknown[]; tupleKeyword: string } {
+    if (!patternProp) return { items: [], tupleKeyword: '' };
+    if (Array.isArray(patternProp['prefixItems'])) {
+        return { items: patternProp['prefixItems'], tupleKeyword: 'prefixItems' };
+    }
+    if (Array.isArray(patternProp['items'])) {
+        return { items: patternProp['items'], tupleKeyword: 'items' };
+    }
+    const singleItem = asRecord(patternProp['items']);
+    if (singleItem) {
+        return { items: [singleItem], tupleKeyword: 'items-object' };
+    }
+    return { items: [], tupleKeyword: '' };
+}
+
 function extractItemsById(
     doc: Record<string, unknown>,
     field: 'nodes' | 'relationships',
@@ -43,27 +66,38 @@ function extractItemsById(
     const direct = doc[field];
     const props = asRecord(doc['properties']);
     const patternProp = props ? asRecord(props[field]) : null;
-    const list = Array.isArray(direct)
-        ? direct
-        : patternProp && Array.isArray(patternProp['prefixItems'])
-          ? patternProp['prefixItems']
-          : [];
+    const isDirect = Array.isArray(direct);
+    const patternTuple = isDirect ? { items: [], tupleKeyword: '' } : readPatternTupleItems(patternProp);
+    const list = isDirect ? direct : patternTuple.items;
 
     for (const raw of list) {
         const obj = asRecord(raw);
         if (!obj) continue;
         const unwrapped = unwrapSchemaProps(obj);
-        const id = readStringOrConst(unwrapped['unique-id']);
+        const id =
+            readStringOrConst(unwrapped['unique-id']) ?? readStringOrConst(unwrapped['uniqueId']);
         if (id) {
-            map.set(id, unwrapped);
+            if (!isDirect) {
+                const enriched: Record<string, unknown> = {
+                    ...unwrapped,
+                    __patternTupleKeyword: patternTuple.tupleKeyword,
+                };
+                if (Array.isArray(obj['required'])) {
+                    enriched.__patternRequired = obj['required'];
+                }
+                map.set(id, enriched);
+            } else {
+                map.set(id, unwrapped);
+            }
         }
     }
     return map;
 }
 
 function omitUniqueId(obj: Record<string, unknown>): Record<string, unknown> {
-    const { 'unique-id': _omit, ...rest } = obj;
-    void _omit;
+    const { 'unique-id': _omit1, uniqueId: _omit2, ...rest } = obj;
+    void _omit1;
+    void _omit2;
     return rest;
 }
 
@@ -76,6 +110,7 @@ function describeNodeModification(orig: Record<string, unknown>, next: Record<st
     const changedFields: string[] = [];
     for (const field of [
         'node-type',
+        'type',
         'name',
         'description',
         'interfaces',
@@ -87,6 +122,18 @@ function describeNodeModification(orig: Record<string, unknown>, next: Record<st
             changedFields.push(field);
         }
     }
+    if (
+        canonicalKey(orig['unique-id']) !== canonicalKey(next['unique-id']) ||
+        canonicalKey(orig['uniqueId']) !== canonicalKey(next['uniqueId'])
+    ) {
+        changedFields.push('unique-id');
+    }
+    if (
+        canonicalKey(orig['__patternTupleKeyword']) !== canonicalKey(next['__patternTupleKeyword']) ||
+        canonicalKey(orig['__patternRequired']) !== canonicalKey(next['__patternRequired'])
+    ) {
+        changedFields.push('pattern-schema');
+    }
     const suffix = changedFields.length > 0 ? ` [${changedFields.join(', ')}]` : '';
     return `Modified node ${displayNodeLabel(next, id)}${suffix}`;
 }
@@ -94,7 +141,8 @@ function describeNodeModification(orig: Record<string, unknown>, next: Record<st
 function collectInlineControls(items: Iterable<Record<string, unknown>>): Map<string, string> {
     const controls = new Map<string, string>();
     for (const obj of items) {
-        const ownerId = readStringOrConst(obj['unique-id']) ?? 'element';
+        const ownerId =
+            readStringOrConst(obj['unique-id']) ?? readStringOrConst(obj['uniqueId']) ?? 'element';
         const ctrlObj = asRecord(obj['controls']);
         if (!ctrlObj) continue;
         for (const [ctrlId, ctrlVal] of Object.entries(ctrlObj)) {
@@ -106,14 +154,47 @@ function collectInlineControls(items: Iterable<Record<string, unknown>>): Map<st
 
 function collectFlows(doc: Record<string, unknown>): Map<string, { name: string; key: string }> {
     const flows = new Map<string, { name: string; key: string }>();
-    if (!Array.isArray(doc['flows'])) return flows;
-    for (const raw of doc['flows']) {
-        const obj = asRecord(raw);
-        if (!obj) continue;
-        const id = readStringOrConst(obj['unique-id']);
-        if (!id) continue;
-        const name = readStringOrConst(obj['name'])?.trim() || id;
-        flows.set(id, { name, key: canonicalKey(obj) });
+    if (Array.isArray(doc['flows'])) {
+        for (const raw of doc['flows']) {
+            if (typeof raw === 'string' && raw.trim()) {
+                const ref = raw.trim();
+                flows.set(`ref:${ref}`, { name: ref, key: JSON.stringify(ref) });
+                continue;
+            }
+            const obj = asRecord(raw);
+            if (!obj) continue;
+            const id = readStringOrConst(obj['unique-id']) ?? readStringOrConst(obj['uniqueId']);
+            if (!id) continue;
+            const name = readStringOrConst(obj['name'])?.trim() || id;
+            flows.set(id, { name, key: canonicalKey(obj) });
+        }
+        return flows;
+    }
+
+    const props = asRecord(doc['properties']);
+    const flowsProp = props ? asRecord(props['flows']) : null;
+    const patternTuple = readPatternTupleItems(flowsProp);
+    for (let idx = 0; idx < patternTuple.items.length; idx++) {
+        const item = asRecord(patternTuple.items[idx]);
+        if (!item) continue;
+        if (typeof item['const'] === 'string' && item['const'].trim()) {
+            const ref = item['const'].trim();
+            flows.set(`ref:${ref}`, {
+                name: ref,
+                key: canonicalKey({ ref, tuple: patternTuple.tupleKeyword }),
+            });
+            continue;
+        }
+        const unwrapped = unwrapSchemaProps(item);
+        const id =
+            readStringOrConst(unwrapped['unique-id']) ??
+            readStringOrConst(unwrapped['uniqueId']) ??
+            `pattern-flow-${idx}`;
+        const name = readStringOrConst(unwrapped['name'])?.trim() || id;
+        flows.set(id, {
+            name,
+            key: canonicalKey({ ...unwrapped, __patternTupleKeyword: patternTuple.tupleKeyword }),
+        });
     }
     return flows;
 }

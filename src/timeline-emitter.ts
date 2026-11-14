@@ -2,6 +2,7 @@
 
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { isCalmPatternDocument } from './calm-diff.js';
 import type {
     FederatedSourceDescriptor,
     GeneratedGitMoment,
@@ -163,7 +164,9 @@ export function assembleCalmTimeline(
 
         const endCommit = cluster.commits[cluster.commits.length - 1].commit;
         const paddedIdx = String(index + 1).padStart(2, '0');
-        const snapshotFileName = `${paddedIdx}-${endCommit.shortSha}-${uniqueId}.architecture.json`;
+        const isPattern = isCalmPatternDocument(cluster.snapshotDocument);
+        const snapshotExt = isPattern ? 'pattern.json' : 'architecture.json';
+        const snapshotFileName = `${paddedIdx}-${endCommit.shortSha}-${uniqueId}.${snapshotExt}`;
         const snapshotAbsPath = path.join(resolvedSnapshotsDir, snapshotFileName);
         writeFileSync(snapshotAbsPath, JSON.stringify(cluster.snapshotDocument, null, 2) + '\n');
         snapshotPaths.push(snapshotAbsPath);
@@ -173,21 +176,35 @@ export function assembleCalmTimeline(
             .split(path.sep)
             .join('/');
 
+        const commitShas = cluster.commits.map((c) => c.commit.shortSha).filter((s) => s.trim().length > 0);
+        const commitSubjects = cluster.commits
+            .map((c) => (c.commit.subject || c.commit.shortSha).trim())
+            .filter((s) => s.length > 0);
+
+        const momentMeta: Record<string, unknown> = {};
+        if (commitShas.length > 0) {
+            momentMeta.commits = commitShas;
+        }
+        if (commitSubjects.length > 0) {
+            momentMeta['commit-messages'] = commitSubjects;
+        }
+        if (cluster.commits.length > 0) {
+            momentMeta['commit-count'] = cluster.commits.length;
+        }
+        if (cluster.nodeProvenance && Object.keys(cluster.nodeProvenance).length > 0) {
+            momentMeta['node-provenance'] = cluster.nodeProvenance;
+        }
+
         const moment: GeneratedGitMoment = {
             'unique-id': uniqueId,
             'node-type': 'moment',
             name: cluster.name || `Moment ${index + 1}`,
             description: cluster.description || `Architectural state at commit ${endCommit.shortSha}`,
             'valid-from': validFrom,
-            details: {
-                'detailed-architecture': relativeArchRef,
-            },
-            metadata: {
-                commits: cluster.commits.map((c) => c.commit.shortSha),
-                'commit-messages': cluster.commits.map((c) => c.commit.subject),
-                'commit-count': cluster.commits.length,
-                ...(cluster.nodeProvenance ? { 'node-provenance': cluster.nodeProvenance } : {}),
-            },
+            details: isPattern
+                ? { 'required-pattern': relativeArchRef }
+                : { 'detailed-architecture': relativeArchRef },
+            ...(Object.keys(momentMeta).length > 0 ? { metadata: momentMeta } : {}),
         };
 
         const nonEmptyAdrs = cluster.adrs.filter((a) => a.trim().length > 0);
@@ -220,6 +237,26 @@ export function assembleCalmTimeline(
     return { timeline, snapshotPaths };
 }
 
+function collectEmptyPropertyViolations(value: unknown, jsonPath: string, errors: string[]): void {
+    if (!value) {
+        errors.push(
+            `timeline-has-no-empty-properties: '${jsonPath}' must be set to a nonempty, nonzero, non-false value.`,
+        );
+        return;
+    }
+    if (Array.isArray(value)) {
+        for (let idx = 0; idx < value.length; idx++) {
+            collectEmptyPropertyViolations(value[idx], `${jsonPath}/${idx}`, errors);
+        }
+        return;
+    }
+    if (isPlainObject(value)) {
+        for (const [key, child] of Object.entries(value)) {
+            collectEmptyPropertyViolations(child, `${jsonPath}/${key}`, errors);
+        }
+    }
+}
+
 export function validateTimelineStructure(
     timeline: GeneratedGitTimeline,
     options?: { timelineFilePath?: string },
@@ -233,45 +270,83 @@ export function validateTimelineStructure(
         return errors;
     }
 
+    for (const [rootKey, rootVal] of Object.entries(timeline)) {
+        collectEmptyPropertyViolations(rootVal, `/${rootKey}`, errors);
+    }
+
     const baseDir = options?.timelineFilePath ? path.dirname(path.resolve(options.timelineFilePath)) : null;
     const ids = new Set<string>();
     let prevTs: number | null = null;
+    let currentMomentIndex = -1;
 
     for (let i = 0; i < timeline.moments.length; i++) {
         const m = timeline.moments[i];
+        const rawMoment = m as unknown as Record<string, unknown>;
         if (!m['unique-id']?.trim()) errors.push(`Moment[${i}] is missing unique-id.`);
         if (ids.has(m['unique-id'])) errors.push(`Duplicate moment unique-id '${m['unique-id']}'.`);
         ids.add(m['unique-id']);
+        if (timeline['current-moment'] && m['unique-id'] === timeline['current-moment']) {
+            currentMomentIndex = i;
+        }
 
         if (m['node-type'] !== 'moment') errors.push(`Moment '${m['unique-id']}' node-type must be 'moment'.`);
         if (!m.name?.trim()) errors.push(`Moment '${m['unique-id']}' has empty name.`);
         if (!m.description?.trim()) errors.push(`Moment '${m['unique-id']}' has empty description.`);
-        const archRef = m.details?.['detailed-architecture']?.trim();
-        if (!archRef) {
-            errors.push(`Moment '${m['unique-id']}' is missing details.detailed-architecture.`);
-        } else if (baseDir && !/^https?:\/\//i.test(archRef)) {
-            const resolvedSnapshotPath = path.resolve(baseDir, archRef);
-            if (!existsSync(resolvedSnapshotPath)) {
-                errors.push(`Moment '${m['unique-id']}' referenced snapshot does not exist: ${archRef}`);
+        if ('interfaces' in rawMoment) {
+            errors.push(`Moment '${m['unique-id']}' must not define 'interfaces'.`);
+        }
+
+        if (!isPlainObject(m.details)) {
+            errors.push(`Moment '${m['unique-id']}' is missing details object.`);
+        } else {
+            for (const key of Object.keys(m.details)) {
+                if (key !== 'detailed-architecture' && key !== 'required-pattern') {
+                    errors.push(`Moment '${m['unique-id']}' has unsupported details key '${key}'.`);
+                }
+            }
+            const archRef = (m.details['detailed-architecture'] ?? m.details['required-pattern'])?.trim();
+            if (!archRef) {
+                errors.push(
+                    `Moment '${m['unique-id']}' must define details.detailed-architecture or details.required-pattern.`,
+                );
+            } else if (baseDir && !/^https?:\/\//i.test(archRef)) {
+                const resolvedSnapshotPath = path.resolve(baseDir, archRef);
+                if (!existsSync(resolvedSnapshotPath)) {
+                    errors.push(`Moment '${m['unique-id']}' referenced snapshot does not exist: ${archRef}`);
+                }
             }
         }
+
         if (m['valid-from']) {
             if (!/^\d{4}-\d{2}-\d{2}$/.test(m['valid-from'])) {
                 errors.push(`Moment '${m['unique-id']}' has invalid valid-from date '${m['valid-from']}'.`);
             } else {
                 const ts = Date.parse(m['valid-from']);
-                if (prevTs !== null && ts < prevTs) {
-                    errors.push(
-                        `Moment '${m['unique-id']}' valid-from '${m['valid-from']}' is out of chronological order.`,
-                    );
+                if (Number.isNaN(ts)) {
+                    errors.push(`Moment '${m['unique-id']}' has unparseable valid-from date '${m['valid-from']}'.`);
+                } else {
+                    if (prevTs !== null && ts < prevTs) {
+                        errors.push(
+                            `Moment '${m['unique-id']}' valid-from '${m['valid-from']}' is out of chronological order.`,
+                        );
+                    }
+                    prevTs = ts;
                 }
-                prevTs = ts;
             }
         }
     }
 
     if (!timeline['current-moment'] || !ids.has(timeline['current-moment'])) {
         errors.push('current-moment must reference an existing moment unique-id.');
+    } else if (currentMomentIndex >= 0) {
+        for (let i = currentMomentIndex + 1; i < timeline.moments.length; i++) {
+            const futureMoment = timeline.moments[i];
+            if (futureMoment['valid-from']) {
+                errors.push(
+                    `Moment '${futureMoment['unique-id']}' appears after current-moment '${timeline['current-moment']}' and must not define valid-from.`,
+                );
+            }
+        }
     }
 
     return errors;
