@@ -1,0 +1,2305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CALM Architecture Timelapse — architecture.calm.json</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #11192e;
+      --panel-alt: #16223f;
+      --border: #253459;
+      --text: #e6edf7;
+      --muted: #93a4c7;
+      --accent: #38bdf8;
+      --added: #22c55e;
+      --modified: #f59e0b;
+      --removed: #ef4444;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+    }
+    header {
+      padding: 9px 16px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 15.5px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .meta-badges {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      font-size: 11.5px;
+      color: var(--muted);
+    }
+    .badge {
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: var(--panel-alt);
+      border: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .badge-funnel {
+      color: #bae6fd;
+      border-color: #0284c7;
+      background: rgba(2, 132, 199, 0.16);
+    }
+    main {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 390px;
+      flex: 1 1 0%;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .stage {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: 0;
+      min-width: 0;
+      padding: 10px 12px;
+      gap: 8px;
+      overflow: hidden;
+    }
+    .stage-toolbar {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 6px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+    .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .toolbar-sep {
+      width: 1px;
+      height: 20px;
+      background: var(--border);
+      margin: 0 2px;
+      flex-shrink: 0;
+    }
+    .stage-toolbar label {
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+    .stage-toolbar select {
+      max-width: 195px;
+    }
+    .canvas-wrap {
+      flex: 1 1 0%;
+      min-height: 0;
+      background: radial-gradient(circle at top left, #15213e 0%, #0b1020 70%);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      cursor: grab;
+      user-select: none;
+    }
+    .canvas-wrap.panning { cursor: grabbing; }
+    svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .canvas-overlay-top {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 5;
+      background: rgba(17, 25, 46, 0.84);
+      padding: 5px 11px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      backdrop-filter: blur(4px);
+      pointer-events: none;
+    }
+    .canvas-hint {
+      font-size: 11px;
+      color: var(--muted);
+      border-left: 1px solid var(--border);
+      padding-left: 10px;
+    }
+    .zoom-controls {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      display: flex;
+      gap: 5px;
+      z-index: 5;
+      background: rgba(17, 25, 46, 0.88);
+      padding: 5px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      backdrop-filter: blur(4px);
+    }
+    .zoom-controls button {
+      padding: 3px 9px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .controls {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: nowrap;
+      flex-shrink: 0;
+    }
+    .transport-btns {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .scrubber-wrap {
+      flex: 1 1 auto;
+      min-width: 120px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .scrubber-label {
+      font-size: 12px;
+      color: #bae6fd;
+      font-weight: 500;
+      max-width: 220px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    button, select, input[type="date"] {
+      background: var(--panel-alt);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 5px 10px;
+      font-size: 12.5px;
+      cursor: pointer;
+    }
+    input[type="date"] { cursor: text; color-scheme: dark; padding: 4px 8px; }
+    button:hover, select:hover { border-color: var(--accent); }
+    button.primary {
+      background: #0284c7;
+      border-color: #38bdf8;
+      font-weight: 600;
+      min-width: 78px;
+    }
+    input[type="range"] {
+      flex: 1;
+      min-width: 100px;
+      accent-color: var(--accent);
+      cursor: pointer;
+      margin: 0;
+    }
+    .legend {
+      display: flex;
+      gap: 11px;
+      font-size: 11.5px;
+      color: var(--muted);
+      align-items: center;
+    }
+    .dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 4px;
+    }
+    aside {
+      background: var(--panel);
+      border-left: 1px solid var(--border);
+      padding: 0 16px 16px 16px;
+      height: 100%;
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+    .moment-header {
+      position: sticky;
+      top: 0;
+      z-index: 4;
+      background: var(--panel);
+      padding: 14px 0 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .moment-header h2 {
+      margin: 0 0 3px 0;
+      font-size: 15.5px;
+      color: var(--accent);
+    }
+    .moment-date {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .card {
+      background: var(--panel-alt);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 12px;
+      flex-shrink: 0;
+    }
+    .card h3 {
+      margin: 0 0 7px 0;
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+    .change-list, .commit-list, .governance-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 12.5px;
+    }
+    .tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-right: 6px;
+    }
+    .tag-added { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+    .tag-modified { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+    .tag-removed { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+    .tag-info { background: rgba(56, 189, 248, 0.2); color: #7dd3fc; }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 11.5px;
+      color: #bae6fd;
+    }
+    .node-group { transition: opacity 280ms ease, transform 280ms ease; cursor: pointer; }
+    .edge-group { transition: opacity 280ms ease; }
+    .audit-banner {
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: #bae6fd;
+      border-radius: 8px;
+      padding: 6px 11px;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+    .audit-banner.warn {
+      background: rgba(245, 158, 11, 0.14);
+      border-color: rgba(245, 158, 11, 0.45);
+      color: #fde68a;
+    }
+    .compare-banner {
+      padding: 6px 8px;
+      border-radius: 6px;
+      background: rgba(56, 189, 248, 0.14);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: #bae6fd;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .gov-section { margin-top: 8px; }
+    .gov-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+    @media (max-width: 980px) {
+      body {
+        height: auto;
+        min-height: 100vh;
+        overflow: auto;
+      }
+      main {
+        grid-template-columns: 1fr;
+        overflow: visible;
+      }
+      .stage {
+        height: auto;
+        overflow: visible;
+      }
+      .canvas-wrap {
+        height: 56vh;
+        min-height: 320px;
+        flex: none;
+      }
+      .controls {
+        flex-wrap: wrap;
+      }
+      .canvas-hint, .scrubber-label {
+        display: none;
+      }
+      aside {
+        height: auto;
+        overflow: visible;
+        border-left: none;
+        border-top: 1px solid var(--border);
+      }
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      flex-wrap: wrap;
+    }
+    .mode-switch {
+      display: inline-flex;
+      background: #0b1020;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 2px;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+    .mode-btn {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 11px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+    .mode-btn:hover {
+      color: var(--text);
+    }
+    .mode-btn.active {
+      background: var(--accent);
+      color: #06202b;
+    }
+    #feed-view {
+      flex: 1 1 0%;
+      min-height: 0;
+      overflow-y: auto;
+      display: none;
+      flex-direction: column;
+      background: radial-gradient(circle at 50% 0%, #131e3a 0%, var(--bg) 55%);
+    }
+    .feed-toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 15;
+      background: rgba(17, 25, 46, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 9px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 12.5px;
+    }
+    .feed-toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .feed-pill-btn {
+      background: var(--panel-alt);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 4px 11px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .feed-pill-btn.active {
+      background: rgba(56, 189, 248, 0.18);
+      color: #bae6fd;
+      border-color: #0284c7;
+    }
+    #feed-search {
+      background: #0b1020;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 12.5px;
+      min-width: 220px;
+    }
+    .feed-stream {
+      width: 100%;
+      max-width: 940px;
+      margin: 0 auto;
+      padding: 24px 20px 64px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .feed-post {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+    }
+    .feed-post-meta {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .feed-author-block {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+    .feed-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.24), rgba(167, 139, 250, 0.22));
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      color: #e0f2fe;
+      font-weight: 700;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .feed-meta-title {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+    .feed-meta-sub {
+      font-size: 11.5px;
+      color: var(--muted);
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .feed-source-pill {
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 1px 8px;
+      border-radius: 999px;
+      background: #0b1020;
+      border: 1px solid #38bdf8;
+      color: #bae6fd;
+    }
+    .feed-actions {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .feed-action-btn {
+      background: var(--panel-alt);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .feed-action-btn.primary {
+      background: rgba(56, 189, 248, 0.16);
+      border-color: #0284c7;
+      color: #bae6fd;
+    }
+    .feed-post-title {
+      margin: 0;
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: #f8fafc;
+    }
+    .feed-post-summary {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.58;
+      color: #cbd5e1;
+    }
+    .feed-figure {
+      margin: 2px 0 0;
+      background: radial-gradient(circle at top left, #15213e 0%, #0b1020 75%);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .feed-svg-wrap {
+      width: 100%;
+      height: 300px;
+      position: relative;
+      cursor: pointer;
+    }
+    .feed-svg-wrap svg {
+      position: static;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .feed-figure-caption {
+      padding: 8px 14px;
+      background: rgba(11, 16, 32, 0.85);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 11.5px;
+      color: var(--muted);
+    }
+    .feed-delta-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-weight: 600;
+    }
+    .feed-highlights {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding-top: 2px;
+    }
+    .feed-chip {
+      font-size: 11.5px;
+      padding: 3px 9px;
+      border-radius: 7px;
+      background: var(--panel-alt);
+      border: 1px solid var(--border);
+      color: #cbd5e1;
+    }
+    .feed-chip.add { border-color: rgba(34, 197, 94, 0.45); color: #86efac; background: rgba(34, 197, 94, 0.1); }
+    .feed-chip.mod { border-color: rgba(245, 158, 11, 0.45); color: #fde68a; background: rgba(245, 158, 11, 0.1); }
+    .feed-chip.del { border-color: rgba(239, 68, 68, 0.45); color: #fca5a5; background: rgba(239, 68, 68, 0.1); }
+    .feed-chip.adr { border-color: rgba(56, 189, 248, 0.45); color: #bae6fd; background: rgba(56, 189, 248, 0.12); }
+    .feed-empty {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--muted);
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-left">
+      <h1>CALM Architecture Timelapse — architecture.calm.json</h1>
+      <div class="mode-switch" role="tablist" aria-label="View mode">
+        <button id="btn-mode-stage" type="button" class="mode-btn active" role="tab" aria-selected="true">▶ Timelapse Stage</button>
+        <button id="btn-mode-feed" type="button" class="mode-btn" role="tab" aria-selected="false">☰ Architecture Feed</button>
+      </div>
+    </div>
+    <div class="meta-badges">
+      <span class="badge" id="badge-moments">0 moments</span>
+      <span class="badge" id="badge-sources" style="display:none;"></span>
+      <span class="badge badge-funnel" id="badge-funnel">5 commits -&gt; 0 noise filtered -&gt; 5 moments</span>
+      <span class="badge" id="badge-engine">engine: clusters-file</span>
+      <span class="badge" id="badge-keys">Keys: Space Play/Pause · ←/→ Step</span>
+    </div>
+  </header>
+
+  <main id="stage-view">
+    <section class="stage">
+      <div class="stage-toolbar">
+        <div class="toolbar-group" id="project-filter-group" style="display:none;">
+          <label for="project-select">Project:</label>
+          <select id="project-select" title="Filter by source repository or architecture">
+            <option value="">All Projects (Synchronized)</option>
+          </select>
+        </div>
+        <div class="toolbar-sep" id="project-filter-sep" style="display:none;"></div>
+        <div class="toolbar-group">
+          <label for="focus-select">Subsystem:</label>
+          <select id="focus-select" title="Focus on a node and its 1-hop subsystem">
+            <option value="">All Subsystems (Full View)</option>
+          </select>
+          <label style="cursor:pointer;">
+            <input id="focus-isolate" type="checkbox" /> 1-hop only
+          </label>
+          <button id="btn-reset-focus" type="button">Reset</button>
+        </div>
+        <div class="toolbar-sep"></div>
+        <div class="toolbar-group">
+          <label for="as-of-date">As-Of Date:</label>
+          <input id="as-of-date" type="date" title="Query authoritative architecture in effect on a specific date" />
+          <label for="compare-select">Compare:</label>
+          <select id="compare-select" title="Compute live structural diff from a baseline moment">
+            <option value="">Previous Moment (Step Delta)</option>
+          </select>
+          <button id="btn-reset-compare" type="button">Reset Diff</button>
+        </div>
+      </div>
+      <div id="as-of-banner" class="audit-banner" style="display:none;"></div>
+
+      <div class="canvas-wrap" id="canvas-wrap">
+        <div class="canvas-overlay-top">
+          <div class="legend">
+            <span><i class="dot" style="background:var(--added)"></i>Added</span>
+            <span><i class="dot" style="background:var(--modified)"></i>Modified</span>
+            <span><i class="dot" style="background:var(--removed)"></i>Removed</span>
+          </div>
+          <span class="canvas-hint">Click node to inspect · Wheel/Drag to zoom &amp; pan</span>
+        </div>
+        <svg id="graph" viewBox="0 0 1780 540" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrow-normal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#64748b" />
+            </marker>
+            <marker id="arrow-added" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#22c55e" />
+            </marker>
+            <marker id="arrow-modified" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#f59e0b" />
+            </marker>
+            <marker id="arrow-removed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#ef4444" />
+            </marker>
+          </defs>
+          <g id="viewport-layer">
+            <g id="edges-layer"></g>
+            <g id="nodes-layer"></g>
+          </g>
+        </svg>
+        <div class="zoom-controls">
+          <button id="btn-zoom-in" type="button" title="Zoom In">+</button>
+          <button id="btn-zoom-out" type="button" title="Zoom Out">-</button>
+          <button id="btn-zoom-fit" type="button" title="Fit Graph">Fit</button>
+        </div>
+      </div>
+
+      <div class="controls" id="playback-bar">
+        <div class="transport-btns">
+          <button id="btn-prev" title="Previous Moment (←)">← Prev</button>
+          <button id="btn-play" class="primary" title="Play / Pause (Space)">▶ Play</button>
+          <button id="btn-next" title="Next Moment (→)">Next →</button>
+        </div>
+        <div class="scrubber-wrap">
+          <input id="scrubber" type="range" min="0" max="0" value="0" />
+          <span class="scrubber-label" id="scrubber-label"></span>
+        </div>
+        <span id="frame-counter" style="font-size:12.5px;min-width:52px;text-align:right;font-variant-numeric:tabular-nums;">0 / 0</span>
+        <select id="speed-select" title="Playback speed">
+          <option value="2200">0.7x</option>
+          <option value="1500" selected>1x</option>
+          <option value="900">1.5x</option>
+          <option value="500">3x</option>
+        </select>
+      </div>
+    </section>
+
+    <aside>
+      <div class="moment-header">
+        <h2 id="moment-title">Loading...</h2>
+        <div class="moment-date" id="moment-date"></div>
+      </div>
+
+      <div class="card" id="node-inspector" style="display:none;">
+        <h3>Subsystem Inspector</h3>
+        <div id="node-inspector-body" style="font-size:13px;line-height:1.45;"></div>
+      </div>
+
+      <div class="card" id="governance-card">
+        <h3>Governance &amp; Compliance Posture</h3>
+        <div id="governance-body" style="font-size:13px;line-height:1.45;"></div>
+      </div>
+
+      <div class="card">
+        <h3>Architectural Summary</h3>
+        <div id="moment-desc" style="font-size:13px;line-height:1.45;"></div>
+      </div>
+
+      <div class="card">
+        <h3>What Changed &amp; Why</h3>
+        <ul class="change-list" id="change-list"></ul>
+      </div>
+
+      <div class="card">
+        <h3>Git Commits &amp; ADRs</h3>
+        <ul class="commit-list" id="commit-list"></ul>
+      </div>
+    </aside>
+  </main>
+
+  <section id="feed-view" aria-label="Architecture Evolution Feed">
+    <div class="feed-toolbar">
+      <div class="feed-toolbar-group">
+        <strong id="feed-count" style="color:#f1f5f9;">0 posts</strong>
+        <span style="color:var(--border);">|</span>
+        <button id="btn-feed-latest" type="button" class="feed-pill-btn active">Latest First (N → 1)</button>
+        <button id="btn-feed-story" type="button" class="feed-pill-btn">Story Order (1 → N)</button>
+      </div>
+      <div class="feed-toolbar-group">
+        <label id="feed-project-wrap" style="display:none;color:var(--muted);align-items:center;gap:6px;">
+          Project:
+          <select id="feed-project-select" title="Filter feed posts by project">
+            <option value="">All Projects</option>
+          </select>
+        </label>
+        <input id="feed-search" type="search" placeholder="Filter posts by node, ADR, control, commit..." />
+      </div>
+    </div>
+    <div class="feed-stream" id="feed-stream"></div>
+  </section>
+
+  <script id="timelapse-data" type="application/json">{"title":"CALM Architecture Timelapse — architecture.calm.json","generatedAt":"2026-11-14T00:32:36.924Z","sourceFile":"architecture.calm.json","engine":"clusters-file","canvasWidth":1780,"canvasHeight":540,"positions":{"architect-user":{"id":"architect-user","name":"Architect / Reviewer","nodeType":"actor","description":"Explores architectural evolution frame-by-frame with as-of compliance dates, baseline diffing, and ADR provenance.","x":165,"y":201,"layer":0},"ide-ai-assistant":{"id":"ide-ai-assistant","name":"IDE AI Assistant (Optional)","nodeType":"actor","description":"Enterprise-approved coding assistant (Copilot, Claude Code, Kiro, Codex, Bob, OpenCode) that optionally reads \u003carch\u003e.digest.json and writes \u003carch\u003e.clusters.json in the workspace.","x":165,"y":339,"layer":0},"git-history-extractor":{"id":"git-history-extractor","name":"Git History Extractor","nodeType":"service","description":"Traverses git log --follow -M30% locally across one or multiple Git repositories and extracts valid JSON snapshots plus co-changed ADRs.","x":455,"y":270,"layer":1},"git-repo":{"id":"git-repo","name":"Git Repository","nodeType":"database","description":"Local commit history of CALM JSON files and co-changed Architecture Decision Records (ADRs).","x":745,"y":201,"layer":2},"federation-engine":{"id":"federation-engine","name":"Multi-Repo Federation Engine","nodeType":"service","description":"Synchronizes chronological commits across repositories, enforces strict peer namespace isolation, and merges shared boundary nodes solely through details.detailed-architecture.","x":745,"y":339,"layer":2},"structural-diff-engine":{"id":"structural-diff-engine","name":"Structural Diff Engine","nodeType":"service","description":"Canonicalizes CALM documents and filters formatting/noise commits from genuine structural deltas.","x":1035,"y":270,"layer":3},"digest-exporter":{"id":"digest-exporter","name":"Commit Diff Digest Exporter","nodeType":"service","description":"Emits compact, deterministic \u003carch\u003e.digest.json summaries with embedded clustering schema for optional review by approved IDE AI assistants.","x":1325,"y":201,"layer":4},"moment-clusterer":{"id":"moment-clusterer","name":"Deterministic \u0026 Spec Clusterer","nodeType":"service","description":"Groups contiguous structural commits into architectural moments via deterministic heuristics or validated --clusters \u003cclusters.json\u003e specifications.","x":1325,"y":339,"layer":4},"architecture-feed-renderer":{"id":"architecture-feed-renderer","name":"Architecture Feed Renderer","nodeType":"service","description":"Renders architectural moments in reverse chronological order (Latest First, N -\u003e 1) as scrollable story cards pairing auto-cropped SVG diagrams, narrative summaries, change/ADR chips, and standalone SVG export.","x":1615,"y":132,"layer":5},"timelapse-renderer":{"id":"timelapse-renderer","name":"Timelapse Stage SVG Renderer","nodeType":"service","description":"Computes layered super-graph coordinates and renders the interactive single-viewport SVG Timelapse Stage with zoom/pan, blast-radius focus, and as-of date queries.","x":1615,"y":270,"layer":5},"timeline-emitter":{"id":"timeline-emitter","name":"CALM Timeline Emitter","nodeType":"service","description":"Emits CALM 1.3 calm-timeline.json documents and immutable Git-backed moment architecture snapshots.","x":1615,"y":408,"layer":5}},"frames":[{"id":"moment-01-structural-diff-engine","name":"Structural CALM Diff Engine Foundation","description":"Establishes canonical JSON normalization and structural CALM diffing to filter pure formatting and key-reordering noise from genuine topology changes.","validFrom":"2026-11-13","commitCount":1,"commits":["a47bcb9"],"commitMessages":["feat(diff): scaffold TypeScript workspace and structural CALM diff engine"],"adrs":[],"summary":"Initial baseline with 3 node(s), 2 relationship(s)","changes":[{"kind":"add","category":"node","id":"git-repo","text":"Added node Git Repository (git-repo)"},{"kind":"add","category":"node","id":"git-history-extractor","text":"Added node Git History Extractor (git-history-extractor)"},{"kind":"add","category":"node","id":"structural-diff-engine","text":"Added node Structural Diff Engine (structural-diff-engine)"},{"kind":"add","category":"relationship","id":"rel-git-to-extractor","text":"Added relationship rel-git-to-extractor"},{"kind":"add","category":"relationship","id":"rel-extractor-to-diff","text":"Added relationship rel-extractor-to-diff"}],"nodes":[{"id":"git-repo","name":"Git Repository","nodeType":"database","description":"Local commit history of CALM JSON files and co-changed Architecture Decision Records (ADRs)."},{"id":"git-history-extractor","name":"Git History Extractor","nodeType":"service","description":"Traverses git log --follow -M30% locally and extracts valid JSON snapshots plus co-changed ADRs."},{"id":"structural-diff-engine","name":"Structural Diff Engine","nodeType":"service","description":"Canonicalizes CALM documents and filters formatting/noise commits from genuine structural deltas."}],"edges":[{"id":"rel-git-to-extractor","source":"git-history-extractor","target":"git-repo","label":"Reads commit history and file bl","relType":"connects"},{"id":"rel-extractor-to-diff","source":"git-history-extractor","target":"structural-diff-engine","label":"Streams chronological CALM snaps","relType":"connects"}],"controls":[],"addedNodeIds":["git-repo","git-history-extractor","structural-diff-engine"],"modifiedNodeIds":[],"removedNodeIds":[],"addedEdgeIds":["rel-git-to-extractor","rel-extractor-to-diff"],"modifiedEdgeIds":[],"removedEdgeIds":[]},{"id":"moment-02-git-timeline-emitter","name":"Git History Extractor \u0026 CALM Timeline Emitter","description":"Adds local git log --follow blob traversal, contiguous 0..N-1 cluster validation, diff digest export, and schema-valid calm-timeline 1.3 snapshot emission.","validFrom":"2026-11-13","commitCount":1,"commits":["08b4549"],"commitMessages":["feat(timeline): add Git history walker, cluster validator, and CALM timeline emitter"],"adrs":[],"summary":"+4 node(s), +4 rel(s), controls(+1/~0/-0)","changes":[{"kind":"add","category":"node","id":"digest-exporter","text":"Added node Commit Diff Digest Exporter (digest-exporter)"},{"kind":"add","category":"node","id":"moment-clusterer","text":"Added node Deterministic \u0026 Spec Clusterer (moment-clusterer)"},{"kind":"add","category":"node","id":"timeline-emitter","text":"Added node CALM Timeline Emitter (timeline-emitter)"},{"kind":"add","category":"node","id":"ide-ai-assistant","text":"Added node IDE AI Assistant (Optional) (ide-ai-assistant)"},{"kind":"add","category":"relationship","id":"rel-diff-to-digest","text":"Added relationship rel-diff-to-digest"},{"kind":"add","category":"relationship","id":"rel-diff-to-cluster","text":"Added relationship rel-diff-to-cluster"},{"kind":"add","category":"relationship","id":"rel-assistant-curates-clusters","text":"Added relationship rel-assistant-curates-clusters"},{"kind":"add","category":"relationship","id":"rel-cluster-to-emitter","text":"Added relationship rel-cluster-to-emitter"},{"kind":"add","category":"control","id":"contiguous-cluster-coverage","text":"Added architecture control contiguous-cluster-coverage"}],"nodes":[{"id":"git-repo","name":"Git Repository","nodeType":"database","description":"Local commit history of CALM JSON files and co-changed Architecture Decision Records (ADRs)."},{"id":"git-history-extractor","name":"Git History Extractor","nodeType":"service","description":"Traverses git log --follow -M30% locally and extracts valid JSON snapshots plus co-changed ADRs."},{"id":"structural-diff-engine","name":"Structural Diff Engine","nodeType":"service","description":"Canonicalizes CALM documents and filters formatting/noise commits from genuine structural deltas."},{"id":"digest-exporter","name":"Commit Diff Digest Exporter","nodeType":"service","description":"Emits compact, deterministic \u003carch\u003e.digest.json summaries with embedded clustering schema for optional review by approved IDE AI assistants."},{"id":"moment-clusterer","name":"Deterministic \u0026 Spec Clusterer","nodeType":"service","description":"Groups contiguous structural commits into architectural moments via deterministic heuristics or validated --clusters \u003cclusters.json\u003e specifications."},{"id":"timeline-emitter","name":"CALM Timeline Emitter","nodeType":"service","description":"Emits CALM 1.3 calm-timeline.json documents and Git-backed moment architecture snapshots."},{"id":"ide-ai-assistant","name":"IDE AI Assistant (Optional)","nodeType":"actor","description":"Enterprise-approved coding assistant (Copilot, Claude Code, Kiro, Codex, Bob, OpenCode) that optionally reads \u003carch\u003e.digest.json and writes \u003carch\u003e.clusters.json in the workspace."}],"edges":[{"id":"rel-git-to-extractor","source":"git-history-extractor","target":"git-repo","label":"Reads commit history and file bl","relType":"connects"},{"id":"rel-extractor-to-diff","source":"git-history-extractor","target":"structural-diff-engine","label":"Streams chronological CALM snaps","relType":"connects"},{"id":"rel-diff-to-digest","source":"structural-diff-engine","target":"digest-exporter","label":"Serializes structural commit del","relType":"connects"},{"id":"rel-diff-to-cluster","source":"structural-diff-engine","target":"moment-clusterer","label":"Sends filtered structural commit","relType":"connects"},{"id":"rel-assistant-curates-clusters::0","source":"ide-ai-assistant","target":"digest-exporter","label":"Reads \u003carch\u003e.digest.json and aut","relType":"interacts"},{"id":"rel-assistant-curates-clusters::1","source":"ide-ai-assistant","target":"moment-clusterer","label":"Reads \u003carch\u003e.digest.json and aut","relType":"interacts"},{"id":"rel-cluster-to-emitter","source":"moment-clusterer","target":"timeline-emitter","label":"Emits ordered, Git-verified Mome","relType":"connects"}],"controls":[{"id":"contiguous-cluster-coverage","description":"Validates any external --clusters JSON specification to ensure contiguous, non-overlapping coverage of structural commits 0..N-1 while sourcing every architecture snapshot strictly from Git.","requirementCount":1}],"addedNodeIds":["digest-exporter","moment-clusterer","timeline-emitter","ide-ai-assistant"],"modifiedNodeIds":[],"removedNodeIds":[],"addedEdgeIds":["rel-diff-to-digest","rel-diff-to-cluster","rel-assistant-curates-clusters::0","rel-assistant-curates-clusters::1","rel-cluster-to-emitter"],"modifiedEdgeIds":[],"removedEdgeIds":[]},{"id":"moment-03-timelapse-stage-and-cli","name":"Interactive SVG Timelapse Stage, CLI \u0026 Governance Controls","description":"Introduces the zero-network CLI entrypoint, offline single-viewport SVG Timelapse Stage renderer, IDE assistant skill, and CALM 1.3 zero-network controls.","validFrom":"2026-11-13","commitCount":1,"commits":["85654fd"],"commitMessages":["feat(timelapse): add interactive SVG stage player, CLI, and IDE skill"],"adrs":[],"summary":"+2 node(s), ~1 node(s), +2 rel(s), controls(+1/~0/-0)","changes":[{"kind":"add","category":"node","id":"timelapse-renderer","text":"Added node HTML Timelapse Renderer (timelapse-renderer)"},{"kind":"add","category":"node","id":"architect-user","text":"Added node Architect / Reviewer (architect-user)"},{"kind":"mod","category":"node","id":"timeline-emitter","text":"Modified node CALM Timeline Emitter (timeline-emitter) [description]"},{"kind":"add","category":"relationship","id":"rel-cluster-to-renderer","text":"Added relationship rel-cluster-to-renderer"},{"kind":"add","category":"relationship","id":"rel-user-views-timelapse","text":"Added relationship rel-user-views-timelapse"},{"kind":"add","category":"control","id":"zero-network-execution","text":"Added architecture control zero-network-execution"}],"nodes":[{"id":"git-repo","name":"Git Repository","nodeType":"database","description":"Local commit history of CALM JSON files and co-changed Architecture Decision Records (ADRs)."},{"id":"git-history-extractor","name":"Git History Extractor","nodeType":"service","description":"Traverses git log --follow -M30% locally and extracts valid JSON snapshots plus co-changed ADRs."},{"id":"structural-diff-engine","name":"Structural Diff Engine","nodeType":"service","description":"Canonicalizes CALM documents and filters formatting/noise commits from genuine structural deltas."},{"id":"digest-exporter","name":"Commit Diff Digest Exporter","nodeType":"service","description":"Emits compact, deterministic \u003carch\u003e.digest.json summaries with embedded clustering schema for optional review by approved IDE AI assistants."},{"id":"moment-clusterer","name":"Deterministic \u0026 Spec Clusterer","nodeType":"service","description":"Groups contiguous structural commits into architectural moments via deterministic heuristics or validated --clusters \u003cclusters.json\u003e specifications."},{"id":"timeline-emitter","name":"CALM Timeline Emitter","nodeType":"service","description":"Emits CALM 1.3 calm-timeline.json documents and immutable Git-backed moment architecture snapshots."},{"id":"timelapse-renderer","name":"HTML Timelapse Renderer","nodeType":"service","description":"Computes layered super-graph coordinates and renders a self-contained offline interactive SVG timelapse player."},{"id":"ide-ai-assistant","name":"IDE AI Assistant (Optional)","nodeType":"actor","description":"Enterprise-approved coding assistant (Copilot, Claude Code, Kiro, Codex, Bob, OpenCode) that optionally reads \u003carch\u003e.digest.json and writes \u003carch\u003e.clusters.json in the workspace."},{"id":"architect-user","name":"Architect / Reviewer","nodeType":"actor","description":"Explores architectural evolution frame-by-frame with as-of compliance dates, baseline diffing, and ADR provenance."}],"edges":[{"id":"rel-git-to-extractor","source":"git-history-extractor","target":"git-repo","label":"Reads commit history and file bl","relType":"connects"},{"id":"rel-extractor-to-diff","source":"git-history-extractor","target":"structural-diff-engine","label":"Streams chronological CALM snaps","relType":"connects"},{"id":"rel-diff-to-digest","source":"structural-diff-engine","target":"digest-exporter","label":"Serializes structural commit del","relType":"connects"},{"id":"rel-diff-to-cluster","source":"structural-diff-engine","target":"moment-clusterer","label":"Sends filtered structural commit","relType":"connects"},{"id":"rel-assistant-curates-clusters::0","source":"ide-ai-assistant","target":"digest-exporter","label":"Reads \u003carch\u003e.digest.json and aut","relType":"interacts"},{"id":"rel-assistant-curates-clusters::1","source":"ide-ai-assistant","target":"moment-clusterer","label":"Reads \u003carch\u003e.digest.json and aut","relType":"interacts"},{"id":"rel-cluster-to-emitter","source":"moment-clusterer","target":"timeline-emitter","label":"Emits ordered, Git-verified Mome","relType":"connects"},{"id":"rel-cluster-to-renderer","source":"moment-clusterer","target":"timelapse-renderer","label":"Feeds super-graph frames, govern","relType":"connects"},{"id":"rel-user-views-timelapse","source":"architect-user","target":"timelapse-renderer","label":"Plays architectural timelapse of","relType":"interacts"}],"controls":[{"id":"zero-network-execution","description":"Guarantees that calm-timelapse executes 100% offline with zero embedded HTTP clients, LLM SDKs, or external runtime network calls.","requirementCount":1},{"id":"contiguous-cluster-coverage","description":"Validates any external --clusters JSON specification to ensure contiguous, non-overlapping coverage of structural commits 0..N-1 while sourcing every architecture snapshot strictly from Git.","requirementCount":1}],"addedNodeIds":["timelapse-renderer","architect-user"],"modifiedNodeIds":["timeline-emitter"],"removedNodeIds":[],"addedEdgeIds":["rel-cluster-to-renderer","rel-user-views-timelapse"],"modifiedEdgeIds":[],"removedEdgeIds":[]},{"id":"moment-04-multi-repo-federation","name":"Multi-Repo Federation \u0026 detailed-architecture Composition","description":"Synchronizes commits across multiple Git repositories with strict peer namespace isolation while merging shared boundary nodes linked through details.detailed-architecture.","validFrom":"2026-11-13","commitCount":1,"commits":["0e983b8"],"commitMessages":["feat(federation): synchronize multi-repo timelines and resolve detailed-architecture"],"adrs":[],"summary":"+1 node(s), ~1 node(s), +2 rel(s), -1 rel(s), controls(+1/~0/-0)","changes":[{"kind":"add","category":"node","id":"federation-engine","text":"Added node Multi-Repo Federation Engine (federation-engine)"},{"kind":"mod","category":"node","id":"git-history-extractor","text":"Modified node Git History Extractor (git-history-extractor) [description]"},{"kind":"add","category":"relationship","id":"rel-extractor-to-federation","text":"Added relationship rel-extractor-to-federation"},{"kind":"add","category":"relationship","id":"rel-federation-to-diff","text":"Added relationship rel-federation-to-diff"},{"kind":"del","category":"relationship","id":"rel-extractor-to-diff","text":"Removed relationship rel-extractor-to-diff"},{"kind":"add","category":"control","id":"strict-peer-namespace-isolation","text":"Added architecture control strict-peer-namespace-isolation"}],"nodes":[{"id":"git-repo","name":"Git Repository","nodeType":"database","description":"Local commit history of CALM JSON files and co-changed Architecture Decision Records (ADRs)."},{"id":"git-history-extractor","name":"Git History Extractor","nodeType":"service","description":"Traverses git log --follow -M30% locally across one or multiple Git repositories and extracts valid JSON snapshots plus co-changed ADRs."},{"id":"federation-engine","name":"Multi-Repo Federation Engine","nodeType":"service","description":"Synchronizes chronological commits across repositories, enforces strict peer namespace isolation, and merges shared boundary nodes solely through details.detailed-architecture."},{"id":"structural-diff-engine","name":"Structural Diff Engine","nodeType":"service","description":"Canonicalizes CALM documents and filters formatting/noise commits from genuine structural deltas."},{"id":"digest-exporter","name":"Commit Diff Digest Exporter","nodeType":"service","description":"Emits compact, deterministic \u003carch\u003e.digest.json summaries with embedded clustering schema for optional review by approved IDE AI assistants."},{"id":"moment-clusterer","name":"Deterministic \u0026 Spec Clusterer","nodeType":"service","description":"Groups contiguous structural commits into architectural moments via deterministic heuristics or validated --clusters \u003cclusters.json\u003e specifications."},{"id":"timeline-emitter","name":"CALM Timeline Emitter","nodeType":"service","description":"Emits CALM 1.3 calm-timeline.json documents and immutable Git-backed moment architecture snapshots."},{"id":"timelapse-renderer","name":"HTML Timelapse Renderer","nodeType":"service","description":"Computes layered super-graph coordinates and renders a self-contained offline interactive SVG timelapse player."},{"id":"ide-ai-assistant","name":"IDE AI Assistant (Optional)","nodeType":"actor","description":"Enterprise-approved coding assistant (Copilot, Claude Code, Kiro, Codex, Bob, OpenCode) that optionally reads \u003carch\u003e.digest.json and writes \u003carch\u003e.clusters.json in the workspace."},{"id":"architect-user","name":"Architect / Reviewer","nodeType":"actor","description":"Explores architectural evolution frame-by-frame with as-of compliance dates, baseline diffing, and ADR provenance."}],"edges":[{"id":"rel-git-to-extractor","source":"git-history-extractor","target":"git-repo","label":"Reads commit history and file bl","relType":"connects"},{"id":"rel-extractor-to-federation","source":"git-history-extractor","target":"federation-engine","label":"Streams per-repository CALM comm","relType":"connects"},{"id":"rel-federation-to-diff","source":"federation-engine","target":"structural-diff-engine","label":"Emits synchronized federated CAL","relType":"connects"},{"id":"rel-diff-to-digest","source":"structural-diff-engine","target":"digest-exporter","label":"Serializes structural commit del","relType":"connects"},{"id":"rel-diff-to-cluster","source":"structural-diff-engine","target":"moment-clusterer","label":"Sends filtered structural commit","relType":"connects"},{"id":"rel-assistant-curates-clusters::0","source":"ide-ai-assistant","target":"digest-exporter","label":"Reads \u003carch\u003e.digest.json and aut","relType":"interacts"},{"id":"rel-assistant-curates-clusters::1","source":"ide-ai-assistant","target":"moment-clusterer","label":"Reads \u003carch\u003e.digest.json and aut","relType":"interacts"},{"id":"rel-cluster-to-emitter","source":"moment-clusterer","target":"timeline-emitter","label":"Emits ordered, Git-verified Mome","relType":"connects"},{"id":"rel-cluster-to-renderer","source":"moment-clusterer","target":"timelapse-renderer","label":"Feeds super-graph frames, govern","relType":"connects"},{"id":"rel-user-views-timelapse","source":"architect-user","target":"timelapse-renderer","label":"Plays architectural timelapse of","relType":"interacts"}],"controls":[{"id":"zero-network-execution","description":"Guarantees that calm-timelapse executes 100% offline with zero embedded HTTP clients, LLM SDKs, or external runtime network calls.","requirementCount":1},{"id":"contiguous-cluster-coverage","description":"Validates any external --clusters JSON specification to ensure contiguous, non-overlapping coverage of structural commits 0..N-1 while sourcing every architecture snapshot strictly from Git.","requirementCount":1},{"id":"strict-peer-namespace-isolation","description":"Prevents unintended node merging across unlinked peer repositories while permitting canonical composition and boundary-node merging when explicitly linked via details.detailed-architecture.","requirementCount":1}],"addedNodeIds":["federation-engine"],"modifiedNodeIds":["git-history-extractor"],"removedNodeIds":[],"addedEdgeIds":["rel-extractor-to-federation","rel-federation-to-diff"],"modifiedEdgeIds":[],"removedEdgeIds":["rel-extractor-to-diff"]},{"id":"moment-05-architecture-feed-mode","name":"Reverse-Chronological Architecture Feed Mode","description":"Adds the scrollable reverse-chronological Architecture Feed (--feed / #feed), rendering each major architectural change as a story card with an auto-cropped SVG diagram and narrative summary.","validFrom":"2026-11-13","commitCount":1,"commits":["0f4a060"],"commitMessages":["feat(player): add reverse-chronological Architecture Feed mode (--feed / #feed)"],"adrs":[],"summary":"+1 node(s), ~1 node(s), +1 rel(s), ~1 rel(s)","changes":[{"kind":"add","category":"node","id":"architecture-feed-renderer","text":"Added node Architecture Feed Renderer (architecture-feed-renderer)"},{"kind":"mod","category":"node","id":"timelapse-renderer","text":"Modified node Timelapse Stage SVG Renderer (timelapse-renderer) [name, description]"},{"kind":"add","category":"relationship","id":"rel-cluster-to-feed","text":"Added relationship rel-cluster-to-feed"},{"kind":"mod","category":"relationship","id":"rel-user-views-timelapse","text":"Modified relationship rel-user-views-timelapse"}],"nodes":[{"id":"git-repo","name":"Git Repository","nodeType":"database","description":"Local commit history of CALM JSON files and co-changed Architecture Decision Records (ADRs)."},{"id":"git-history-extractor","name":"Git History Extractor","nodeType":"service","description":"Traverses git log --follow -M30% locally across one or multiple Git repositories and extracts valid JSON snapshots plus co-changed ADRs."},{"id":"federation-engine","name":"Multi-Repo Federation Engine","nodeType":"service","description":"Synchronizes chronological commits across repositories, enforces strict peer namespace isolation, and merges shared boundary nodes solely through details.detailed-architecture."},{"id":"structural-diff-engine","name":"Structural Diff Engine","nodeType":"service","description":"Canonicalizes CALM documents and filters formatting/noise commits from genuine structural deltas."},{"id":"digest-exporter","name":"Commit Diff Digest Exporter","nodeType":"service","description":"Emits compact, deterministic \u003carch\u003e.digest.json summaries with embedded clustering schema for optional review by approved IDE AI assistants."},{"id":"moment-clusterer","name":"Deterministic \u0026 Spec Clusterer","nodeType":"service","description":"Groups contiguous structural commits into architectural moments via deterministic heuristics or validated --clusters \u003cclusters.json\u003e specifications."},{"id":"timeline-emitter","name":"CALM Timeline Emitter","nodeType":"service","description":"Emits CALM 1.3 calm-timeline.json documents and immutable Git-backed moment architecture snapshots."},{"id":"timelapse-renderer","name":"Timelapse Stage SVG Renderer","nodeType":"service","description":"Computes layered super-graph coordinates and renders the interactive single-viewport SVG Timelapse Stage with zoom/pan, blast-radius focus, and as-of date queries."},{"id":"architecture-feed-renderer","name":"Architecture Feed Renderer","nodeType":"service","description":"Renders architectural moments in reverse chronological order (Latest First, N -\u003e 1) as scrollable story cards pairing auto-cropped SVG diagrams, narrative summaries, change/ADR chips, and standalone SVG export."},{"id":"ide-ai-assistant","name":"IDE AI Assistant (Optional)","nodeType":"actor","description":"Enterprise-approved coding assistant (Copilot, Claude Code, Kiro, Codex, Bob, OpenCode) that optionally reads \u003carch\u003e.digest.json and writes \u003carch\u003e.clusters.json in the workspace."},{"id":"architect-user","name":"Architect / Reviewer","nodeType":"actor","description":"Explores architectural evolution frame-by-frame with as-of compliance dates, baseline diffing, and ADR provenance."}],"edges":[{"id":"rel-git-to-extractor","source":"git-history-extractor","target":"git-repo","label":"Reads commit history and file bl","relType":"connects"},{"id":"rel-extractor-to-federation","source":"git-history-extractor","target":"federation-engine","label":"Streams per-repository CALM comm","relType":"connects"},{"id":"rel-federation-to-diff","source":"federation-engine","target":"structural-diff-engine","label":"Emits synchronized federated CAL","relType":"connects"},{"id":"rel-diff-to-digest","source":"structural-diff-engine","target":"digest-exporter","label":"Serializes structural commit del","relType":"connects"},{"id":"rel-diff-to-cluster","source":"structural-diff-engine","target":"moment-clusterer","label":"Sends filtered structural commit","relType":"connects"},{"id":"rel-assistant-curates-clusters::0","source":"ide-ai-assistant","target":"digest-exporter","label":"Reads \u003carch\u003e.digest.json and aut","relType":"interacts"},{"id":"rel-assistant-curates-clusters::1","source":"ide-ai-assistant","target":"moment-clusterer","label":"Reads \u003carch\u003e.digest.json and aut","relType":"interacts"},{"id":"rel-cluster-to-emitter","source":"moment-clusterer","target":"timeline-emitter","label":"Emits ordered, Git-verified Mome","relType":"connects"},{"id":"rel-cluster-to-renderer","source":"moment-clusterer","target":"timelapse-renderer","label":"Feeds super-graph frames, govern","relType":"connects"},{"id":"rel-cluster-to-feed","source":"moment-clusterer","target":"architecture-feed-renderer","label":"Streams ordered MomentClusters i","relType":"connects"},{"id":"rel-user-views-timelapse::0","source":"architect-user","target":"timelapse-renderer","label":"Explores architectural evolution","relType":"interacts"},{"id":"rel-user-views-timelapse::1","source":"architect-user","target":"architecture-feed-renderer","label":"Explores architectural evolution","relType":"interacts"}],"controls":[{"id":"zero-network-execution","description":"Guarantees that calm-timelapse executes 100% offline with zero embedded HTTP clients, LLM SDKs, or external runtime network calls.","requirementCount":1},{"id":"contiguous-cluster-coverage","description":"Validates any external --clusters JSON specification to ensure contiguous, non-overlapping coverage of structural commits 0..N-1 while sourcing every architecture snapshot strictly from Git.","requirementCount":1},{"id":"strict-peer-namespace-isolation","description":"Prevents unintended node merging across unlinked peer repositories while permitting canonical composition and boundary-node merging when explicitly linked via details.detailed-architecture.","requirementCount":1}],"addedNodeIds":["architecture-feed-renderer"],"modifiedNodeIds":["timelapse-renderer"],"removedNodeIds":[],"addedEdgeIds":["rel-cluster-to-feed","rel-user-views-timelapse::0","rel-user-views-timelapse::1"],"modifiedEdgeIds":[],"removedEdgeIds":["rel-user-views-timelapse"]}],"stats":{"totalCommitsScanned":5,"noiseCommitsFiltered":0,"structuralCommitsRetained":5,"momentsGenerated":5}}</script>
+  <script>
+    (function () {
+      const payload = JSON.parse(document.getElementById('timelapse-data').textContent);
+      const frames = payload.frames || [];
+      const positions = payload.positions || {};
+      const sources = payload.sources || [];
+      const isMultiSource = sources.length > 1;
+      const sourcePalette = ['#38bdf8', '#a78bfa', '#2dd4bf', '#fb7185', '#818cf8', '#22d3ee'];
+      const sourceColorMap = new Map();
+      sources.forEach((src, idx) => {
+        sourceColorMap.set(src.sourceId, sourcePalette[idx % sourcePalette.length]);
+      });
+      const canvasWidth = payload.canvasWidth || 960;
+      const canvasHeight = payload.canvasHeight || 540;
+
+      const canvasWrap = document.getElementById('canvas-wrap');
+      const svgGraph = document.getElementById('graph');
+      const viewportLayer = document.getElementById('viewport-layer');
+      const svgEdges = document.getElementById('edges-layer');
+      const svgNodes = document.getElementById('nodes-layer');
+      const scrubber = document.getElementById('scrubber');
+      const scrubberLabel = document.getElementById('scrubber-label');
+      const counter = document.getElementById('frame-counter');
+      const btnPlay = document.getElementById('btn-play');
+      const btnPrev = document.getElementById('btn-prev');
+      const btnNext = document.getElementById('btn-next');
+      const speedSelect = document.getElementById('speed-select');
+      const badgeMoments = document.getElementById('badge-moments');
+      const badgeSources = document.getElementById('badge-sources');
+      const badgeFunnel = document.getElementById('badge-funnel');
+      const badgeKeys = document.getElementById('badge-keys');
+
+      const stageView = document.getElementById('stage-view');
+      const feedView = document.getElementById('feed-view');
+      const btnModeStage = document.getElementById('btn-mode-stage');
+      const btnModeFeed = document.getElementById('btn-mode-feed');
+      const feedCount = document.getElementById('feed-count');
+      const btnFeedStory = document.getElementById('btn-feed-story');
+      const btnFeedLatest = document.getElementById('btn-feed-latest');
+      const feedProjectWrap = document.getElementById('feed-project-wrap');
+      const feedProjectSelect = document.getElementById('feed-project-select');
+      const feedSearch = document.getElementById('feed-search');
+      const feedStream = document.getElementById('feed-stream');
+
+      const btnZoomIn = document.getElementById('btn-zoom-in');
+      const btnZoomOut = document.getElementById('btn-zoom-out');
+      const btnZoomFit = document.getElementById('btn-zoom-fit');
+
+      const momentTitle = document.getElementById('moment-title');
+      const momentDate = document.getElementById('moment-date');
+      const momentDesc = document.getElementById('moment-desc');
+      const changeList = document.getElementById('change-list');
+      const commitList = document.getElementById('commit-list');
+      const projectFilterGroup = document.getElementById('project-filter-group');
+      const projectFilterSep = document.getElementById('project-filter-sep');
+      const projectSelect = document.getElementById('project-select');
+      const focusSelect = document.getElementById('focus-select');
+      const focusIsolate = document.getElementById('focus-isolate');
+      const btnResetFocus = document.getElementById('btn-reset-focus');
+      const nodeInspector = document.getElementById('node-inspector');
+      const nodeInspectorBody = document.getElementById('node-inspector-body');
+      const governanceBody = document.getElementById('governance-body');
+      const asOfDateInput = document.getElementById('as-of-date');
+      const asOfBanner = document.getElementById('as-of-banner');
+      const compareSelect = document.getElementById('compare-select');
+      const btnResetCompare = document.getElementById('btn-reset-compare');
+
+      badgeMoments.textContent = frames.length + ' moment' + (frames.length === 1 ? '' : 's');
+      scrubber.max = String(Math.max(0, frames.length - 1));
+
+      if (isMultiSource) {
+        const repoSet = new Set(sources.map((s) => s.repoName).filter(Boolean));
+        if (badgeSources) {
+          badgeSources.textContent =
+            sources.length +
+            ' architectures' +
+            (repoSet.size > 1 ? ' · ' + repoSet.size + ' repos' : '');
+          badgeSources.style.display = 'inline-block';
+        }
+        if (projectFilterGroup) projectFilterGroup.style.display = 'flex';
+        if (projectFilterSep) projectFilterSep.style.display = 'block';
+        if (projectSelect) {
+          sources.forEach((src) => {
+            const opt = document.createElement('option');
+            opt.value = src.sourceId;
+            opt.textContent = src.sourceLabel;
+            projectSelect.appendChild(opt);
+          });
+        }
+        if (feedProjectWrap) feedProjectWrap.style.display = 'inline-flex';
+        if (feedProjectSelect) {
+          sources.forEach((src) => {
+            const opt = document.createElement('option');
+            opt.value = src.sourceId;
+            opt.textContent = src.sourceLabel;
+            feedProjectSelect.appendChild(opt);
+          });
+        }
+      }
+
+      if (badgeFunnel && !badgeFunnel.textContent) {
+        const totalSum = frames.reduce((acc, f) => acc + (f.commitCount || 0), 0);
+        if (payload.stats && payload.stats.totalCommitsScanned !== undefined) {
+          const scanned = payload.stats.totalCommitsScanned;
+          const noise = payload.stats.noiseCommitsFiltered || 0;
+          const moments = payload.stats.momentsGenerated || frames.length;
+          badgeFunnel.textContent = scanned + ' commits -> ' + noise + ' noise filtered -> ' + moments + ' moments';
+          badgeFunnel.style.display = 'inline-block';
+        } else if (totalSum > frames.length) {
+          badgeFunnel.textContent = totalSum + ' commits -> ' + frames.length + ' moments';
+          badgeFunnel.style.display = 'inline-block';
+        }
+      }
+
+      let currentIndex = 0;
+      let timer = null;
+      let focusedNodeId = '';
+      let selectedProjectId = '';
+      let zoomScale = 1;
+      let panX = 0;
+      let panY = 0;
+      let isPanning = false;
+      let dragStartX = 0;
+      let dragStartY = 0;
+      let panStartX = 0;
+      let panStartY = 0;
+      let auditPrecedesFirst = false;
+
+      function nodeMatchesProject(nodeOrPos) {
+        if (!selectedProjectId) return true;
+        if (!nodeOrPos) return false;
+        if (Array.isArray(nodeOrPos.sourceIds) && nodeOrPos.sourceIds.includes(selectedProjectId)) {
+          return true;
+        }
+        return nodeOrPos.sourceId === selectedProjectId;
+      }
+
+      function applyTransform() {
+        viewportLayer.setAttribute(
+          'transform',
+          'translate(' + panX.toFixed(2) + ',' + panY.toFixed(2) + ') scale(' + zoomScale.toFixed(4) + ')',
+        );
+      }
+
+      function setZoom(nextScale, anchorX, anchorY) {
+        const clamped = Math.max(0.4, Math.min(2.8, nextScale));
+        const ax = anchorX !== undefined ? anchorX : canvasWidth / 2;
+        const ay = anchorY !== undefined ? anchorY : canvasHeight / 2;
+        const ratio = clamped / zoomScale;
+        panX = ax - (ax - panX) * ratio;
+        panY = ay - (ay - panY) * ratio;
+        zoomScale = clamped;
+        applyTransform();
+      }
+
+      function resetZoom() {
+        zoomScale = 1;
+        panX = 0;
+        panY = 0;
+        applyTransform();
+      }
+
+      Object.values(positions)
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .forEach((pos) => {
+          const opt = document.createElement('option');
+          opt.value = pos.id;
+          const srcPrefix = isMultiSource && pos.sourceLabel ? ' [' + pos.sourceLabel + ']' : '';
+          opt.textContent = pos.name + srcPrefix + ' (' + pos.nodeType + ')';
+          focusSelect.appendChild(opt);
+        });
+
+      frames.forEach((f, idx) => {
+        const opt = document.createElement('option');
+        opt.value = String(idx);
+        const dateStr = String(f.validFrom || '').slice(0, 10);
+        opt.textContent = 'Moment ' + (idx + 1) + ': ' + f.name + (dateStr ? ' (' + dateStr + ')' : '');
+        compareSelect.appendChild(opt);
+      });
+
+      function setFocusNode(nodeId) {
+        focusedNodeId = nodeId || '';
+        focusSelect.value = focusedNodeId;
+        renderFrame(currentIndex);
+      }
+
+      function createSvgEl(tag, attrs) {
+        const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+        for (const [k, v] of Object.entries(attrs)) {
+          el.setAttribute(k, String(v));
+        }
+        return el;
+      }
+
+      function computeMomentDiff(baseFrame, currFrame) {
+        const baseNodes = new Map((baseFrame.nodes || []).map((n) => [n.id, n]));
+        const currNodes = new Map((currFrame.nodes || []).map((n) => [n.id, n]));
+        const baseEdges = new Map((baseFrame.edges || []).map((e) => [e.id, e]));
+        const currEdges = new Map((currFrame.edges || []).map((e) => [e.id, e]));
+        const baseCtrls = new Map((baseFrame.controls || []).map((c) => [c.id, c]));
+        const currCtrls = new Map((currFrame.controls || []).map((c) => [c.id, c]));
+
+        const addedNodeIds = [];
+        const modifiedNodeIds = [];
+        const removedNodeIds = [];
+        const addedEdgeIds = [];
+        const modifiedEdgeIds = [];
+        const removedEdgeIds = [];
+        const items = [];
+
+        for (const [id, node] of currNodes.entries()) {
+          const prev = baseNodes.get(id);
+          if (!prev) {
+            addedNodeIds.push(id);
+            items.push({ kind: 'add', text: 'Added node ' + node.name + ' (' + id + ')' });
+          } else if (
+            prev.name !== node.name ||
+            prev.nodeType !== node.nodeType ||
+            (prev.description || '') !== (node.description || '') ||
+            (prev.controlCount || 0) !== (node.controlCount || 0)
+          ) {
+            modifiedNodeIds.push(id);
+            items.push({ kind: 'mod', text: 'Modified node ' + node.name + ' (' + id + ')' });
+          }
+        }
+        for (const [id, node] of baseNodes.entries()) {
+          if (!currNodes.has(id)) {
+            removedNodeIds.push(id);
+            items.push({ kind: 'del', text: 'Removed node ' + node.name + ' (' + id + ')' });
+          }
+        }
+
+        for (const [id, edge] of currEdges.entries()) {
+          const prev = baseEdges.get(id);
+          if (!prev) {
+            addedEdgeIds.push(id);
+            items.push({ kind: 'add', text: 'Added relationship ' + id + ' (' + edge.source + ' -> ' + edge.target + ')' });
+          } else if (
+            prev.source !== edge.source ||
+            prev.target !== edge.target ||
+            prev.label !== edge.label ||
+            prev.relType !== edge.relType
+          ) {
+            modifiedEdgeIds.push(id);
+            items.push({ kind: 'mod', text: 'Modified relationship ' + id });
+          }
+        }
+        for (const [id, edge] of baseEdges.entries()) {
+          if (!currEdges.has(id)) {
+            removedEdgeIds.push(id);
+            items.push({ kind: 'del', text: 'Removed relationship ' + id + ' (' + edge.source + ' -> ' + edge.target + ')' });
+          }
+        }
+
+        for (const [id, ctrl] of currCtrls.entries()) {
+          const prev = baseCtrls.get(id);
+          if (!prev) {
+            items.push({ kind: 'add', text: 'Added control ' + id + (ctrl.description ? ' — ' + ctrl.description : '') });
+          } else if (
+            prev.description !== ctrl.description ||
+            prev.requirementCount !== ctrl.requirementCount
+          ) {
+            items.push({ kind: 'mod', text: 'Modified control ' + id });
+          }
+        }
+        for (const [id] of baseCtrls.entries()) {
+          if (!currCtrls.has(id)) {
+            items.push({ kind: 'del', text: 'Removed control ' + id });
+          }
+        }
+
+        return {
+          addedNodeIds,
+          modifiedNodeIds,
+          removedNodeIds,
+          addedEdgeIds,
+          modifiedEdgeIds,
+          removedEdgeIds,
+          items,
+          baseNodes,
+        };
+      }
+
+      function renderGovernancePosture(index, frame) {
+        governanceBody.innerHTML = '';
+
+        const validDiv = document.createElement('div');
+        const validLabel = document.createElement('strong');
+        validLabel.textContent = 'Effective Valid-From: ';
+        const validVal = document.createElement('code');
+        validVal.textContent = frame.validFrom
+          ? String(frame.validFrom)
+          : 'unspecified (omitted in manual timeline)';
+        validDiv.appendChild(validLabel);
+        validDiv.appendChild(validVal);
+        governanceBody.appendChild(validDiv);
+
+        if (auditPrecedesFirst) {
+          const warnDiv = document.createElement('div');
+          warnDiv.style.color = '#fde68a';
+          warnDiv.style.fontSize = '12px';
+          warnDiv.style.marginTop = '4px';
+          warnDiv.textContent = frames[0] && !frames[0].validFrom
+            ? 'Moment 1 omits valid-from in this manual timeline; effective start date cannot be verified.'
+            : 'Queried audit date precedes Moment 1; showing earliest recorded posture.';
+          governanceBody.appendChild(warnDiv);
+        }
+
+        const ctrlSec = document.createElement('div');
+        ctrlSec.className = 'gov-section';
+        const ctrls = frame.controls || [];
+        const ctrlHeader = document.createElement('div');
+        ctrlHeader.className = 'gov-label';
+        ctrlHeader.textContent = 'Active CALM Controls (' + ctrls.length + ')';
+        ctrlSec.appendChild(ctrlHeader);
+
+        if (ctrls.length === 0) {
+          const emptyCtrl = document.createElement('div');
+          emptyCtrl.style.color = '#93a4c7';
+          emptyCtrl.style.fontSize = '12px';
+          emptyCtrl.textContent = 'No active CALM controls in this moment.';
+          ctrlSec.appendChild(emptyCtrl);
+        } else {
+          const ul = document.createElement('ul');
+          ul.className = 'governance-list';
+          for (const ctrl of ctrls) {
+            const li = document.createElement('li');
+            const code = document.createElement('code');
+            code.textContent = ctrl.id;
+            li.appendChild(code);
+            if (ctrl.requirementCount > 0) {
+              const reqTag = document.createElement('span');
+              reqTag.className = 'tag tag-info';
+              reqTag.style.marginLeft = '6px';
+              reqTag.textContent = ctrl.requirementCount + ' req';
+              li.appendChild(reqTag);
+            }
+            if (ctrl.description) {
+              const descSpan = document.createElement('div');
+              descSpan.style.color = '#cbd5e1';
+              descSpan.style.fontSize = '12px';
+              descSpan.textContent = ctrl.description;
+              li.appendChild(descSpan);
+            }
+            ul.appendChild(li);
+          }
+          ctrlSec.appendChild(ul);
+        }
+        governanceBody.appendChild(ctrlSec);
+
+        const adrSet = new Set();
+        for (let k = 0; k <= index; k++) {
+          for (const adr of frames[k].adrs || []) {
+            if (adr) adrSet.add(adr);
+          }
+        }
+        const adrSec = document.createElement('div');
+        adrSec.className = 'gov-section';
+        const adrHeader = document.createElement('div');
+        adrHeader.className = 'gov-label';
+        adrHeader.textContent = 'Cumulative ADRs in Effect (' + adrSet.size + ')';
+        adrSec.appendChild(adrHeader);
+
+        if (adrSet.size === 0) {
+          const emptyAdr = document.createElement('div');
+          emptyAdr.style.color = '#93a4c7';
+          emptyAdr.style.fontSize = '12px';
+          emptyAdr.textContent = 'No ADRs recorded up to this moment.';
+          adrSec.appendChild(emptyAdr);
+        } else {
+          const ul = document.createElement('ul');
+          ul.className = 'governance-list';
+          for (const adr of adrSet) {
+            const li = document.createElement('li');
+            const tag = document.createElement('span');
+            tag.className = 'tag tag-added';
+            tag.textContent = 'ADR';
+            li.appendChild(tag);
+            li.appendChild(document.createTextNode(adr));
+            ul.appendChild(li);
+          }
+          adrSec.appendChild(ul);
+        }
+        governanceBody.appendChild(adrSec);
+      }
+
+      function renderFrame(index) {
+        if (frames.length === 0) return;
+        currentIndex = Math.max(0, Math.min(index, frames.length - 1));
+        const frame = frames[currentIndex];
+        scrubber.value = String(currentIndex);
+        counter.textContent = (currentIndex + 1) + ' / ' + frames.length;
+
+        momentTitle.textContent = frame.name;
+        const shortIsoDate = String(frame.validFrom || '').slice(0, 10);
+        if (scrubberLabel) {
+          scrubberLabel.textContent = (shortIsoDate ? shortIsoDate + ' · ' : '') + frame.name;
+          scrubberLabel.title = frame.name;
+        }
+        const parsedDate = Date.parse(frame.validFrom);
+        const dateDisplay = Number.isFinite(parsedDate)
+          ? new Date(parsedDate).toUTCString()
+          : (frame.validFrom ? String(frame.validFrom) : 'No valid-from date');
+        const provenanceSuffix = frame.commitCount > 0
+          ? frame.commitCount + ' commit(s)'
+          : 'manual snapshot';
+        momentDate.textContent = dateDisplay + ' · ' + provenanceSuffix;
+        momentDesc.textContent = frame.description || frame.summary;
+
+        svgEdges.innerHTML = '';
+        svgNodes.innerHTML = '';
+
+        const compareIdxRaw = compareSelect.value;
+        const isCompareMode = compareIdxRaw !== '' && frames[Number(compareIdxRaw)] !== undefined;
+        const compareBase = isCompareMode ? frames[Number(compareIdxRaw)] : null;
+        const liveDiff = compareBase ? computeMomentDiff(compareBase, frame) : null;
+
+        const addedNodes = new Set(liveDiff ? liveDiff.addedNodeIds : (frame.addedNodeIds || []));
+        const modifiedNodes = new Set(liveDiff ? liveDiff.modifiedNodeIds : (frame.modifiedNodeIds || []));
+        const removedNodes = new Set(liveDiff ? liveDiff.removedNodeIds : (frame.removedNodeIds || []));
+        const addedEdges = new Set(liveDiff ? liveDiff.addedEdgeIds : (frame.addedEdgeIds || []));
+        const modifiedEdges = new Set(liveDiff ? liveDiff.modifiedEdgeIds : (frame.modifiedEdgeIds || []));
+
+        const isolateMode = Boolean(focusIsolate && focusIsolate.checked);
+        const neighborhood = new Set();
+        const incomingEdges = [];
+        const outgoingEdges = [];
+        if (focusedNodeId) {
+          neighborhood.add(focusedNodeId);
+          for (const edge of frame.edges || []) {
+            if (edge.source === focusedNodeId) {
+              neighborhood.add(edge.target);
+              outgoingEdges.push(edge);
+            }
+            if (edge.target === focusedNodeId) {
+              neighborhood.add(edge.source);
+              incomingEdges.push(edge);
+            }
+          }
+        }
+
+        if (focusedNodeId && positions[focusedNodeId]) {
+          const fNode = (frame.nodes || []).find((n) => n.id === focusedNodeId) || positions[focusedNodeId];
+          const inList = incomingEdges.map((e) => (positions[e.source]?.name || e.source) + ' (' + e.label + ')').join(', ') || 'none';
+          const outList = outgoingEdges.map((e) => (positions[e.target]?.name || e.target) + ' (' + e.label + ')').join(', ') || 'none';
+          nodeInspector.style.display = 'block';
+          nodeInspectorBody.innerHTML = '';
+          const p1 = document.createElement('div');
+          const strong = document.createElement('strong');
+          strong.textContent = fNode.name + ' ';
+          const code = document.createElement('code');
+          code.textContent = fNode.id;
+          p1.appendChild(strong);
+          p1.appendChild(code);
+          nodeInspectorBody.appendChild(p1);
+          if (fNode.sourceLabel || positions[focusedNodeId].sourceLabel) {
+            const labels = fNode.sourceLabels || positions[focusedNodeId].sourceLabels || [fNode.sourceLabel || positions[focusedNodeId].sourceLabel];
+            const isMerged = Boolean(fNode.mergedViaDetailedArch || positions[focusedNodeId].mergedViaDetailedArch);
+            const pSrc = document.createElement('div');
+            pSrc.style.color = '#38bdf8';
+            pSrc.style.margin = '4px 0 2px';
+            pSrc.textContent =
+              'Source: ' +
+              labels.join(' + ') +
+              (isMerged ? ' (merged via detailed-architecture)' : '');
+            nodeInspectorBody.appendChild(pSrc);
+          }
+          const p2 = document.createElement('div');
+          p2.style.color = '#93a4c7';
+          p2.style.margin = '4px 0';
+          p2.textContent = 'Type: ' + fNode.nodeType + (fNode.description ? ' — ' + fNode.description : '');
+          const p3 = document.createElement('div');
+          p3.textContent = 'Upstream: ' + inList;
+          const p4 = document.createElement('div');
+          p4.textContent = 'Downstream: ' + outList;
+          nodeInspectorBody.appendChild(p2);
+          nodeInspectorBody.appendChild(p3);
+          nodeInspectorBody.appendChild(p4);
+        } else {
+          nodeInspector.style.display = 'none';
+        }
+
+        renderGovernancePosture(currentIndex, frame);
+
+        drawGraphScene({
+          edgesContainer: svgEdges,
+          nodesContainer: svgNodes,
+          frame,
+          addedNodes,
+          modifiedNodes,
+          removedNodes,
+          addedEdges,
+          modifiedEdges,
+          fallbackBaseNodes: liveDiff ? liveDiff.baseNodes : null,
+          focusedId: focusedNodeId,
+          neighborhoodSet: neighborhood,
+          projectFilterId: selectedProjectId,
+          isolate: isolateMode,
+          markerPrefix: '',
+          onNodeClick: (clickedId) => {
+            setFocusNode(focusedNodeId === clickedId ? '' : clickedId);
+          },
+        });
+
+        changeList.innerHTML = '';
+        if (liveDiff && compareBase) {
+          const bannerLi = document.createElement('li');
+          bannerLi.className = 'compare-banner';
+          bannerLi.textContent = 'Comparing: ' + compareBase.name + ' -> ' + frame.name;
+          changeList.appendChild(bannerLi);
+
+          if (liveDiff.items.length === 0) {
+            const li = document.createElement('li');
+            li.textContent = 'No structural differences between selected moments.';
+            changeList.appendChild(li);
+          } else {
+            const kindLabelMap = { add: 'added', mod: 'modified', del: 'removed' };
+            for (const ch of liveDiff.items) {
+              const kindLabel = kindLabelMap[ch.kind] || 'modified';
+              const li = document.createElement('li');
+              const tag = document.createElement('span');
+              tag.className = 'tag tag-' + kindLabel;
+              tag.textContent = kindLabel;
+              li.appendChild(tag);
+              li.appendChild(document.createTextNode(ch.text));
+              changeList.appendChild(li);
+            }
+          }
+        } else {
+          const changes = frame.changes || [];
+          if (changes.length === 0) {
+            const li = document.createElement('li');
+            li.textContent = 'No structural diff recorded.';
+            changeList.appendChild(li);
+          } else {
+            const kindLabelMap = { add: 'added', mod: 'modified', del: 'removed' };
+            for (const ch of changes) {
+              const kindLabel = kindLabelMap[ch.kind] || 'modified';
+              const li = document.createElement('li');
+              const tag = document.createElement('span');
+              tag.className = 'tag tag-' + kindLabel;
+              tag.textContent = kindLabel;
+              li.appendChild(tag);
+              li.appendChild(document.createTextNode(ch.text));
+              changeList.appendChild(li);
+            }
+          }
+        }
+
+        commitList.innerHTML = '';
+        const msgs = frame.commitMessages || [];
+        const commitHashes = frame.commits || [];
+        const frameAdrs = frame.adrs || [];
+        commitHashes.forEach((hash, idx) => {
+          const li = document.createElement('li');
+          const code = document.createElement('code');
+          code.textContent = hash;
+          li.appendChild(code);
+          li.appendChild(document.createTextNode(' ' + (msgs[idx] || '')));
+          commitList.appendChild(li);
+        });
+        for (const adr of frameAdrs) {
+          const li = document.createElement('li');
+          const tag = document.createElement('span');
+          tag.className = 'tag tag-added';
+          tag.textContent = 'ADR';
+          li.appendChild(tag);
+          li.appendChild(document.createTextNode(adr));
+          commitList.appendChild(li);
+        }
+        if (commitHashes.length === 0 && frameAdrs.length === 0) {
+          const li = document.createElement('li');
+          li.style.color = '#93a4c7';
+          li.textContent = 'No Git commit SHAs or ADRs linked (manual timeline moment).';
+          commitList.appendChild(li);
+        }
+      }
+
+      function stopPlayback() {
+        if (timer) {
+          clearInterval(timer);
+          timer = null;
+        }
+        btnPlay.textContent = '▶ Play';
+      }
+
+      function startPlayback() {
+        stopPlayback();
+        if (frames.length <= 1) return;
+        if (currentIndex >= frames.length - 1) {
+          renderFrame(0);
+        }
+        btnPlay.textContent = '⏸ Pause';
+        const intervalMs = Number(speedSelect.value) || 1500;
+        timer = setInterval(() => {
+          if (currentIndex >= frames.length - 1) {
+            stopPlayback();
+          } else {
+            renderFrame(currentIndex + 1);
+          }
+        }, intervalMs);
+      }
+
+      function clientToSvgPoint(clientX, clientY) {
+        if (svgGraph.createSVGPoint && svgGraph.getScreenCTM) {
+          const ctm = svgGraph.getScreenCTM();
+          if (ctm) {
+            const pt = svgGraph.createSVGPoint();
+            pt.x = clientX;
+            pt.y = clientY;
+            const mapped = pt.matrixTransform(ctm.inverse());
+            return { x: mapped.x, y: mapped.y, scaleX: 1 / (ctm.a || 1), scaleY: 1 / (ctm.d || 1) };
+          }
+        }
+        const rect = svgGraph.getBoundingClientRect();
+        const scaleX = canvasWidth / (rect.width || 1);
+        const scaleY = canvasHeight / (rect.height || 1);
+        return {
+          x: (clientX - rect.left) * scaleX,
+          y: (clientY - rect.top) * scaleY,
+          scaleX,
+          scaleY,
+        };
+      }
+
+      svgGraph.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const pt = clientToSvgPoint(e.clientX, e.clientY);
+        const factor = e.deltaY < 0 ? 1.12 : 1 / 1.12;
+        setZoom(zoomScale * factor, pt.x, pt.y);
+      }, { passive: false });
+
+      svgGraph.addEventListener('mousedown', (e) => {
+        if (e.button !== 0) return;
+        if (e.target && typeof e.target.closest === 'function' && e.target.closest('.node-group')) {
+          return;
+        }
+        isPanning = true;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        panStartX = panX;
+        panStartY = panY;
+        canvasWrap.classList.add('panning');
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isPanning) return;
+        const pt = clientToSvgPoint(e.clientX, e.clientY);
+        const dx = e.clientX - dragStartX;
+        const dy = e.clientY - dragStartY;
+        panX = panStartX + dx * pt.scaleX;
+        panY = panStartY + dy * pt.scaleY;
+        applyTransform();
+      });
+
+      window.addEventListener('mouseup', () => {
+        if (!isPanning) return;
+        isPanning = false;
+        canvasWrap.classList.remove('panning');
+      });
+
+      btnZoomIn.addEventListener('click', () => {
+        setZoom(zoomScale * 1.2, canvasWidth / 2, canvasHeight / 2);
+      });
+      btnZoomOut.addEventListener('click', () => {
+        setZoom(zoomScale / 1.2, canvasWidth / 2, canvasHeight / 2);
+      });
+      btnZoomFit.addEventListener('click', () => {
+        resetZoom();
+      });
+
+      asOfDateInput.addEventListener('change', () => {
+        const targetDate = (asOfDateInput.value || '').trim();
+        if (!targetDate) {
+          auditPrecedesFirst = false;
+          asOfBanner.style.display = 'none';
+          renderFrame(currentIndex);
+          return;
+        }
+        stopPlayback();
+        let matchIdx = -1;
+        for (let i = 0; i < frames.length; i++) {
+          const fDate = String(frames[i].validFrom || '').slice(0, 10);
+          if (fDate && fDate <= targetDate) {
+            matchIdx = i;
+          }
+        }
+        if (matchIdx === -1) {
+          auditPrecedesFirst = true;
+          const firstDate = String(frames[0]?.validFrom || '').slice(0, 10);
+          asOfBanner.className = 'audit-banner warn';
+          asOfBanner.textContent = firstDate
+            ? 'Audit Alert: ' + targetDate + ' precedes Moment 1 (' + firstDate + '). No architecture was effective on that date.'
+            : 'Audit Alert: Moment 1 omits valid-from in this manual timeline, so effective posture on ' + targetDate + ' cannot be verified.';
+          asOfBanner.style.display = 'block';
+          renderFrame(0);
+        } else {
+          auditPrecedesFirst = false;
+          asOfBanner.className = 'audit-banner';
+          asOfBanner.textContent =
+            'Authoritative Architecture as of ' + targetDate + ': Moment ' + (matchIdx + 1) + ' — ' + frames[matchIdx].name;
+          asOfBanner.style.display = 'block';
+          renderFrame(matchIdx);
+        }
+      });
+
+      compareSelect.addEventListener('change', () => {
+        renderFrame(currentIndex);
+      });
+      btnResetCompare.addEventListener('click', () => {
+        compareSelect.value = '';
+        renderFrame(currentIndex);
+      });
+
+      btnPlay.addEventListener('click', () => {
+        if (timer) stopPlayback();
+        else startPlayback();
+      });
+      btnPrev.addEventListener('click', () => {
+        stopPlayback();
+        renderFrame(currentIndex - 1);
+      });
+      btnNext.addEventListener('click', () => {
+        stopPlayback();
+        renderFrame(currentIndex + 1);
+      });
+      scrubber.addEventListener('input', (e) => {
+        stopPlayback();
+        renderFrame(Number(e.target.value));
+      });
+      speedSelect.addEventListener('change', () => {
+        if (timer) startPlayback();
+      });
+      if (projectSelect) {
+        projectSelect.addEventListener('change', (e) => {
+          selectedProjectId = e.target.value || '';
+          renderFrame(currentIndex);
+        });
+      }
+      focusSelect.addEventListener('change', (e) => {
+        setFocusNode(e.target.value);
+      });
+      focusIsolate.addEventListener('change', () => {
+        renderFrame(currentIndex);
+      });
+      btnResetFocus.addEventListener('click', () => {
+        selectedProjectId = '';
+        if (projectSelect) projectSelect.value = '';
+        setFocusNode('');
+      });
+      function nodeMatchesSpecificProject(nodeOrPos, projId) {
+        if (!projId) return true;
+        if (!nodeOrPos) return false;
+        if (Array.isArray(nodeOrPos.sourceIds) && nodeOrPos.sourceIds.includes(projId)) {
+          return true;
+        }
+        return nodeOrPos.sourceId === projId;
+      }
+
+      function drawGraphScene(opts) {
+        const {
+          edgesContainer,
+          nodesContainer,
+          frame,
+          addedNodes,
+          modifiedNodes,
+          removedNodes,
+          addedEdges,
+          modifiedEdges,
+          fallbackBaseNodes,
+          focusedId,
+          neighborhoodSet,
+          projectFilterId,
+          isolate,
+          markerPrefix,
+          onNodeClick,
+        } = opts;
+
+        const nodeHalfW = 88;
+        const nodeHalfH = 32;
+        const activeEdges = frame.edges || [];
+        const totalEdgeCount = activeEdges.length;
+        const pairCounts = new Map();
+        for (const e of activeEdges) {
+          const key = e.source < e.target ? e.source + '::' + e.target : e.target + '::' + e.source;
+          pairCounts.set(key, (pairCounts.get(key) || 0) + 1);
+        }
+        const pairSeen = new Map();
+        const mkNorm = 'url(#' + markerPrefix + 'arrow-normal)';
+        const mkAdd = 'url(#' + markerPrefix + 'arrow-added)';
+        const mkMod = 'url(#' + markerPrefix + 'arrow-modified)';
+
+        for (const edge of activeEdges) {
+          const src = positions[edge.source];
+          const dst = positions[edge.target];
+          if (!src || !dst) continue;
+
+          const inFocus = !focusedId || edge.source === focusedId || edge.target === focusedId;
+          const srcInProj = nodeMatchesSpecificProject(src, projectFilterId);
+          const dstInProj = nodeMatchesSpecificProject(dst, projectFilterId);
+          const inProject = !projectFilterId || (srcInProj && dstInProj);
+          if (focusedId && isolate && !inFocus) continue;
+          if (projectFilterId && isolate && !inProject) continue;
+
+          const pairKey = edge.source < edge.target ? edge.source + '::' + edge.target : edge.target + '::' + edge.source;
+          const pairTotal = pairCounts.get(pairKey) || 1;
+          const pairIdx = pairSeen.get(pairKey) || 0;
+          pairSeen.set(pairKey, pairIdx + 1);
+          const curveOffset = pairTotal > 1 ? (pairIdx - (pairTotal - 1) / 2) * 34 : 0;
+
+          const isAdded = addedEdges.has(edge.id);
+          const isModified = modifiedEdges.has(edge.id);
+          const stroke = isAdded ? '#22c55e' : (isModified ? '#f59e0b' : '#64748b');
+          const marker = isAdded ? mkAdd : (isModified ? mkMod : mkNorm);
+
+          const dx = dst.x - src.x;
+          const dy = dst.y - src.y;
+          let x1, y1, x2, y2, cx1, cy1, cx2, cy2;
+
+          if (dx > 20) {
+            x1 = src.x + nodeHalfW;
+            y1 = src.y;
+            x2 = dst.x - nodeHalfW;
+            y2 = dst.y;
+            const span = Math.max(48, (x2 - x1) * 0.48);
+            cx1 = x1 + span;
+            cy1 = y1 + curveOffset;
+            cx2 = x2 - span;
+            cy2 = y2 + curveOffset;
+          } else if (dx < -20) {
+            x1 = src.x - nodeHalfW;
+            y1 = src.y;
+            x2 = dst.x + nodeHalfW;
+            y2 = dst.y;
+            const arch = (Math.abs(dy) < 25 ? -72 : 0) + curveOffset;
+            const span = Math.max(54, Math.abs(x1 - x2) * 0.42);
+            cx1 = x1 - span;
+            cy1 = y1 + arch;
+            cx2 = x2 + span;
+            cy2 = y2 + arch;
+          } else {
+            const signY = dy >= 0 ? 1 : -1;
+            x1 = src.x;
+            y1 = src.y + signY * nodeHalfH;
+            x2 = dst.x;
+            y2 = dst.y - signY * nodeHalfH;
+            const bulge = 58 + curveOffset;
+            cx1 = x1 + bulge;
+            cy1 = y1 + signY * 18;
+            cx2 = x2 + bulge;
+            cy2 = y2 - signY * 18;
+          }
+
+          const edgeActive = inFocus && (!projectFilterId || srcInProj || dstInProj);
+          const g = createSvgEl('g', {
+            class: 'edge-group',
+            opacity: edgeActive ? (inProject ? 1 : 0.45) : 0.12,
+          });
+          g.appendChild(createSvgEl('path', {
+            d: 'M ' + x1 + ' ' + y1 + ' C ' + cx1 + ' ' + cy1 + ', ' + cx2 + ' ' + cy2 + ', ' + x2 + ' ' + y2,
+            fill: 'none',
+            stroke,
+            'stroke-width': isAdded || isModified || (focusedId && inFocus) ? 2.5 : 1.75,
+            'marker-end': marker,
+            opacity: isAdded || isModified ? 1 : 0.78,
+          }));
+
+          const showLabel = Boolean(edge.label) && (
+            totalEdgeCount <= 12 ||
+            Boolean(focusedId && inFocus) ||
+            isAdded ||
+            isModified
+          );
+          if (showLabel) {
+            const mx = 0.125 * x1 + 0.375 * cx1 + 0.375 * cx2 + 0.125 * x2;
+            const my = 0.125 * y1 + 0.375 * cy1 + 0.375 * cy2 + 0.125 * y2;
+            const labelStr = edge.label.length > 18 ? edge.label.slice(0, 17) + '…' : edge.label;
+            const pillW = Math.max(32, Math.round(labelStr.length * 6.4 + 14));
+            const pillH = 18;
+
+            g.appendChild(createSvgEl('rect', {
+              x: mx - pillW / 2,
+              y: my - pillH / 2,
+              width: pillW,
+              height: pillH,
+              rx: 9,
+              fill: '#0b1020',
+              'fill-opacity': 0.92,
+              stroke: isAdded ? '#22c55e' : (isModified ? '#f59e0b' : '#334155'),
+              'stroke-width': 1,
+            }));
+
+            const label = createSvgEl('text', {
+              x: mx,
+              y: my + 3.5,
+              fill: isAdded ? '#86efac' : (isModified ? '#fde68a' : '#cbd5e1'),
+              'font-size': 10.5,
+              'text-anchor': 'middle',
+            });
+            label.textContent = labelStr;
+            g.appendChild(label);
+          }
+          edgesContainer.appendChild(g);
+        }
+
+        const renderNodes = [...(frame.nodes || [])];
+        for (const remId of removedNodes) {
+          const fallbackNode = fallbackBaseNodes ? fallbackBaseNodes.get(remId) : null;
+          if (positions[remId]) {
+            renderNodes.push({
+              id: remId,
+              name: fallbackNode?.name || positions[remId].name,
+              nodeType: fallbackNode?.nodeType || positions[remId].nodeType,
+              controlCount: fallbackNode?.controlCount || positions[remId].controlCount,
+              sourceId: fallbackNode?.sourceId || positions[remId].sourceId,
+              sourceLabel: fallbackNode?.sourceLabel || positions[remId].sourceLabel,
+              sourceIds: fallbackNode?.sourceIds || positions[remId].sourceIds,
+              sourceLabels: fallbackNode?.sourceLabels || positions[remId].sourceLabels,
+              mergedViaDetailedArch:
+                fallbackNode?.mergedViaDetailedArch || positions[remId].mergedViaDetailedArch,
+            });
+          }
+        }
+
+        for (const node of renderNodes) {
+          const pos = positions[node.id];
+          if (!pos) continue;
+
+          const inFocus = !focusedId || (neighborhoodSet && neighborhoodSet.has(node.id));
+          const inProject = nodeMatchesSpecificProject(node.sourceId || node.sourceIds ? node : pos, projectFilterId);
+          if (focusedId && isolate && !inFocus) continue;
+          if (projectFilterId && isolate && !inProject) continue;
+          const visibleActive = inFocus && inProject;
+
+          const isFocusedTarget = focusedId === node.id;
+          const isAdded = addedNodes.has(node.id);
+          const isModified = modifiedNodes.has(node.id);
+          const isRemoved = removedNodes.has(node.id);
+
+          let stroke = '#3b82f6';
+          let fill = '#13203d';
+          if (isAdded) { stroke = '#22c55e'; fill = '#0f291e'; }
+          else if (isModified) { stroke = '#f59e0b'; fill = '#2b200c'; }
+          else if (isRemoved) { stroke = '#ef4444'; fill = '#2c1215'; }
+          if (isFocusedTarget) { stroke = '#38bdf8'; }
+
+          const g = createSvgEl('g', {
+            class: 'node-group',
+            opacity: isRemoved ? (visibleActive ? 0.45 : 0.12) : (visibleActive ? 1 : 0.16),
+          });
+          if (onNodeClick) {
+            g.addEventListener('click', (ev) => {
+              ev.stopPropagation();
+              onNodeClick(node.id);
+            });
+          }
+
+          const w = 176;
+          const h = 64;
+          g.appendChild(createSvgEl('rect', {
+            x: pos.x - w / 2,
+            y: pos.y - h / 2,
+            width: w,
+            height: h,
+            rx: 10,
+            fill,
+            stroke,
+            'stroke-width': isAdded || isModified || isRemoved ? 2.4 : 1.5,
+            'stroke-dasharray': isRemoved ? '5 4' : 'none',
+          }));
+
+          const effSourceId = node.sourceId || pos.sourceId;
+          const effSourceLabel = node.sourceLabel || pos.sourceLabel;
+          const effSourceLabels = node.sourceLabels || pos.sourceLabels;
+          const effMerged = Boolean(node.mergedViaDetailedArch || pos.mergedViaDetailedArch);
+          if (isMultiSource && effSourceLabel) {
+            const rawBadge = effMerged && Array.isArray(effSourceLabels) && effSourceLabels.length > 1
+              ? '⇄ ' + effSourceLabels.join('+')
+              : effSourceLabel;
+            const badgeStr = rawBadge.length > 22 ? rawBadge.slice(0, 21) + '…' : rawBadge;
+            const badgeW = Math.min(w - 12, Math.max(44, Math.round(badgeStr.length * 5.8 + 14)));
+            const badgeH = 15;
+            const badgeColor = sourceColorMap.get(effSourceId) || '#38bdf8';
+            g.appendChild(createSvgEl('rect', {
+              x: pos.x - badgeW / 2,
+              y: pos.y - h / 2 - 8,
+              width: badgeW,
+              height: badgeH,
+              rx: 7.5,
+              fill: '#0b1020',
+              stroke: badgeColor,
+              'stroke-width': 1.1,
+            }));
+            const badgeText = createSvgEl('text', {
+              x: pos.x,
+              y: pos.y - h / 2 + 2.5,
+              fill: badgeColor,
+              'font-size': 9.5,
+              'font-weight': 600,
+              'text-anchor': 'middle',
+            });
+            badgeText.textContent = badgeStr;
+            g.appendChild(badgeText);
+          }
+
+          const titleText = createSvgEl('text', {
+            x: pos.x,
+            y: pos.y - 5,
+            fill: '#f1f5f9',
+            'font-size': 12.5,
+            'font-weight': 600,
+            'text-anchor': 'middle',
+          });
+          titleText.textContent = node.name.length > 22 ? node.name.slice(0, 21) + '…' : node.name;
+          g.appendChild(titleText);
+
+          const ctrlSuffix = node.controlCount ? ' · ' + node.controlCount + ' ctrl' : '';
+          const typeText = createSvgEl('text', {
+            x: pos.x,
+            y: pos.y + 15,
+            fill: '#93a4c7',
+            'font-size': 10.5,
+            'text-anchor': 'middle',
+          });
+          typeText.textContent = node.nodeType + ctrlSuffix + (isRemoved ? ' (removed)' : '');
+          g.appendChild(typeText);
+
+          nodesContainer.appendChild(g);
+        }
+      }
+
+      let currentViewMode = 'stage';
+      let feedNewestFirst = true;
+      let feedProjectFilter = '';
+      let feedQuery = '';
+
+      function createFeedPostSvg(frame, frameIdx, projFilter) {
+        const activeIds = [
+          ...(frame.nodes || []).map((n) => n.id),
+          ...(frame.removedNodeIds || []),
+        ];
+        let minX = Infinity;
+        let minY = Infinity;
+        let maxX = -Infinity;
+        let maxY = -Infinity;
+        for (const id of activeIds) {
+          const p = positions[id];
+          if (!p) continue;
+          if (p.x < minX) minX = p.x;
+          if (p.y < minY) minY = p.y;
+          if (p.x > maxX) maxX = p.x;
+          if (p.y > maxY) maxY = p.y;
+        }
+        if (!Number.isFinite(minX)) {
+          minX = 0; minY = 0; maxX = canvasWidth; maxY = canvasHeight;
+        }
+        const padX = 135;
+        const padY = 72;
+        const rawW = (maxX - minX) + padX * 2;
+        const rawH = (maxY - minY) + padY * 2;
+        const vbW = Math.max(580, rawW);
+        const vbH = Math.max(240, rawH);
+        const cx = (minX + maxX) / 2;
+        const cy = (minY + maxY) / 2;
+        const vbX = Math.round(cx - vbW / 2);
+        const vbY = Math.round(cy - vbH / 2);
+
+        const markerPrefix = 'feed-' + frameIdx + '-';
+        const svg = createSvgEl('svg', {
+          viewBox: vbX + ' ' + vbY + ' ' + Math.round(vbW) + ' ' + Math.round(vbH),
+          preserveAspectRatio: 'xMidYMid meet',
+          xmlns: 'http://www.w3.org/2000/svg',
+        });
+
+        const defs = createSvgEl('defs', {});
+        const markerSpecs = [
+          ['arrow-normal', '#64748b'],
+          ['arrow-added', '#22c55e'],
+          ['arrow-modified', '#f59e0b'],
+        ];
+        for (const [mName, color] of markerSpecs) {
+          const m = createSvgEl('marker', {
+            id: markerPrefix + mName,
+            viewBox: '0 0 10 10',
+            refX: 9,
+            refY: 5,
+            markerWidth: 7,
+            markerHeight: 7,
+            orient: 'auto-start-reverse',
+          });
+          m.appendChild(createSvgEl('path', { d: 'M 0 1 L 10 5 L 0 9 z', fill: color }));
+          defs.appendChild(m);
+        }
+        svg.appendChild(defs);
+
+        const edgesG = createSvgEl('g', {});
+        const nodesG = createSvgEl('g', {});
+        svg.appendChild(edgesG);
+        svg.appendChild(nodesG);
+
+        const prevFrame = frameIdx > 0 ? frames[frameIdx - 1] : null;
+        const fallbackBaseNodes = prevFrame
+          ? new Map((prevFrame.nodes || []).map((n) => [n.id, n]))
+          : null;
+
+        drawGraphScene({
+          edgesContainer: edgesG,
+          nodesContainer: nodesG,
+          frame,
+          addedNodes: new Set(frame.addedNodeIds || []),
+          modifiedNodes: new Set(frame.modifiedNodeIds || []),
+          removedNodes: new Set(frame.removedNodeIds || []),
+          addedEdges: new Set(frame.addedEdgeIds || []),
+          modifiedEdges: new Set(frame.modifiedEdgeIds || []),
+          fallbackBaseNodes,
+          focusedId: '',
+          neighborhoodSet: null,
+          projectFilterId: projFilter,
+          isolate: false,
+          markerPrefix,
+          onNodeClick: (clickedNodeId) => {
+            setViewMode('stage');
+            renderFrame(frameIdx);
+            setFocusNode(clickedNodeId);
+          },
+        });
+
+        return { svg, vbX, vbY, vbW: Math.round(vbW), vbH: Math.round(vbH) };
+      }
+
+      function downloadPostSvg(svgEl, vbX, vbY, vbW, vbH, filename) {
+        const clone = svgEl.cloneNode(true);
+        clone.setAttribute('width', String(vbW));
+        clone.setAttribute('height', String(vbH));
+        clone.setAttribute('style', 'font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;');
+        const bgRect = createSvgEl('rect', {
+          x: vbX,
+          y: vbY,
+          width: vbW,
+          height: vbH,
+          fill: '#0b1020',
+        });
+        clone.insertBefore(bgRect, clone.firstChild);
+        const xml = '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(clone);
+        const blob = new Blob([xml], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+
+      function frameTouchesProject(frame, projId) {
+        if (!projId) return true;
+        const srcObj = sources.find((s) => s.sourceId === projId);
+        const labelNeedle = srcObj ? '[' + srcObj.sourceLabel + ']' : '';
+        if (labelNeedle) {
+          if ((frame.commitMessages || []).some((m) => String(m).includes(labelNeedle))) return true;
+          if ((frame.changes || []).some((c) => String(c.text || '').includes(labelNeedle))) return true;
+        }
+        const changedIds = [
+          ...(frame.addedNodeIds || []),
+          ...(frame.modifiedNodeIds || []),
+          ...(frame.removedNodeIds || []),
+        ];
+        for (const id of changedIds) {
+          const p = positions[id];
+          if (nodeMatchesSpecificProject(p, projId)) return true;
+        }
+        return false;
+      }
+
+      function collectMomentSourceLabels(frame) {
+        if (!isMultiSource) return [];
+        const touched = [];
+        for (const src of sources) {
+          if (frameTouchesProject(frame, src.sourceId)) {
+            touched.push(src);
+          }
+        }
+        return touched;
+      }
+
+      function renderFeed() {
+        if (!feedStream) return;
+        feedStream.innerHTML = '';
+
+        const indices = frames.map((_, idx) => idx);
+        indices.sort((a, b) => {
+          const da = String(frames[a].validFrom || '');
+          const db = String(frames[b].validFrom || '');
+          if (da && db && da !== db) {
+            return feedNewestFirst ? db.localeCompare(da) : da.localeCompare(db);
+          }
+          return feedNewestFirst ? b - a : a - b;
+        });
+
+        const needle = feedQuery.trim().toLowerCase();
+        const matched = indices.filter((idx) => {
+          const f = frames[idx];
+          if (!frameTouchesProject(f, feedProjectFilter)) return false;
+          if (!needle) return true;
+          const hay = [
+            f.name,
+            f.description,
+            f.validFrom,
+            ...(f.commits || []),
+            ...(f.commitMessages || []),
+            ...(f.adrs || []),
+            ...(f.changes || []).map((c) => c.text),
+            ...(f.nodes || []).map((n) => n.name + ' ' + n.id),
+            ...(f.controls || []).map((c) => c.id + ' ' + c.description),
+          ]
+            .join(' ')
+            .toLowerCase();
+          return hay.includes(needle);
+        });
+
+        if (feedCount) {
+          feedCount.textContent =
+            matched.length + ' architectural post' + (matched.length === 1 ? '' : 's');
+        }
+
+        if (matched.length === 0) {
+          const empty = document.createElement('div');
+          empty.className = 'feed-empty';
+          empty.textContent = 'No architectural moments match the current project or search filter.';
+          feedStream.appendChild(empty);
+          return;
+        }
+
+        for (const idx of matched) {
+          const f = frames[idx];
+          const article = document.createElement('article');
+          article.className = 'feed-post';
+          article.setAttribute('data-moment-index', String(idx));
+
+          const metaRow = document.createElement('div');
+          metaRow.className = 'feed-post-meta';
+
+          const authorBlock = document.createElement('div');
+          authorBlock.className = 'feed-author-block';
+
+          const avatar = document.createElement('div');
+          avatar.className = 'feed-avatar';
+          avatar.textContent = 'M' + (idx + 1);
+          authorBlock.appendChild(avatar);
+
+          const metaTextWrap = document.createElement('div');
+          const metaTitle = document.createElement('div');
+          metaTitle.className = 'feed-meta-title';
+          const dateLabel = f.validFrom ? String(f.validFrom).slice(0, 10) : 'Manual Moment';
+          metaTitle.appendChild(
+            document.createTextNode('Moment ' + (idx + 1) + ' of ' + frames.length + ' · ' + dateLabel),
+          );
+
+          for (const src of collectMomentSourceLabels(f)) {
+            const sp = document.createElement('span');
+            sp.className = 'feed-source-pill';
+            const c = sourceColorMap.get(src.sourceId) || '#38bdf8';
+            sp.style.borderColor = c;
+            sp.style.color = c;
+            sp.textContent = src.sourceLabel;
+            metaTitle.appendChild(sp);
+          }
+
+          const metaSub = document.createElement('div');
+          metaSub.className = 'feed-meta-sub';
+          const commitInfo = (f.commits && f.commits.length > 0)
+            ? f.commitCount + ' commit' + (f.commitCount === 1 ? '' : 's') + ' (' + f.commits[0] + (f.commits.length > 1 ? '..' + f.commits[f.commits.length - 1] : '') + ')'
+            : 'Curated snapshot';
+          metaSub.textContent =
+            commitInfo +
+            ((f.adrs && f.adrs.length) ? ' · ' + f.adrs.length + ' ADR(s)' : '') +
+            ((f.controls && f.controls.length) ? ' · ' + f.controls.length + ' active control(s)' : '');
+
+          metaTextWrap.appendChild(metaTitle);
+          metaTextWrap.appendChild(metaSub);
+          authorBlock.appendChild(metaTextWrap);
+          metaRow.appendChild(authorBlock);
+
+          const actions = document.createElement('div');
+          actions.className = 'feed-actions';
+
+          const { svg, vbX, vbY, vbW, vbH } = createFeedPostSvg(f, idx, feedProjectFilter);
+
+          const btnSaveSvg = document.createElement('button');
+          btnSaveSvg.type = 'button';
+          btnSaveSvg.className = 'feed-action-btn';
+          btnSaveSvg.textContent = '⬇ Save SVG';
+          btnSaveSvg.title = 'Download standalone SVG snapshot for this post';
+          btnSaveSvg.addEventListener('click', () => {
+            const slug = String(f.id || ('moment-' + (idx + 1))).replace(/[^a-zA-Z0-9_-]+/g, '-');
+            downloadPostSvg(svg, vbX, vbY, vbW, vbH, slug + '.svg');
+          });
+
+          const btnOpenStage = document.createElement('button');
+          btnOpenStage.type = 'button';
+          btnOpenStage.className = 'feed-action-btn primary';
+          btnOpenStage.textContent = 'Inspect in Stage →';
+          btnOpenStage.addEventListener('click', () => {
+            setViewMode('stage');
+            renderFrame(idx);
+          });
+
+          actions.appendChild(btnSaveSvg);
+          actions.appendChild(btnOpenStage);
+          metaRow.appendChild(actions);
+          article.appendChild(metaRow);
+
+          const h3 = document.createElement('h3');
+          h3.className = 'feed-post-title';
+          h3.textContent = f.name;
+          article.appendChild(h3);
+
+          const summaryP = document.createElement('p');
+          summaryP.className = 'feed-post-summary';
+          summaryP.textContent = f.description || f.summary || '';
+          article.appendChild(summaryP);
+
+          const figure = document.createElement('div');
+          figure.className = 'feed-figure';
+          const svgWrap = document.createElement('div');
+          svgWrap.className = 'feed-svg-wrap';
+          svgWrap.title = 'Click diagram or any node to inspect in interactive Timelapse Stage';
+          svgWrap.appendChild(svg);
+          svgWrap.addEventListener('click', () => {
+            setViewMode('stage');
+            renderFrame(idx);
+          });
+          figure.appendChild(svgWrap);
+
+          const caption = document.createElement('div');
+          caption.className = 'feed-figure-caption';
+          const deltaPills = document.createElement('div');
+          deltaPills.className = 'feed-delta-pills';
+          const addCnt = (f.addedNodeIds || []).length + (f.addedEdgeIds || []).length;
+          const modCnt = (f.modifiedNodeIds || []).length + (f.modifiedEdgeIds || []).length;
+          const delCnt = (f.removedNodeIds || []).length + (f.removedEdgeIds || []).length;
+
+          const sAdd = document.createElement('span');
+          sAdd.style.color = '#86efac';
+          sAdd.textContent = '+' + addCnt + ' added';
+          deltaPills.appendChild(sAdd);
+
+          if (modCnt > 0) {
+            const sMod = document.createElement('span');
+            sMod.style.color = '#fde68a';
+            sMod.textContent = '~' + modCnt + ' modified';
+            deltaPills.appendChild(sMod);
+          }
+          if (delCnt > 0) {
+            const sDel = document.createElement('span');
+            sDel.style.color = '#fca5a5';
+            sDel.textContent = '-' + delCnt + ' removed';
+            deltaPills.appendChild(sDel);
+          }
+
+          const stateTotals = document.createElement('span');
+          stateTotals.textContent =
+            (f.nodes || []).length +
+            ' nodes · ' +
+            (f.edges || []).length +
+            ' relationships' +
+            ((f.controls && f.controls.length) ? ' · ' + f.controls.length + ' controls' : '');
+
+          caption.appendChild(deltaPills);
+          caption.appendChild(stateTotals);
+          figure.appendChild(caption);
+          article.appendChild(figure);
+
+          const highlights = document.createElement('div');
+          highlights.className = 'feed-highlights';
+          const allChanges = f.changes || [];
+          const maxInline = 6;
+          const renderChips = (limit) => {
+            highlights.innerHTML = '';
+            const shown = allChanges.slice(0, limit);
+            for (const ch of shown) {
+              const chip = document.createElement('span');
+              chip.className = 'feed-chip ' + (ch.kind || 'mod');
+              const prefix = ch.kind === 'add' ? '+ ' : (ch.kind === 'del' ? '- ' : '~ ');
+              chip.textContent = prefix + ch.text;
+              highlights.appendChild(chip);
+            }
+            if (allChanges.length > limit) {
+              const moreBtn = document.createElement('button');
+              moreBtn.type = 'button';
+              moreBtn.className = 'feed-action-btn';
+              moreBtn.style.fontSize = '11px';
+              moreBtn.style.padding = '3px 9px';
+              moreBtn.textContent = '+' + (allChanges.length - limit) + ' more changes';
+              moreBtn.addEventListener('click', () => renderChips(allChanges.length));
+              highlights.appendChild(moreBtn);
+            }
+            for (const adr of f.adrs || []) {
+              const adrChip = document.createElement('span');
+              adrChip.className = 'feed-chip adr';
+              adrChip.textContent = 'ADR: ' + adr;
+              highlights.appendChild(adrChip);
+            }
+          };
+          if (allChanges.length > 0 || (f.adrs && f.adrs.length > 0)) {
+            renderChips(maxInline);
+            article.appendChild(highlights);
+          }
+
+          feedStream.appendChild(article);
+        }
+      }
+
+      function setViewMode(mode, updateHash = true) {
+        currentViewMode = mode === 'feed' ? 'feed' : 'stage';
+        const isFeed = currentViewMode === 'feed';
+        if (isFeed) stopPlayback();
+
+        if (stageView) stageView.style.display = isFeed ? 'none' : 'grid';
+        if (feedView) feedView.style.display = isFeed ? 'flex' : 'none';
+        if (badgeKeys) badgeKeys.style.display = isFeed ? 'none' : 'inline-block';
+
+        if (btnModeStage) {
+          btnModeStage.classList.toggle('active', !isFeed);
+          btnModeStage.setAttribute('aria-selected', String(!isFeed));
+        }
+        if (btnModeFeed) {
+          btnModeFeed.classList.toggle('active', isFeed);
+          btnModeFeed.setAttribute('aria-selected', String(isFeed));
+        }
+
+        if (isFeed) {
+          renderFeed();
+        }
+        if (updateHash && window.history && window.history.replaceState) {
+          const base = window.location.pathname + window.location.search;
+          window.history.replaceState(null, '', isFeed ? base + '#feed' : base);
+        }
+      }
+
+      if (btnModeStage) {
+        btnModeStage.addEventListener('click', () => setViewMode('stage'));
+      }
+      if (btnModeFeed) {
+        btnModeFeed.addEventListener('click', () => setViewMode('feed'));
+      }
+      if (btnFeedStory) {
+        btnFeedStory.addEventListener('click', () => {
+          feedNewestFirst = false;
+          btnFeedStory.classList.add('active');
+          if (btnFeedLatest) btnFeedLatest.classList.remove('active');
+          renderFeed();
+        });
+      }
+      if (btnFeedLatest) {
+        btnFeedLatest.addEventListener('click', () => {
+          feedNewestFirst = true;
+          btnFeedLatest.classList.add('active');
+          if (btnFeedStory) btnFeedStory.classList.remove('active');
+          renderFeed();
+        });
+      }
+      if (feedProjectSelect) {
+        feedProjectSelect.addEventListener('change', (e) => {
+          feedProjectFilter = e.target.value || '';
+          renderFeed();
+        });
+      }
+      if (feedSearch) {
+        feedSearch.addEventListener('input', (e) => {
+          feedQuery = e.target.value || '';
+          renderFeed();
+        });
+      }
+
+      window.addEventListener('keydown', (e) => {
+        if (currentViewMode === 'feed') return;
+        const tag = document.activeElement && document.activeElement.tagName;
+        if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
+        if (e.code === 'Space') {
+          e.preventDefault();
+          if (timer) stopPlayback();
+          else startPlayback();
+        } else if (e.code === 'ArrowLeft') {
+          stopPlayback();
+          renderFrame(currentIndex - 1);
+        } else if (e.code === 'ArrowRight') {
+          stopPlayback();
+          renderFrame(currentIndex + 1);
+        }
+      });
+
+      renderFrame(0);
+      const urlWantsFeed =
+        window.location.hash === '#feed' ||
+        new URLSearchParams(window.location.search).get('view') === 'feed' ||
+        payload.defaultView === 'feed';
+      if (urlWantsFeed) {
+        setViewMode('feed', false);
+      }
+    })();
+  </script>
+</body>
+</html>

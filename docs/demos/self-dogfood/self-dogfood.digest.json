@@ -1,0 +1,148 @@
+{
+  "schemaVersion": "1.0",
+  "sourceFile": "architecture.calm.json",
+  "latestCommitDate": "2026-11-13",
+  "stats": {
+    "totalCommitsScanned": 5,
+    "validSnapshotsParsed": 5,
+    "noiseCommitsFiltered": 0,
+    "structuralCommitsRetained": 5
+  },
+  "instructions": [
+    "Group the 5 structural commits below (indices 0..4) into cohesive architectural moments (phases).",
+    "Every commit index from 0 to 4 MUST be covered contiguously with zero gaps or overlaps: first startIndex=0, each next startIndex = previous endIndex + 1, final endIndex=4.",
+    "Group multi-commit sprints, node-addition + relationship-wiring sequences, protocol hardening, and coupled control/ADR rollouts into unified phases while keeping pivotal milestones distinct.",
+    "Write an executive `name` (3-7 words; no leading step numbers and no conventional-commit prefixes such as \"feat:\" or \"chore:\").",
+    "Write a 2-3 sentence narrative `description` explaining WHAT changed architecturally, HOW connectivity or security boundaries shifted, and WHY, citing concrete node IDs, protocols, controls, or ADRs. Do not output mechanical count strings such as \"+1 node(s)\".",
+    "Save the resulting JSON array to a `<name>.clusters.json` file and pass `--clusters <name>.clusters.json` back to `calm-timelapse`."
+  ],
+  "expectedClusterSchema": {
+    "type": "array",
+    "items": {
+      "type": "object",
+      "required": [
+        "startIndex",
+        "endIndex",
+        "uniqueId",
+        "name",
+        "description"
+      ],
+      "properties": {
+        "startIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "endIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "uniqueId": {
+          "type": "string",
+          "description": "kebab-case moment identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "Executive phase title (3-7 words)"
+        },
+        "description": {
+          "type": "string",
+          "description": "2-3 sentence architectural narrative"
+        }
+      }
+    }
+  },
+  "commits": [
+    {
+      "index": 0,
+      "sha": "a47bcb9edf88895c2f71016f37422d2f64907931",
+      "shortSha": "a47bcb9",
+      "date": "2026-11-13",
+      "author": "Akshar Prabhu Desai",
+      "subject": "feat(diff): scaffold TypeScript workspace and structural CALM diff engine",
+      "summaryLine": "Initial baseline with 3 node(s), 2 relationship(s)",
+      "changes": [
+        "Added node Git Repository (git-repo)",
+        "Added node Git History Extractor (git-history-extractor)",
+        "Added node Structural Diff Engine (structural-diff-engine)",
+        "Added relationship rel-git-to-extractor",
+        "Added relationship rel-extractor-to-diff"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 1,
+      "sha": "08b45490e785cae360e9f35369cbf7f2c29e80c6",
+      "shortSha": "08b4549",
+      "date": "2026-11-13",
+      "author": "Akshar Prabhu Desai",
+      "subject": "feat(timeline): add Git history walker, cluster validator, and CALM timeline emitter",
+      "summaryLine": "+4 node(s), +4 rel(s), controls(+1/~0/-0)",
+      "changes": [
+        "Added node Commit Diff Digest Exporter (digest-exporter)",
+        "Added node Deterministic & Spec Clusterer (moment-clusterer)",
+        "Added node CALM Timeline Emitter (timeline-emitter)",
+        "Added node IDE AI Assistant (Optional) (ide-ai-assistant)",
+        "Added relationship rel-diff-to-digest",
+        "Added relationship rel-diff-to-cluster",
+        "Added relationship rel-assistant-curates-clusters",
+        "Added relationship rel-cluster-to-emitter",
+        "Added architecture control contiguous-cluster-coverage"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 2,
+      "sha": "85654fda18fab8c2d013518c92914b68d3e763e0",
+      "shortSha": "85654fd",
+      "date": "2026-11-13",
+      "author": "Akshar Prabhu Desai",
+      "subject": "feat(timelapse): add interactive SVG stage player, CLI, and IDE skill",
+      "summaryLine": "+2 node(s), ~1 node(s), +2 rel(s), controls(+1/~0/-0)",
+      "changes": [
+        "Added node HTML Timelapse Renderer (timelapse-renderer)",
+        "Added node Architect / Reviewer (architect-user)",
+        "Modified node CALM Timeline Emitter (timeline-emitter) [description]",
+        "Added relationship rel-cluster-to-renderer",
+        "Added relationship rel-user-views-timelapse",
+        "Added architecture control zero-network-execution"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 3,
+      "sha": "0e983b8703c6405b653494524782ef176641cade",
+      "shortSha": "0e983b8",
+      "date": "2026-11-13",
+      "author": "Akshar Prabhu Desai",
+      "subject": "feat(federation): synchronize multi-repo timelines and resolve detailed-architecture",
+      "summaryLine": "+1 node(s), ~1 node(s), +2 rel(s), -1 rel(s), controls(+1/~0/-0)",
+      "changes": [
+        "Added node Multi-Repo Federation Engine (federation-engine)",
+        "Modified node Git History Extractor (git-history-extractor) [description]",
+        "Added relationship rel-extractor-to-federation",
+        "Added relationship rel-federation-to-diff",
+        "Removed relationship rel-extractor-to-diff",
+        "Added architecture control strict-peer-namespace-isolation"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 4,
+      "sha": "0f4a060d879d8b29b069f6ffd2a27de13356ce46",
+      "shortSha": "0f4a060",
+      "date": "2026-11-13",
+      "author": "Akshar Prabhu Desai",
+      "subject": "feat(player): add reverse-chronological Architecture Feed mode (--feed / #feed)",
+      "summaryLine": "+1 node(s), ~1 node(s), +1 rel(s), ~1 rel(s)",
+      "changes": [
+        "Added node Architecture Feed Renderer (architecture-feed-renderer)",
+        "Modified node Timelapse Stage SVG Renderer (timelapse-renderer) [name, description]",
+        "Added relationship rel-cluster-to-feed",
+        "Modified relationship rel-user-views-timelapse"
+      ],
+      "coChangedAdrs": []
+    }
+  ]
+}

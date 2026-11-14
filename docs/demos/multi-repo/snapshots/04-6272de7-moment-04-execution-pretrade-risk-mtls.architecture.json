@@ -1,0 +1,237 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm.json",
+  "nodes": [
+    {
+      "unique-id": "traderx-platform--institutional-client",
+      "node-type": "actor",
+      "name": "Institutional Desk",
+      "description": "Buy-side execution desk submitting FIX/HTTPS orders."
+    },
+    {
+      "unique-id": "traderx-platform--edge-gateway",
+      "node-type": "service",
+      "name": "TraderX Edge Gateway",
+      "description": "North-south ingress gateway handling session auth."
+    },
+    {
+      "unique-id": "traderx-platform--execution-core",
+      "node-type": "system",
+      "name": "Execution Core Subsystem",
+      "description": "Core equity execution subsystem linked to traderx-execution repo."
+    },
+    {
+      "unique-id": "traderx-platform--kafka-event-bus",
+      "node-type": "queue",
+      "name": "Shared Execution Event Bus",
+      "description": "Platform-wide execution fill backbone."
+    },
+    {
+      "unique-id": "traderx-platform--settlement-adapter",
+      "node-type": "service",
+      "name": "T+1 Settlement Adapter",
+      "description": "Consumes execution fills for DTCC T+1 clearing."
+    },
+    {
+      "unique-id": "traderx-execution--sor-router",
+      "node-type": "service",
+      "name": "Smart Order Router",
+      "description": "Routes child slices across lit and dark venues."
+    },
+    {
+      "unique-id": "traderx-execution--matching-engine",
+      "node-type": "service",
+      "name": "Internal Crossing Engine",
+      "description": "Low-latency internal midpoint matching engine."
+    },
+    {
+      "unique-id": "traderx-execution--postgres-trades-db",
+      "node-type": "database",
+      "name": "Execution Trades DB",
+      "description": "Operational OLTP trade ledger inside Execution repo (same raw ID as Surveillance, kept isolated)."
+    },
+    {
+      "unique-id": "traderx-execution--pretrade-risk",
+      "node-type": "service",
+      "name": "SEC 15c3-5 Risk Gate",
+      "description": "Enforces credit, fat-finger, and market-access limits prior to routing."
+    },
+    {
+      "unique-id": "finra-surveillance--cat-ingestor",
+      "node-type": "service",
+      "name": "CAT Drop-Copy Ingestor",
+      "description": "Ingests regulatory trade drop-copies over SFTP."
+    },
+    {
+      "unique-id": "finra-surveillance--postgres-trades-db",
+      "node-type": "database",
+      "name": "Surveillance Trades DB",
+      "description": "Independent compliance PostgreSQL warehouse (isolated from execution DB)."
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "traderx-platform--client-to-edge",
+      "description": "Submits institutional equity orders.",
+      "relationship-type": {
+        "interacts": {
+          "actor": "traderx-platform--institutional-client",
+          "nodes": [
+            "traderx-platform--edge-gateway"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "traderx-platform--edge-to-exec",
+      "description": "Forwards validated orders.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "traderx-platform--edge-gateway"
+          },
+          "destination": {
+            "node": "traderx-platform--execution-core"
+          }
+        }
+      },
+      "protocol": "HTTPS"
+    },
+    {
+      "unique-id": "traderx-platform--exec-to-kafka",
+      "description": "Streams execution events to platform bus.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "traderx-platform--execution-core"
+          },
+          "destination": {
+            "node": "traderx-platform--kafka-event-bus"
+          }
+        }
+      },
+      "protocol": "AMQP"
+    },
+    {
+      "unique-id": "traderx-platform--settlement-from-kafka",
+      "description": "Consumes fill stream for clearing.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "traderx-platform--settlement-adapter"
+          },
+          "destination": {
+            "node": "traderx-platform--kafka-event-bus"
+          }
+        }
+      },
+      "protocol": "AMQP"
+    },
+    {
+      "unique-id": "traderx-execution--sor-to-risk",
+      "description": "Validates order limits synchronously.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "traderx-execution--sor-router"
+          },
+          "destination": {
+            "node": "traderx-execution--pretrade-risk"
+          }
+        }
+      },
+      "protocol": "mTLS"
+    },
+    {
+      "unique-id": "traderx-execution--sor-to-matcher",
+      "description": "Sends risk-approved crossing orders over mTLS.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "traderx-execution--sor-router"
+          },
+          "destination": {
+            "node": "traderx-execution--matching-engine"
+          }
+        }
+      },
+      "protocol": "mTLS"
+    },
+    {
+      "unique-id": "traderx-execution--matcher-to-exec-db",
+      "description": "Persists execution fills.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "traderx-execution--matching-engine"
+          },
+          "destination": {
+            "node": "traderx-execution--postgres-trades-db"
+          }
+        }
+      },
+      "protocol": "JDBC"
+    },
+    {
+      "unique-id": "traderx-execution--matcher-to-kafka",
+      "description": "Publishes execution fill events.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "traderx-execution--matching-engine"
+          },
+          "destination": {
+            "node": "traderx-platform--kafka-event-bus"
+          }
+        }
+      },
+      "protocol": "AMQP"
+    },
+    {
+      "unique-id": "finra-surveillance--ingestor-to-surv-db",
+      "description": "Writes immutable trade audit rows.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "finra-surveillance--cat-ingestor"
+          },
+          "destination": {
+            "node": "finra-surveillance--postgres-trades-db"
+          }
+        }
+      },
+      "protocol": "JDBC"
+    },
+    {
+      "unique-id": "traderx-execution--resolved-detailed-architecture",
+      "description": "Detailed architecture of Execution Core Subsystem resolved from execution-detail.calm.json",
+      "relationship-type": {
+        "composed-of": {
+          "container": "traderx-platform--execution-core",
+          "nodes": [
+            "traderx-execution--sor-router",
+            "traderx-execution--matching-engine",
+            "traderx-execution--postgres-trades-db",
+            "traderx-execution--pretrade-risk"
+          ]
+        }
+      }
+    }
+  ],
+  "controls": {
+    "traderx-execution--sec-15c3-5-pretrade": {
+      "description": "[TraderX Execution] Blocks unapproved direct market access and enforces sub-millisecond credit checks.",
+      "requirements": [
+        {
+          "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+          "config": {
+            "control-id": "sec-15c3-5-pretrade",
+            "name": "SEC Rule 15c3-5 Pre-Trade Risk Gate",
+            "description": "Blocks unapproved direct market access and enforces sub-millisecond credit checks.",
+            "maxLatencyMicros": 350,
+            "mTlsEnforced": true
+          }
+        }
+      ]
+    }
+  }
+}

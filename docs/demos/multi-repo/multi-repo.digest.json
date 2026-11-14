@@ -1,0 +1,216 @@
+{
+  "schemaVersion": "1.0",
+  "sourceFile": "TraderX Platform + TraderX Execution + FINRA Surveillance",
+  "sources": [
+    {
+      "sourceId": "traderx-platform",
+      "sourceLabel": "TraderX Platform",
+      "repoName": "traderx-platform",
+      "fileName": "platform.calm.json",
+      "relPath": "architecture/platform.calm.json"
+    },
+    {
+      "sourceId": "traderx-execution",
+      "sourceLabel": "TraderX Execution",
+      "repoName": "traderx-execution",
+      "fileName": "execution-detail.calm.json",
+      "relPath": "calm/execution-detail.calm.json"
+    },
+    {
+      "sourceId": "finra-surveillance",
+      "sourceLabel": "FINRA Surveillance",
+      "repoName": "finra-surveillance",
+      "fileName": "surveillance.calm.json",
+      "relPath": "calm/surveillance.calm.json"
+    }
+  ],
+  "latestCommitDate": "2026-04-09",
+  "stats": {
+    "totalCommitsScanned": 8,
+    "validSnapshotsParsed": 8,
+    "noiseCommitsFiltered": 2,
+    "structuralCommitsRetained": 6
+  },
+  "instructions": [
+    "Group the 6 structural commits below (indices 0..5) into cohesive architectural moments (phases).",
+    "Every commit index from 0 to 5 MUST be covered contiguously with zero gaps or overlaps: first startIndex=0, each next startIndex = previous endIndex + 1, final endIndex=5.",
+    "Group multi-commit sprints, node-addition + relationship-wiring sequences, protocol hardening, and coupled control/ADR rollouts into unified phases while keeping pivotal milestones distinct.",
+    "Write an executive `name` (3-7 words; no leading step numbers and no conventional-commit prefixes such as \"feat:\" or \"chore:\").",
+    "Write a 2-3 sentence narrative `description` explaining WHAT changed architecturally, HOW connectivity or security boundaries shifted, and WHY, citing concrete node IDs, protocols, controls, or ADRs. Do not output mechanical count strings such as \"+1 node(s)\".",
+    "Save the resulting JSON array to a `<name>.clusters.json` file and pass `--clusters <name>.clusters.json` back to `calm-timelapse`."
+  ],
+  "expectedClusterSchema": {
+    "type": "array",
+    "items": {
+      "type": "object",
+      "required": [
+        "startIndex",
+        "endIndex",
+        "uniqueId",
+        "name",
+        "description"
+      ],
+      "properties": {
+        "startIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "endIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "uniqueId": {
+          "type": "string",
+          "description": "kebab-case moment identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "Executive phase title (3-7 words)"
+        },
+        "description": {
+          "type": "string",
+          "description": "2-3 sentence architectural narrative"
+        }
+      }
+    }
+  },
+  "commits": [
+    {
+      "index": 0,
+      "sha": "4095156ca7c1847e79b82c78cf330f2277ef123c",
+      "shortSha": "4095156",
+      "date": "2026-01-12",
+      "author": "FINOS Architecture Guild",
+      "subject": "[TraderX Platform] feat(platform): bootstrap edge gateway and execution core subsystem",
+      "summaryLine": "[TraderX Platform] Initial baseline with 3 node(s), 2 relationship(s)",
+      "changes": [
+        "[TraderX Platform] Added node Institutional Desk (traderx-platform--institutional-client)",
+        "[TraderX Platform] Added node TraderX Edge Gateway (traderx-platform--edge-gateway)",
+        "[TraderX Platform] Added node Execution Core Subsystem (traderx-platform--execution-core)",
+        "[TraderX Platform] Added relationship traderx-platform--client-to-edge",
+        "[TraderX Platform] Added relationship traderx-platform--edge-to-exec"
+      ],
+      "coChangedAdrs": [
+        "[TraderX Platform] docs/adr/0001-platform-boundary.md"
+      ],
+      "sourceId": "traderx-platform",
+      "sourceLabel": "TraderX Platform",
+      "repoName": "traderx-platform"
+    },
+    {
+      "index": 1,
+      "sha": "b373268db433c173aa3f82b94f2240c6e4b57718",
+      "shortSha": "b373268",
+      "date": "2026-02-03",
+      "author": "FINOS Architecture Guild",
+      "subject": "[FINRA Surveillance] feat(surveillance): launch independent FINRA CAT drop-copy ingestor and compliance DB",
+      "summaryLine": "[FINRA Surveillance] +2 node(s), +1 rel(s)",
+      "changes": [
+        "[FINRA Surveillance] Added node CAT Drop-Copy Ingestor (finra-surveillance--cat-ingestor)",
+        "[FINRA Surveillance] Added node Surveillance Trades DB (finra-surveillance--postgres-trades-db)",
+        "[FINRA Surveillance] Added relationship finra-surveillance--ingestor-to-surv-db"
+      ],
+      "coChangedAdrs": [
+        "[FINRA Surveillance] docs/adr/0001-regulatory-isolation.md"
+      ],
+      "sourceId": "finra-surveillance",
+      "sourceLabel": "FINRA Surveillance",
+      "repoName": "finra-surveillance"
+    },
+    {
+      "index": 2,
+      "sha": "addf93b63791900365cfa32819850dce5ee2815d",
+      "shortSha": "addf93b",
+      "date": "2026-02-24",
+      "author": "FINOS Architecture Guild",
+      "subject": "[TraderX Execution] feat(execution): publish execution-detail sub-architecture with SOR, matcher, and Kafka fills",
+      "summaryLine": "[TraderX Execution] +4 node(s), +3 rel(s)",
+      "changes": [
+        "[TraderX Execution] Added node Smart Order Router (traderx-execution--sor-router)",
+        "[TraderX Execution] Added node Internal Crossing Engine (traderx-execution--matching-engine)",
+        "[TraderX Execution] Added node Execution Trades DB (traderx-execution--postgres-trades-db)",
+        "[TraderX Execution] Added node Shared Execution Event Bus (traderx-execution--kafka-event-bus)",
+        "[TraderX Execution] Added relationship traderx-execution--sor-to-matcher",
+        "[TraderX Execution] Added relationship traderx-execution--matcher-to-exec-db",
+        "[TraderX Execution] Added relationship traderx-execution--matcher-to-kafka"
+      ],
+      "coChangedAdrs": [
+        "[TraderX Execution] docs/adr/0002-execution-subarch.md"
+      ],
+      "sourceId": "traderx-execution",
+      "sourceLabel": "TraderX Execution",
+      "repoName": "traderx-execution"
+    },
+    {
+      "index": 3,
+      "sha": "786cc9d9358f1fe9b30bf54381a49c8165e7ebc8",
+      "shortSha": "786cc9d",
+      "date": "2026-02-24",
+      "author": "FINOS Architecture Guild",
+      "subject": "[TraderX Platform] feat(platform): link execution-core via detailed-architecture and attach T+1 settlement adapter",
+      "summaryLine": "[TraderX Platform] +2 node(s), ~1 node(s), -1 node(s), +3 rel(s), ~1 rel(s)",
+      "changes": [
+        "[TraderX Platform] Added node Shared Execution Event Bus (traderx-platform--kafka-event-bus)",
+        "[TraderX Platform] Added node T+1 Settlement Adapter (traderx-platform--settlement-adapter)",
+        "[TraderX Platform] Removed node Shared Execution Event Bus (traderx-execution--kafka-event-bus)",
+        "[TraderX Platform] Modified node Execution Core Subsystem (traderx-platform--execution-core) [description]",
+        "[TraderX Platform] Added relationship traderx-platform--exec-to-kafka",
+        "[TraderX Platform] Added relationship traderx-platform--settlement-from-kafka",
+        "[TraderX Platform] Added relationship traderx-execution--resolved-detailed-architecture",
+        "[TraderX Platform] Modified relationship traderx-execution--matcher-to-kafka"
+      ],
+      "coChangedAdrs": [
+        "[TraderX Platform] docs/adr/0002-federated-execution-link.md"
+      ],
+      "sourceId": "traderx-platform",
+      "sourceLabel": "TraderX Platform",
+      "repoName": "traderx-platform"
+    },
+    {
+      "index": 4,
+      "sha": "6272de7be75d4d7f2366c1c224e6d73a35ac3d46",
+      "shortSha": "6272de7",
+      "date": "2026-03-18",
+      "author": "FINOS Architecture Guild",
+      "subject": "[TraderX Execution] feat(execution): enforce SEC 15c3-5 pre-trade risk gate and mTLS internal transport",
+      "summaryLine": "[TraderX Execution] +1 node(s), +1 rel(s), ~2 rel(s), controls(+1/~0/-0)",
+      "changes": [
+        "[TraderX Execution] Added node SEC 15c3-5 Risk Gate (traderx-execution--pretrade-risk)",
+        "[TraderX Execution] Added relationship traderx-execution--sor-to-risk",
+        "[TraderX Execution] Modified relationship traderx-execution--sor-to-matcher",
+        "[TraderX Execution] Modified relationship traderx-execution--resolved-detailed-architecture",
+        "[TraderX Execution] Added architecture control traderx-execution--sec-15c3-5-pretrade"
+      ],
+      "coChangedAdrs": [
+        "[TraderX Execution] docs/adr/0003-sec-15c3-5-mtls.md"
+      ],
+      "sourceId": "traderx-execution",
+      "sourceLabel": "TraderX Execution",
+      "repoName": "traderx-execution"
+    },
+    {
+      "index": 5,
+      "sha": "e2204e8af146ddfd1964a96e9a091949ec698d94",
+      "shortSha": "e2204e8",
+      "date": "2026-04-09",
+      "author": "FINOS Architecture Guild",
+      "subject": "[FINRA Surveillance] feat(surveillance): deploy spoofing detector and SEC 17a-4 WORM archive",
+      "summaryLine": "[FINRA Surveillance] +2 node(s), +2 rel(s), controls(+1/~0/-0)",
+      "changes": [
+        "[FINRA Surveillance] Added node Spoofing & Layering Detector (finra-surveillance--finra-alert-engine)",
+        "[FINRA Surveillance] Added node SEC 17a-4 WORM Archive (finra-surveillance--worm-audit-vault)",
+        "[FINRA Surveillance] Added relationship finra-surveillance--alert-reads-surv-db",
+        "[FINRA Surveillance] Added relationship finra-surveillance--alert-writes-worm",
+        "[FINRA Surveillance] Added architecture control finra-surveillance--sec-17a-4-worm-retention"
+      ],
+      "coChangedAdrs": [
+        "[FINRA Surveillance] docs/adr/0002-worm-surveillance-retention.md"
+      ],
+      "sourceId": "finra-surveillance",
+      "sourceLabel": "FINRA Surveillance",
+      "repoName": "finra-surveillance"
+    }
+  ]
+}

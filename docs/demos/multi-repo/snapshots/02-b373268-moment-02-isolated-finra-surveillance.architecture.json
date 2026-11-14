@@ -1,0 +1,79 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm.json",
+  "nodes": [
+    {
+      "unique-id": "traderx-platform--institutional-client",
+      "node-type": "actor",
+      "name": "Institutional Desk",
+      "description": "Buy-side execution desk submitting FIX/HTTPS orders."
+    },
+    {
+      "unique-id": "traderx-platform--edge-gateway",
+      "node-type": "service",
+      "name": "TraderX Edge Gateway",
+      "description": "North-south ingress gateway handling session auth."
+    },
+    {
+      "unique-id": "traderx-platform--execution-core",
+      "node-type": "system",
+      "name": "Execution Core Subsystem",
+      "description": "Core equity order execution subsystem."
+    },
+    {
+      "unique-id": "finra-surveillance--cat-ingestor",
+      "node-type": "service",
+      "name": "CAT Drop-Copy Ingestor",
+      "description": "Ingests regulatory trade drop-copies over SFTP."
+    },
+    {
+      "unique-id": "finra-surveillance--postgres-trades-db",
+      "node-type": "database",
+      "name": "Surveillance Trades DB",
+      "description": "Independent compliance PostgreSQL warehouse (isolated from execution DB)."
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "traderx-platform--client-to-edge",
+      "description": "Submits institutional equity orders.",
+      "relationship-type": {
+        "interacts": {
+          "actor": "traderx-platform--institutional-client",
+          "nodes": [
+            "traderx-platform--edge-gateway"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "traderx-platform--edge-to-exec",
+      "description": "Forwards validated orders.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "traderx-platform--edge-gateway"
+          },
+          "destination": {
+            "node": "traderx-platform--execution-core"
+          }
+        }
+      },
+      "protocol": "HTTPS"
+    },
+    {
+      "unique-id": "finra-surveillance--ingestor-to-surv-db",
+      "description": "Writes immutable trade audit rows.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "finra-surveillance--cat-ingestor"
+          },
+          "destination": {
+            "node": "finra-surveillance--postgres-trades-db"
+          }
+        }
+      },
+      "protocol": "JDBC"
+    }
+  ]
+}
