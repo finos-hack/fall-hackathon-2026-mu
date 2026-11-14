@@ -122,23 +122,31 @@ function extractNodeId(raw: Record<string, unknown>, fallbackIndex: number): str
   return `node-${fallbackIndex}`;
 }
 
+function readPatternSchemaTuple(prop: Record<string, unknown> | null): unknown[] {
+  if (!prop) return [];
+  if (Array.isArray(prop['prefixItems'])) return prop['prefixItems'];
+  if (Array.isArray(prop['items'])) return prop['items'];
+  const single = asRecord(prop['items']);
+  return single ? [single] : [];
+}
+
 function extractNodesFromPatternSchema(doc: Record<string, unknown>): GraphNode[] {
   const props = asRecord(doc['properties']);
   const nodesProp = asRecord(props?.['nodes']);
-  const prefixItems = nodesProp?.['prefixItems'];
-  if (!Array.isArray(prefixItems)) {
+  const tupleItems = readPatternSchemaTuple(nodesProp);
+  if (tupleItems.length === 0) {
     return [];
   }
 
   const out: GraphNode[] = [];
-  for (let i = 0; i < prefixItems.length; i++) {
-    const item = asRecord(prefixItems[i]);
+  for (let i = 0; i < tupleItems.length; i++) {
+    const item = asRecord(tupleItems[i]);
     const itemProps = asRecord(item?.['properties']);
     if (!itemProps) continue;
 
-    const idProp = asRecord(itemProps['unique-id']);
+    const idProp = asRecord(itemProps['unique-id']) ?? asRecord(itemProps['uniqueId']);
     const nameProp = asRecord(itemProps['name']);
-    const typeProp = asRecord(itemProps['node-type']);
+    const typeProp = asRecord(itemProps['node-type']) ?? asRecord(itemProps['type']);
     const descProp = asRecord(itemProps['description']);
 
     const id = typeof idProp?.['const'] === 'string' ? idProp['const'] : `pattern-node-${i}`;
@@ -276,42 +284,92 @@ export function extractGraphNodes(doc: Record<string, unknown>): GraphNode[] {
   return out;
 }
 
+function readPatternConnectsEndpoints(relTypeProp: Record<string, unknown> | null): {
+  source: string;
+  target: string;
+  relType: string;
+} {
+  if (!relTypeProp) return { source: '', target: '', relType: 'connects' };
+
+  const relProps = asRecord(relTypeProp['properties']);
+  const connects = asRecord(relProps?.['connects']);
+  const connectsProps = asRecord(connects?.['properties']);
+  if (connectsProps) {
+    const srcProp = asRecord(connectsProps['source']);
+    const dstProp = asRecord(connectsProps['destination']);
+    const srcNode = asRecord(asRecord(srcProp?.['properties'])?.['node']);
+    const dstNode = asRecord(asRecord(dstProp?.['properties'])?.['node']);
+    const source =
+      typeof srcNode?.['const'] === 'string'
+        ? srcNode['const']
+        : typeof srcProp?.['const'] === 'string'
+          ? srcProp['const']
+          : '';
+    const target =
+      typeof dstNode?.['const'] === 'string'
+        ? dstNode['const']
+        : typeof dstProp?.['const'] === 'string'
+          ? dstProp['const']
+          : '';
+    if (source && target) {
+      return { source, target, relType: 'connects' };
+    }
+  }
+
+  const constObj = asRecord(relTypeProp['const']);
+  const constConnects = asRecord(constObj?.['connects']);
+  if (constConnects) {
+    const rawSrc = constConnects['source'];
+    const rawDst = constConnects['destination'];
+    const source =
+      typeof rawSrc === 'string'
+        ? rawSrc
+        : typeof asRecord(rawSrc)?.['node'] === 'string'
+          ? (asRecord(rawSrc)!['node'] as string)
+          : '';
+    const target =
+      typeof rawDst === 'string'
+        ? rawDst
+        : typeof asRecord(rawDst)?.['node'] === 'string'
+          ? (asRecord(rawDst)!['node'] as string)
+          : '';
+    if (source && target) {
+      return { source, target, relType: 'connects' };
+    }
+  }
+
+  return { source: '', target: '', relType: 'connects' };
+}
+
 function extractEdgesFromPatternSchema(doc: Record<string, unknown>): GraphEdge[] {
   const props = asRecord(doc['properties']);
   const relsProp = asRecord(props?.['relationships']);
-  const prefixItems = relsProp?.['prefixItems'];
-  if (!Array.isArray(prefixItems)) {
+  const tupleItems = readPatternSchemaTuple(relsProp);
+  if (tupleItems.length === 0) {
     return [];
   }
 
   const out: GraphEdge[] = [];
-  for (let i = 0; i < prefixItems.length; i++) {
-    const item = asRecord(prefixItems[i]);
+  for (let i = 0; i < tupleItems.length; i++) {
+    const item = asRecord(tupleItems[i]);
     const itemProps = asRecord(item?.['properties']);
     if (!itemProps) continue;
 
-    const idProp = asRecord(itemProps['unique-id']);
+    const idProp = asRecord(itemProps['unique-id']) ?? asRecord(itemProps['uniqueId']);
     const descProp = asRecord(itemProps['description']);
+    const protoProp = asRecord(itemProps['protocol']);
     const relTypeProp = asRecord(itemProps['relationship-type']);
-    const relProps = asRecord(relTypeProp?.['properties']);
-    const connects = asRecord(relProps?.['connects']);
-    const connectsProps = asRecord(connects?.['properties']);
-    const sourceNode = asRecord(asRecord(connectsProps?.['source'])?.['properties'])?.['node'];
-    const destNode = asRecord(asRecord(connectsProps?.['destination'])?.['properties'])?.['node'];
-
-    const source =
-      typeof asRecord(sourceNode)?.['const'] === 'string'
-        ? (asRecord(sourceNode)!['const'] as string)
-        : '';
-    const target =
-      typeof asRecord(destNode)?.['const'] === 'string'
-        ? (asRecord(destNode)!['const'] as string)
-        : '';
+    const { source, target, relType } = readPatternConnectsEndpoints(relTypeProp);
     if (!source || !target) continue;
 
     const id = typeof idProp?.['const'] === 'string' ? idProp['const'] : `pattern-rel-${i}`;
-    const label = typeof descProp?.['const'] === 'string' ? descProp['const'] : 'connects';
-    out.push({ id, source, target, label, relType: 'connects' });
+    const label =
+      typeof descProp?.['const'] === 'string'
+        ? descProp['const']
+        : typeof protoProp?.['const'] === 'string'
+          ? protoProp['const']
+          : relType;
+    out.push({ id, source, target, label, relType });
   }
   return out;
 }
@@ -805,7 +863,12 @@ export function buildTimelapsePayloadFromTimelineFile(
 
   for (let i = 0; i < entries.length; i++) {
     const entry = entries[i];
-    const snapshotRel = entry.details?.['detailed-architecture'];
+    const snapshotRel = entry.details?.['detailed-architecture'] ?? entry.details?.['required-pattern'];
+    if (!snapshotRel) {
+      throw new Error(
+        `Moment '${entry['unique-id']}' in '${resolved}' is missing details.detailed-architecture or details.required-pattern.`,
+      );
+    }
     const snapshotPath = path.resolve(timelineDir, snapshotRel);
     const doc = JSON.parse(fs.readFileSync(snapshotPath, 'utf8')) as Record<string, unknown>;
     const delta = computeStructuralDelta(prevDoc, doc);

@@ -268,7 +268,6 @@ export function composeFederatedArchitecture(activeSources: ActiveSourceSnapshot
                 primarySourceLabel: src.sourceLabel,
                 sourceIds: [src.sourceId],
                 sourceLabels: [src.sourceLabel],
-                mergedViaDetailedArch: false,
                 ...(parentAnchorCanonicalId ? { resolvedFromParentId: parentAnchorCanonicalId } : {}),
             };
 
@@ -910,10 +909,10 @@ export function synchronizeSavedTimelines(timelineSpecs: string[]): {
         const descriptor = descriptors[sourceIdx];
 
         raw.moments.forEach((m, momentIdx) => {
-            const archRef = m.details?.['detailed-architecture']?.trim();
+            const archRef = (m.details?.['detailed-architecture'] ?? m.details?.['required-pattern'])?.trim();
             if (!archRef || /^https?:\/\//i.test(archRef)) {
                 throw new Error(
-                    `Moment '${m['unique-id']}' in '${descriptor.fileName}' must reference a local detailed-architecture snapshot.`,
+                    `Moment '${m['unique-id']}' in '${descriptor.fileName}' must reference a local detailed-architecture or required-pattern snapshot.`,
                 );
             }
             const snapAbs = path.resolve(baseDir, archRef);

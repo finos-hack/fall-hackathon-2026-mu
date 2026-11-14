@@ -17,7 +17,7 @@ export interface FederatedNodeProvenance {
     primarySourceLabel: string;
     sourceIds: string[];
     sourceLabels: string[];
-    mergedViaDetailedArch: boolean;
+    mergedViaDetailedArch?: boolean;
     resolvedFromParentId?: string;
 }
 
@@ -138,7 +138,8 @@ export interface GeneratedGitMoment {
     description: string;
     'valid-from': string;
     details: {
-        'detailed-architecture': string;
+        'detailed-architecture'?: string;
+        'required-pattern'?: string;
     };
     adrs?: string[];
     metadata?: Record<string, unknown>;

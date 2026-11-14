@@ -235,7 +235,8 @@ describe('multi-repository and multi-architecture federation', () => {
     expect(finalNodes).toHaveLength(5);
 
     for (const prov of Object.values(finalCluster.nodeProvenance ?? {})) {
-      expect(prov.mergedViaDetailedArch).toBe(false);
+      expect(prov.mergedViaDetailedArch).toBeUndefined();
+      expect('mergedViaDetailedArch' in prov).toBe(false);
       expect(prov.sourceIds).toHaveLength(1);
     }
   });
@@ -375,9 +376,7 @@ describe('multi-repository and multi-architecture federation', () => {
 
     // Unlinked peer repo's colliding ID stayed strictly isolated!
     expect(nodeIds).toContain('surveillance--shared-ledger-db');
-    expect(composed.nodeProvenance['surveillance--shared-ledger-db'].mergedViaDetailedArch).toBe(
-      false,
-    );
+    expect(composed.nodeProvenance['surveillance--shared-ledger-db'].mergedViaDetailedArch).toBeUndefined();
 
     // Parent node stripped its relative details.detailed-architecture pointer and received composed-of
     const parentNode = nodes.find((n) => n['unique-id'] === 'platform--clearing-hub')!;
