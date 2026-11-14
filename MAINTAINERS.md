@@ -6,6 +6,7 @@ This file lists the maintainers of this repository.
 
 | GitHub Username | Name | Organization | Email (Optional) |
 |----------------|------|--------------|-------|
+| [@aksharprabhudesai](https://github.com/aksharprabhudesai) | Akshar Prabhu Desai | Independent | |
 
 For information about maintainer responsibilities and resources, see the [FINOS Maintainers Cheatsheet](https://community.finos.org/docs/finos-maintainers-cheatsheet).
 
