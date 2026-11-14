@@ -122,4 +122,55 @@ describe('extractGitHistory and filterStructuralCommits', () => {
 
         expect(() => extractGitHistory(untracked)).toThrow(/No Git commit history found/);
     });
+
+    it('throws clear errors for nonexistent paths and non-git directories instead of spawnSync ENOENT', () => {
+        const missingOutsideRepo = path.join(tempDir, 'missing-dir', 'missing-subdir', 'arch.calm.json');
+        expect(() => extractGitHistory(missingOutsideRepo)).toThrow(/Path does not exist/);
+
+        const plainFile = path.join(tempDir, 'plain.json');
+        fs.writeFileSync(plainFile, '{}');
+        expect(() => extractGitHistory(plainFile)).toThrow(/Not inside a Git repository/);
+
+        const repoDir = path.join(tempDir, 'existing-repo');
+        fs.mkdirSync(repoDir, { recursive: true });
+        execFileSync('git', ['init'], { cwd: repoDir, stdio: 'ignore' });
+        execFileSync('git', ['config', 'user.email', 'dev@finos.org'], { cwd: repoDir, stdio: 'ignore' });
+        execFileSync('git', ['config', 'user.name', 'FINOS Dev'], { cwd: repoDir, stdio: 'ignore' });
+        fs.writeFileSync(path.join(repoDir, 'README.md'), 'init');
+        execFileSync('git', ['add', 'README.md'], { cwd: repoDir, stdio: 'ignore' });
+        execFileSync('git', ['commit', '-m', 'init'], { cwd: repoDir, stdio: 'ignore' });
+
+        const missingInRepo = path.join(repoDir, 'nonexistent-folder', 'arch.calm.json');
+        expect(() => extractGitHistory(missingInRepo)).toThrow(/Path does not exist/);
+    });
+
+    it('walks unlimited commits by default and forwards --first-parent when requested', () => {
+        const recordedCalls: string[][] = [];
+        const mockRunner = (args: string[]): string => {
+            recordedCalls.push(args);
+            if (args[0] === 'rev-parse') return tempDir;
+            if (args[0] === 'log') {
+                return '\x1e1111111111111111\x1f1111111\x1f2026-03-01\x1fDev\x1finit\x1f\x1f2026-03-01T00:00:00Z\x1darch.json\n';
+            }
+            if (args[0] === 'show' && args[1] === '--format=%x1e%H') {
+                return '\x1e1111111111111111\narch.json\n';
+            }
+            return JSON.stringify({ nodes: [{ 'unique-id': 'a', name: 'A', 'node-type': 'service' }], relationships: [] });
+        };
+
+        const dummyPath = path.join(tempDir, 'arch.json');
+        fs.writeFileSync(dummyPath, '{}');
+
+        extractGitHistory(dummyPath, { gitRunner: mockRunner });
+        const defaultLogCall = recordedCalls.find((c) => c[0] === 'log')!;
+        expect(defaultLogCall).not.toContain('-n');
+        expect(defaultLogCall).not.toContain('--first-parent');
+
+        recordedCalls.length = 0;
+        extractGitHistory(dummyPath, { gitRunner: mockRunner, firstParent: true, maxCommits: 50 });
+        const customLogCall = recordedCalls.find((c) => c[0] === 'log')!;
+        expect(customLogCall).toContain('--first-parent');
+        expect(customLogCall).toContain('-n');
+        expect(customLogCall).toContain('50');
+    });
 });

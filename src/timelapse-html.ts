@@ -697,13 +697,13 @@ export function computeSuperGraphLayout(
   }
 
   const colSpacing = 290;
-  const rowSpacing = 138;
-  const padX = 165;
-  const padY = 115;
+  const rowSpacing = 132;
+  const padX = 115;
+  const padY = 64;
 
   const maxRowsInAnyLayer = Math.max(1, ...finalColumns.map((col) => col.length));
-  const canvasWidth = Math.max(960, padX * 2 + Math.max(0, finalColumns.length - 1) * colSpacing);
-  const canvasHeight = Math.max(540, padY * 2 + Math.max(0, maxRowsInAnyLayer - 1) * rowSpacing);
+  const canvasWidth = Math.max(520, padX * 2 + Math.max(0, finalColumns.length - 1) * colSpacing);
+  const canvasHeight = Math.max(260, padY * 2 + Math.max(0, maxRowsInAnyLayer - 1) * rowSpacing);
 
   const positions: Record<string, PositionedNode> = {};
   finalColumns.forEach((list, colIdx) => {
@@ -849,6 +849,9 @@ export function buildTimelapsePayloadFromTimelineFile(
   timelineFilePath: string,
 ): TimelapsePayload {
   const resolved = path.resolve(timelineFilePath);
+  if (!fs.existsSync(resolved)) {
+    throw new Error(`Timeline file does not exist: "${timelineFilePath}"`);
+  }
   const raw = JSON.parse(fs.readFileSync(resolved, 'utf8')) as GeneratedGitTimeline;
   const timelineDir = path.dirname(resolved);
   const entries = Array.isArray(raw.moments) ? raw.moments : [];
@@ -1437,6 +1440,7 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
     }
     .node-group { transition: opacity 280ms ease, transform 280ms ease; cursor: pointer; }
     .edge-group { transition: opacity 280ms ease; }
+    #viewport-layer.smooth-cam { transition: transform 240ms ease-out; }
     .audit-banner {
       background: rgba(56, 189, 248, 0.12);
       border: 1px solid rgba(56, 189, 248, 0.4);
@@ -1462,11 +1466,23 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
     }
     .gov-section { margin-top: 8px; }
     .gov-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
-    @media (max-width: 980px) {
+    @media (max-width: 1180px) {
+      main {
+        grid-template-columns: minmax(0, 1fr) 310px;
+      }
+    }
+    @media (max-width: 900px) {
       body {
         height: auto;
         min-height: 100vh;
         overflow: auto;
+      }
+      header {
+        padding: 7px 12px;
+        gap: 8px;
+      }
+      #badge-keys, #badge-engine {
+        display: none !important;
       }
       main {
         grid-template-columns: 1fr;
@@ -1474,15 +1490,25 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
       }
       .stage {
         height: auto;
+        padding: 8px;
+        gap: 6px;
         overflow: visible;
       }
+      .stage-toolbar {
+        padding: 5px 8px;
+        gap: 6px;
+      }
+      .toolbar-sep {
+        display: none !important;
+      }
       .canvas-wrap {
-        height: 56vh;
+        height: clamp(340px, 62dvh, 540px);
         min-height: 320px;
         flex: none;
       }
       .controls {
         flex-wrap: wrap;
+        padding: 6px 10px;
       }
       .canvas-hint, .scrubber-label {
         display: none;
@@ -1695,7 +1721,7 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
     }
     .feed-svg-wrap {
       width: 100%;
-      height: 300px;
+      height: clamp(220px, 42vw, 310px);
       position: relative;
       cursor: pointer;
     }
@@ -2030,9 +2056,13 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
       let timer = null;
       let focusedNodeId = '';
       let selectedProjectId = '';
+      let viewW = canvasWidth;
+      let viewH = canvasHeight;
       let zoomScale = 1;
       let panX = 0;
       let panY = 0;
+      let autoFit = true;
+      let hasInitialFit = false;
       let isPanning = false;
       let dragStartX = 0;
       let dragStartY = 0;
@@ -2049,29 +2079,106 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
         return nodeOrPos.sourceId === selectedProjectId;
       }
 
-      function applyTransform() {
+      function syncSvgViewBox() {
+        if (!canvasWrap || typeof canvasWrap.getBoundingClientRect !== 'function') return;
+        const rect = canvasWrap.getBoundingClientRect();
+        if (rect && rect.width >= 120 && rect.height >= 120) {
+          viewW = Math.round(rect.width);
+          viewH = Math.round(rect.height);
+          svgGraph.setAttribute('viewBox', '0 0 ' + viewW + ' ' + viewH);
+        }
+      }
+
+      function applyTransform(animate) {
+        if (viewportLayer && viewportLayer.classList) {
+          viewportLayer.classList.toggle('smooth-cam', Boolean(animate));
+        }
         viewportLayer.setAttribute(
           'transform',
           'translate(' + panX.toFixed(2) + ',' + panY.toFixed(2) + ') scale(' + zoomScale.toFixed(4) + ')',
         );
       }
 
+      function computeActiveFrameBounds() {
+        const frame = frames[currentIndex];
+        const isolateMode = Boolean(focusIsolate && focusIsolate.checked);
+        const ids = [];
+        if (frame) {
+          const neighborhood = new Set();
+          if (focusedNodeId) {
+            neighborhood.add(focusedNodeId);
+            for (const edge of frame.edges || []) {
+              if (edge.source === focusedNodeId) neighborhood.add(edge.target);
+              if (edge.target === focusedNodeId) neighborhood.add(edge.source);
+            }
+          }
+          const candidateIds = new Set([
+            ...(frame.nodes || []).map((n) => n.id),
+            ...(frame.removedNodeIds || []),
+          ]);
+          for (const id of candidateIds) {
+            const p = positions[id];
+            if (!p) continue;
+            if (focusedNodeId && isolateMode && !neighborhood.has(id)) continue;
+            if (selectedProjectId && !nodeMatchesProject(p)) continue;
+            ids.push(id);
+          }
+        }
+        const useIds = ids.length > 0 ? ids : Object.keys(positions);
+        let minX = Infinity;
+        let minY = Infinity;
+        let maxX = -Infinity;
+        let maxY = -Infinity;
+        for (const id of useIds) {
+          const p = positions[id];
+          if (!p) continue;
+          if (p.x - 94 < minX) minX = p.x - 94;
+          if (p.y - 46 < minY) minY = p.y - 46;
+          if (p.x + 94 > maxX) maxX = p.x + 94;
+          if (p.y + 40 > maxY) maxY = p.y + 40;
+        }
+        if (!Number.isFinite(minX)) {
+          return { minX: 0, minY: 0, maxX: canvasWidth, maxY: canvasHeight };
+        }
+        return { minX, minY, maxX, maxY };
+      }
+
+      function fitCurrentFrame(animate) {
+        syncSvgViewBox();
+        const bounds = computeActiveFrameBounds();
+        const padX = Math.min(28, Math.round(viewW * 0.045));
+        const padTop = Math.min(48, Math.max(36, Math.round(viewH * 0.09)));
+        const padBottom = Math.min(44, Math.max(24, Math.round(viewH * 0.07)));
+        const availW = Math.max(100, viewW - padX * 2);
+        const availH = Math.max(100, viewH - padTop - padBottom);
+        const bw = Math.max(200, bounds.maxX - bounds.minX);
+        const bh = Math.max(96, bounds.maxY - bounds.minY);
+        const scale = Math.max(0.28, Math.min(availW / bw, availH / bh, 1.32));
+        const cx = (bounds.minX + bounds.maxX) / 2;
+        const cy = (bounds.minY + bounds.maxY) / 2;
+        zoomScale = scale;
+        panX = viewW / 2 - cx * scale;
+        panY = padTop + availH / 2 - cy * scale;
+        applyTransform(animate && hasInitialFit);
+        hasInitialFit = true;
+      }
+
       function setZoom(nextScale, anchorX, anchorY) {
-        const clamped = Math.max(0.4, Math.min(2.8, nextScale));
-        const ax = anchorX !== undefined ? anchorX : canvasWidth / 2;
-        const ay = anchorY !== undefined ? anchorY : canvasHeight / 2;
+        autoFit = false;
+        syncSvgViewBox();
+        const clamped = Math.max(0.25, Math.min(3.2, nextScale));
+        const ax = anchorX !== undefined ? anchorX : viewW / 2;
+        const ay = anchorY !== undefined ? anchorY : viewH / 2;
         const ratio = clamped / zoomScale;
         panX = ax - (ax - panX) * ratio;
         panY = ay - (ay - panY) * ratio;
         zoomScale = clamped;
-        applyTransform();
+        applyTransform(false);
       }
 
       function resetZoom() {
-        zoomScale = 1;
-        panX = 0;
-        panY = 0;
-        applyTransform();
+        autoFit = true;
+        fitCurrentFrame(true);
       }
 
       Object.values(positions)
@@ -2416,6 +2523,10 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
           },
         });
 
+        if (autoFit) {
+          fitCurrentFrame(true);
+        }
+
         changeList.innerHTML = '';
         if (liveDiff && compareBase) {
           const bannerLi = document.createElement('li');
@@ -2527,8 +2638,8 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
           }
         }
         const rect = svgGraph.getBoundingClientRect();
-        const scaleX = canvasWidth / (rect.width || 1);
-        const scaleY = canvasHeight / (rect.height || 1);
+        const scaleX = viewW / (rect.width || 1);
+        const scaleY = viewH / (rect.height || 1);
         return {
           x: (clientX - rect.left) * scaleX,
           y: (clientY - rect.top) * scaleY,
@@ -2550,6 +2661,7 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
           return;
         }
         isPanning = true;
+        autoFit = false;
         dragStartX = e.clientX;
         dragStartY = e.clientY;
         panStartX = panX;
@@ -2564,7 +2676,7 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
         const dy = e.clientY - dragStartY;
         panX = panStartX + dx * pt.scaleX;
         panY = panStartY + dy * pt.scaleY;
-        applyTransform();
+        applyTransform(false);
       });
 
       window.addEventListener('mouseup', () => {
@@ -2574,10 +2686,12 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
       });
 
       btnZoomIn.addEventListener('click', () => {
-        setZoom(zoomScale * 1.2, canvasWidth / 2, canvasHeight / 2);
+        syncSvgViewBox();
+        setZoom(zoomScale * 1.2, viewW / 2, viewH / 2);
       });
       btnZoomOut.addEventListener('click', () => {
-        setZoom(zoomScale / 1.2, canvasWidth / 2, canvasHeight / 2);
+        syncSvgViewBox();
+        setZoom(zoomScale / 1.2, viewW / 2, viewH / 2);
       });
       btnZoomFit.addEventListener('click', () => {
         resetZoom();
@@ -2968,12 +3082,12 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
         if (!Number.isFinite(minX)) {
           minX = 0; minY = 0; maxX = canvasWidth; maxY = canvasHeight;
         }
-        const padX = 135;
-        const padY = 72;
+        const padX = 108;
+        const padY = 52;
         const rawW = (maxX - minX) + padX * 2;
         const rawH = (maxY - minY) + padY * 2;
-        const vbW = Math.max(580, rawW);
-        const vbH = Math.max(240, rawH);
+        const vbW = Math.max(380, rawW);
+        const vbH = Math.max(175, rawH);
         const cx = (minX + maxX) / 2;
         const cy = (minY + maxY) / 2;
         const vbX = Math.round(cx - vbW / 2);
@@ -3346,6 +3460,8 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
 
         if (isFeed) {
           renderFeed();
+        } else if (autoFit) {
+          fitCurrentFrame(false);
         }
         if (updateHash && window.history && window.history.replaceState) {
           const base = window.location.pathname + window.location.search;
@@ -3404,6 +3520,21 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
           renderFrame(currentIndex + 1);
         }
       });
+
+      const handleViewportResize = () => {
+        if (currentViewMode !== 'stage') return;
+        syncSvgViewBox();
+        if (autoFit) {
+          fitCurrentFrame(false);
+        } else {
+          applyTransform(false);
+        }
+      };
+      window.addEventListener('resize', handleViewportResize);
+      if (typeof ResizeObserver === 'function' && canvasWrap) {
+        const ro = new ResizeObserver(() => handleViewportResize());
+        ro.observe(canvasWrap);
+      }
 
       renderFrame(0);
       const urlWantsFeed =

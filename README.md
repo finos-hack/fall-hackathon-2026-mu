@@ -131,6 +131,7 @@ node dist/cli.js \
 |---|---|
 | `--from-git <files...>` | Extract and synchronize one or more Git-tracked CALM files (supports `Label=path`) |
 | `--resolve-details` | Auto-discover and synchronize same-repo `details.detailed-architecture` child files |
+| `--max-commits <n>` / `--first-parent` | Optional commit cap (unlimited by default) and optional first-parent mainline walk |
 | `--timeline <files...>` | Validate or synchronize one or more existing `calm-timeline` JSON files |
 | `--emit-digest <file>` / `--clusters <file>` | Export deterministic diff digests and apply validated `0..N-1` phase clusters |
 | `--timelapse [html]` / `--feed` | Render standalone HTML/SVG player (pass `--feed` to open in Architecture Feed mode by default) |
@@ -147,8 +148,8 @@ node dist/cli.js \
 
 ### Known Limitations
 
-- **File renames with heavy rewrites:** Uses `git log --first-parent --follow -M30%`; simple moves are tracked across paths, but a file move combined with a rewrite that leaves under 30% similarity stops rename tracking at that commit.
-- **Mainline merge traversal:** `--first-parent` walks mainline history chronologically and summarizes merged feature branches at their merge commit rather than expanding side-branch commits individually.
+- **File renames with heavy rewrites:** Uses `git log --follow -M30%` by default (with unlimited commit depth unless `--max-commits <n>` is passed); simple moves are tracked across paths, but a file move combined with a rewrite that leaves under 30% similarity stops rename tracking at that commit.
+- **Branch merge traversal:** Walks full commit history touching the file by default so feature-branch commits merged via pull requests retain their granular subjects; pass `--first-parent` to summarize merged branches at their mainline merge commit instead.
 - **Remote HTTP `detailed-architecture` URLs:** Local relative paths and co-supplied `--from-git` files are resolved offline; remote `https://` `detailed-architecture` URLs are intentionally not fetched to preserve the zero-network guarantee.
 - **Invalid historical JSON commits:** Commits where the CALM file failed `JSON.parse` are skipped safely and tallied in digest `stats` rather than halting extraction.
 
