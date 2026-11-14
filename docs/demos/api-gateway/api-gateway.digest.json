@@ -1,0 +1,260 @@
+{
+  "schemaVersion": "1.0",
+  "sourceFile": "api-gateway.json",
+  "latestCommitDate": "2026-10-25",
+  "stats": {
+    "totalCommitsScanned": 23,
+    "validSnapshotsParsed": 23,
+    "noiseCommitsFiltered": 9,
+    "structuralCommitsRetained": 14
+  },
+  "instructions": [
+    "Group the 14 structural commits below (indices 0..13) into cohesive architectural moments (phases).",
+    "Every commit index from 0 to 13 MUST be covered contiguously with zero gaps or overlaps: first startIndex=0, each next startIndex = previous endIndex + 1, final endIndex=13.",
+    "Group multi-commit sprints, node-addition + relationship-wiring sequences, protocol hardening, and coupled control/ADR rollouts into unified phases while keeping pivotal milestones distinct.",
+    "Write an executive `name` (3-7 words; no leading step numbers and no conventional-commit prefixes such as \"feat:\" or \"chore:\").",
+    "Write a 2-3 sentence narrative `description` explaining WHAT changed architecturally, HOW connectivity or security boundaries shifted, and WHY, citing concrete node IDs, protocols, controls, or ADRs. Do not output mechanical count strings such as \"+1 node(s)\".",
+    "Save the resulting JSON array to a `<name>.clusters.json` file and pass `--clusters <name>.clusters.json` back to `calm-timelapse`."
+  ],
+  "expectedClusterSchema": {
+    "type": "array",
+    "items": {
+      "type": "object",
+      "required": [
+        "startIndex",
+        "endIndex",
+        "uniqueId",
+        "name",
+        "description"
+      ],
+      "properties": {
+        "startIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 13
+        },
+        "endIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 13
+        },
+        "uniqueId": {
+          "type": "string",
+          "description": "kebab-case moment identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "Executive phase title (3-7 words)"
+        },
+        "description": {
+          "type": "string",
+          "description": "2-3 sentence architectural narrative"
+        }
+      }
+    }
+  },
+  "commits": [
+    {
+      "index": 0,
+      "sha": "3ace47c9b8866bd057079a7d5dda0570ec6f8c08",
+      "shortSha": "3ace47c9",
+      "date": "2024-02-21",
+      "author": "Matthew Bain",
+      "subject": "Major refactor - migrating CALM to a specific JSON vocabulary (#15)",
+      "summaryLine": "Initial baseline with 0 node(s), 0 relationship(s)",
+      "changes": [],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 1,
+      "sha": "0cf6064183856a92b60f0cc1ec2824e431aee309",
+      "shortSha": "0cf60641",
+      "date": "2024-03-26",
+      "author": "Luigi Bulanti",
+      "subject": "#74 - Updating the api-gateway.json pattern to use prefixItems (#79)",
+      "summaryLine": "+4 node(s), +3 rel(s)",
+      "changes": [
+        "Added node API Gateway (api-gateway)",
+        "Added node Python Based API Consumer (api-consumer)",
+        "Added node Java Based API Producer (api-producer)",
+        "Added node Identity Provider (idp)",
+        "Added relationship api-consumer-api-gateway",
+        "Added relationship api-gateway-idp",
+        "Added relationship api-gateway-api-producer"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 2,
+      "sha": "ba39ab4760bf7b9dc3112a4612b69550b0dac582",
+      "shortSha": "ba39ab47",
+      "date": "2024-04-02",
+      "author": "Will Osborne",
+      "subject": "Pattern flag and fixing api-gateway pattern sample (#91)",
+      "summaryLine": "~4 node(s)",
+      "changes": [
+        "Modified node API Gateway (api-gateway) [node-type]",
+        "Modified node Python Based API Consumer (api-consumer) [node-type]",
+        "Modified node Java Based API Producer (api-producer) [node-type]",
+        "Modified node Identity Provider (idp) [node-type]"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 3,
+      "sha": "a1c8e5803296b30f39fc31269b74316b6e12f019",
+      "shortSha": "a1c8e580",
+      "date": "2024-04-03",
+      "author": "jpgough-ms",
+      "subject": "Update API Gateway Pattern to Add Interface (#109)",
+      "summaryLine": "~2 node(s), ~2 rel(s)",
+      "changes": [
+        "Modified node API Gateway (api-gateway) [interfaces]",
+        "Modified node Java Based API Producer (api-producer) [interfaces]",
+        "Modified relationship api-consumer-api-gateway",
+        "Modified relationship api-gateway-api-producer"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 4,
+      "sha": "90121e0aef9373bb8fc0ff91261d11781870498d",
+      "shortSha": "90121e0a",
+      "date": "2024-04-03",
+      "author": "Will Osborne",
+      "subject": "Lint and insert missing properties block",
+      "summaryLine": "~1 node(s)",
+      "changes": [
+        "Modified node Java Based API Producer (api-producer) [interfaces]"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 5,
+      "sha": "08fee19541e24665cfd6a2b8766797c0a972145a",
+      "shortSha": "08fee195",
+      "date": "2024-04-19",
+      "author": "Aidan McPhelim",
+      "subject": "#100 visualizer works with patterns",
+      "summaryLine": "~1 rel(s)",
+      "changes": [
+        "Modified relationship api-gateway-idp"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 6,
+      "sha": "a4de5e95eaa5e35a64ca0509261b1a72fae6833a",
+      "shortSha": "a4de5e95",
+      "date": "2024-04-24",
+      "author": "Will Osborne",
+      "subject": "Update spectral rules to use new interface format",
+      "summaryLine": "~2 rel(s)",
+      "changes": [
+        "Modified relationship api-consumer-api-gateway",
+        "Modified relationship api-gateway-api-producer"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 7,
+      "sha": "97ae376f2cecb9d1562a915542d6734f44287c16",
+      "shortSha": "97ae376f",
+      "date": "2024-05-20",
+      "author": "Juan Estrella",
+      "subject": "replace finos-labs with finos (#195)",
+      "summaryLine": "~2 node(s)",
+      "changes": [
+        "Modified node API Gateway (api-gateway) [interfaces]",
+        "Modified node Java Based API Producer (api-producer) [interfaces]"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 8,
+      "sha": "f7f7ee7ba503c21e573695100e3e95b0fa6b0472",
+      "shortSha": "f7f7ee7b",
+      "date": "2024-06-10",
+      "author": "Aidan McPhelim",
+      "subject": "Visualizer improvments (#278)",
+      "summaryLine": "~2 node(s), +1 rel(s), ~3 rel(s)",
+      "changes": [
+        "Modified node API Consumer (api-consumer) [name]",
+        "Modified node API Producer (api-producer) [name]",
+        "Added relationship api-consumer-idp",
+        "Modified relationship api-consumer-api-gateway",
+        "Modified relationship api-gateway-idp",
+        "Modified relationship api-gateway-api-producer"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 9,
+      "sha": "7e2a71785057a09bd693c1d191a777554f7e96b0",
+      "shortSha": "7e2a7178",
+      "date": "2024-12-20",
+      "author": "Thels",
+      "subject": "#446 - Upgrade CLI to 2024-10. (#696)",
+      "summaryLine": "~2 node(s)",
+      "changes": [
+        "Modified node API Gateway (api-gateway) [interfaces]",
+        "Modified node API Producer (api-producer) [interfaces]"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 10,
+      "sha": "fd445f234be7f0e481bf6924b3f59adf67a91ec0",
+      "shortSha": "fd445f23",
+      "date": "2025-03-30",
+      "author": "LeighF",
+      "subject": "Ensure SchemaDirectory works with latest CALM draft",
+      "summaryLine": "~2 node(s)",
+      "changes": [
+        "Modified node API Gateway (api-gateway) [interfaces]",
+        "Modified node API Producer (api-producer) [interfaces]"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 11,
+      "sha": "619f45a18acb24579e5698979075d8ca52343232",
+      "shortSha": "619f45a1",
+      "date": "2025-06-05",
+      "author": "LeighF",
+      "subject": "Update endpoints and test files related to validate/generate endpoints to use release RC-1 candidate schema (finos#1284)",
+      "summaryLine": "~2 node(s)",
+      "changes": [
+        "Modified node API Gateway (api-gateway) [interfaces]",
+        "Modified node API Producer (api-producer) [interfaces]"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 12,
+      "sha": "6d4976fe5fdcf1459eacf36d1c884d01cb001cbd",
+      "shortSha": "6d4976fe",
+      "date": "2026-02-01",
+      "author": "Mark Scott",
+      "subject": "fix(cli): fix test pattern to consistent use a single schema version",
+      "summaryLine": "~1 node(s)",
+      "changes": [
+        "Modified node API Producer (api-producer) [interfaces]"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 13,
+      "sha": "472e5e340465ad0c806a39d2f8e923ec025c253c",
+      "shortSha": "472e5e34",
+      "date": "2026-10-25",
+      "author": "Matthew Bain",
+      "subject": "feat(calm-server): stop bundling the CALM 1.0 release candidates and the 2025-03 draft",
+      "summaryLine": "~1 node(s)",
+      "changes": [
+        "Modified node API Gateway (api-gateway) [interfaces]"
+      ],
+      "coChangedAdrs": []
+    }
+  ]
+}

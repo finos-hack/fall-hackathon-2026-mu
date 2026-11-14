@@ -1,0 +1,253 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm-timeline.json",
+  "moments": [
+    {
+      "unique-id": "legacy-monolith-baseline",
+      "node-type": "moment",
+      "name": "Legacy Monolithic Order Desk Baseline",
+      "description": "Captures the initial TraderX equities desk where traderx-web posts orders over plain HTTP directly into monolith-order-svc backed by oracle-trades-db without gateway isolation or transport encryption.",
+      "valid-from": "2025-01-06",
+      "details": {
+        "detailed-architecture": "snapshots/01-e1be461-legacy-monolith-baseline.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "e1be461"
+        ],
+        "commit-messages": [
+          "feat(arch): capture initial TraderX legacy order desk baseline"
+        ],
+        "commit-count": 1
+      }
+    },
+    {
+      "unique-id": "zero-trust-gateway-and-oidc",
+      "node-type": "moment",
+      "name": "Zero-Trust API Gateway & OIDC Enforcement",
+      "description": "Introduces edge-api-gateway and ping-oidc-idp per ADR-001, severing direct browser-to-monolith access, enforcing PKCE token introspection, and mandating the mtls-everywhere control on internal hops.",
+      "valid-from": "2025-01-22",
+      "details": {
+        "detailed-architecture": "snapshots/02-53fa856-zero-trust-gateway-and-oidc.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "0f98089",
+          "f9a2a6f",
+          "1af0200",
+          "53fa856"
+        ],
+        "commit-messages": [
+          "feat(security): introduce edge API gateway and OIDC identity provider",
+          "refactor(ingress): route traderx-web traffic exclusively through edge-api-gateway",
+          "feat(auth): wire OIDC PKCE and JWKS validation links",
+          "feat(controls): upgrade east-west gateway hop to mTLS and enforce mtls-everywhere"
+        ],
+        "commit-count": 4
+      },
+      "adrs": [
+        "docs/adr/ADR-001-zero-trust-api-gateway.md"
+      ]
+    },
+    {
+      "unique-id": "kafka-backbone-and-order-router",
+      "node-type": "moment",
+      "name": "Order Router Extraction & Kafka Backbone",
+      "description": "Extracts stateless order-router-svc ahead of kafka-event-bus per ADR-002 and defines order-submission-flow so ingress order capture decouples cleanly from downstream trade booking.",
+      "valid-from": "2025-02-14",
+      "details": {
+        "detailed-architecture": "snapshots/03-55c7c93-kafka-backbone-and-order-router.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "72452dd",
+          "0e07245",
+          "5adcc62",
+          "55c7c93"
+        ],
+        "commit-messages": [
+          "feat(messaging): provision Kafka order event backbone",
+          "feat(routing): extract stateless order-router-svc behind API gateway",
+          "feat(routing): stream router events through kafka-event-bus into monolith consumer",
+          "feat(flows): codify order-submission-flow across ingress pipeline"
+        ],
+        "commit-count": 4
+      },
+      "adrs": [
+        "docs/adr/ADR-002-kafka-event-backbone.md"
+      ]
+    },
+    {
+      "unique-id": "pretrade-risk-and-position-cache",
+      "node-type": "moment",
+      "name": "Pre-Trade Risk Circuit Breaker & Cache",
+      "description": "Deploys pretrade-risk-svc backed by redis-position-cache per ADR-003, gating order-router-svc over synchronous gRPC/mTLS credit and fat-finger checks before orders reach kafka-event-bus.",
+      "valid-from": "2025-03-14",
+      "details": {
+        "detailed-architecture": "snapshots/04-726ca5d-pretrade-risk-and-position-cache.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "c152dc1",
+          "cc7f9f8",
+          "9f43d64",
+          "726ca5d"
+        ],
+        "commit-messages": [
+          "feat(risk): add SEC 15c3-5 pretrade-risk-svc node",
+          "feat(risk): back pretrade-risk-svc with redis-position-cache",
+          "feat(risk): wire synchronous gRPC/mTLS pre-trade risk gate from order-router-svc",
+          "feat(flows): insert pre-trade risk verification steps into order-submission-flow"
+        ],
+        "commit-count": 4
+      },
+      "adrs": [
+        "docs/adr/ADR-003-pretrade-risk-circuit-breaker.md"
+      ]
+    },
+    {
+      "unique-id": "fix-venue-connectivity-and-market-data",
+      "node-type": "moment",
+      "name": "FIX Venue Execution & Live Market Data",
+      "description": "Adds fix-execution-gateway connected to external-liquidity-venue over FIX-4.4/TLS alongside market-data-feed and execution-fill-flow for real-time mark-to-market exposure and drop-copy fills.",
+      "valid-from": "2025-04-14",
+      "details": {
+        "detailed-architecture": "snapshots/05-e78c782-fix-venue-connectivity-and-market-data.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "9836851",
+          "5b2d103",
+          "d3aa2b8",
+          "4729bf6",
+          "e78c782"
+        ],
+        "commit-messages": [
+          "feat(execution): introduce fix-execution-gateway and external-liquidity-venue",
+          "feat(execution): connect Kafka approved order topic through FIX gateway to venue",
+          "feat(marketdata): wire live NBBO market-data-feed into risk and position cache",
+          "feat(execution): publish venue ExecutionReports to Kafka and add execution-fill-flow",
+          "feat(execution): expose dedicated fix-dropcopy-session interface on FIX gateway"
+        ],
+        "commit-count": 5
+      }
+    },
+    {
+      "unique-id": "monolith-retirement-and-clearing-split",
+      "node-type": "moment",
+      "name": "Legacy Monolith Retirement & Clearing Split",
+      "description": "Migrates trade persistence and clearing to trade-ledger-svc, settlement-clearing-svc, and postgres-trades-db over TLS, permanently decommissioning monolith-order-svc and oracle-trades-db.",
+      "valid-from": "2025-05-09",
+      "details": {
+        "detailed-architecture": "snapshots/06-78f7649-monolith-retirement-and-clearing-split.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "51991fd",
+          "e475f2a",
+          "215fd12",
+          "78f7649"
+        ],
+        "commit-messages": [
+          "feat(ledger): deploy trade-ledger-svc and postgres-trades-db alongside legacy monolith",
+          "feat(ledger): wire Kafka fill consumer through trade-ledger-svc to PostgreSQL",
+          "feat(clearing): add T+1 settlement-clearing-svc backed by PostgreSQL trade store",
+          "refactor(decommission): retire legacy monolith-order-svc and oracle-trades-db"
+        ],
+        "commit-count": 4
+      }
+    },
+    {
+      "unique-id": "sec-17a4-immutable-worm-archive",
+      "node-type": "moment",
+      "name": "SEC 17a-4 Immutable WORM Audit Archive",
+      "description": "Streams Kafka execution events through worm-audit-archiver into s3-object-lock-vault per ADR-004, binding the sec-17a4-worm retention control and exposing audit verification to compliance-officer.",
+      "valid-from": "2025-06-06",
+      "details": {
+        "detailed-architecture": "snapshots/07-12a9d75-sec-17a4-immutable-worm-archive.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "94f7e9f",
+          "7456e8d",
+          "e833512",
+          "12a9d75"
+        ],
+        "commit-messages": [
+          "feat(compliance): introduce worm-audit-archiver and s3-object-lock-vault",
+          "feat(compliance): stream Kafka lifecycle events into WORM Object-Lock vault",
+          "feat(controls): bind sec-17a4-worm 7-year compliance retention control",
+          "feat(compliance): model compliance-officer supervisory access to worm-audit-archiver"
+        ],
+        "commit-count": 4
+      },
+      "adrs": [
+        "docs/adr/ADR-004-sec-17a4-worm-ledger.md"
+      ]
+    },
+    {
+      "unique-id": "dora-multi-region-resilience",
+      "node-type": "moment",
+      "name": "DORA Multi-Region Failover & Telemetry",
+      "description": "Adds dr-standby-cluster replication and otel-observability-hub distributed tracing per ADR-005, codifying operational failover readiness under the dora-ict-resilience control.",
+      "valid-from": "2025-07-07",
+      "details": {
+        "detailed-architecture": "snapshots/08-a664e44-dora-multi-region-resilience.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "649ed2c",
+          "e6007fe",
+          "6c169fe",
+          "a664e44"
+        ],
+        "commit-messages": [
+          "feat(resilience): add otel-observability-hub and dr-standby-cluster",
+          "feat(resilience): enable cross-region WAL and Kafka replication to dr-standby-cluster",
+          "feat(observability): stream OTLP telemetry from router, risk, and FIX gateway",
+          "feat(controls): add dora-ict-resilience control for multi-region failover readiness"
+        ],
+        "commit-count": 4
+      },
+      "adrs": [
+        "docs/adr/ADR-005-dora-multi-region-failover.md"
+      ]
+    },
+    {
+      "unique-id": "finra-cat-regulatory-reporting",
+      "node-type": "moment",
+      "name": "FINRA CAT T+1 Regulatory Reporting Pipeline",
+      "description": "Launches cat-regulatory-reporter reconciled against s3-object-lock-vault and trade-ledger-svc to transmit SFTP/mTLS reports to finra-cat-portal under regulatory-cat-submission-flow and finra-cat-sla.",
+      "valid-from": "2025-08-22",
+      "details": {
+        "detailed-architecture": "snapshots/09-1e91d00-finra-cat-regulatory-reporting.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "fe21641",
+          "0851a1b",
+          "bae4c85",
+          "dfccbd1",
+          "1e91d00"
+        ],
+        "commit-messages": [
+          "feat(cat): introduce cat-regulatory-reporter and external finra-cat-portal",
+          "feat(cat): reconcile cat-regulatory-reporter against WORM vault and trade ledger",
+          "feat(cat): wire SFTP/mTLS submission channel to finra-cat-portal",
+          "feat(flows): define regulatory-cat-submission-flow across WORM, ledger, and FINRA CAT",
+          "feat(controls): enforce finra-cat-sla T+1 08:00 ET reporting control"
+        ],
+        "commit-count": 5
+      }
+    }
+  ],
+  "metadata": {
+    "title": "Git Architecture Timeline — traderx.calm.json",
+    "description": "Automatically synthesized from Git commit history of traderx.calm.json",
+    "generator": "calm-timelapse",
+    "clustering-engine": "clusters-file",
+    "total-commits-scanned": "40",
+    "noise-commits-filtered": "5",
+    "structural-commits-retained": "35"
+  },
+  "current-moment": "finra-cat-regulatory-reporting"
+}

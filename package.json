@@ -17,7 +17,8 @@
     "build": "tsup src/index.ts src/cli.ts --format esm --dts --clean",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "demo:traderx": "bash scripts/seed-traderx-demo.sh"
   },
   "keywords": [
     "finos",

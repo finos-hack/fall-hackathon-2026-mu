@@ -1,0 +1,245 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm.json",
+  "nodes": [
+    {
+      "unique-id": "trader-actor",
+      "node-type": "actor",
+      "name": "Institutional Equity Trader",
+      "description": "Executes equity block and algorithmic orders through TraderX Workstation."
+    },
+    {
+      "unique-id": "traderx-web",
+      "node-type": "webclient",
+      "name": "TraderX Blotter Web UI",
+      "description": "Browser order blotter for institutional equity trading desks."
+    },
+    {
+      "unique-id": "monolith-order-svc",
+      "node-type": "service",
+      "name": "Legacy Order Monolith",
+      "description": "Java EE monolithic order capture, booking, and position engine.",
+      "interfaces": [
+        {
+          "unique-id": "monolith-http",
+          "host": "monolith.internal",
+          "port": 8080
+        }
+      ]
+    },
+    {
+      "unique-id": "oracle-trades-db",
+      "node-type": "database",
+      "name": "Legacy Oracle Trades DB",
+      "description": "Single-region relational store holding orders, fills, and EOD blotters."
+    },
+    {
+      "unique-id": "edge-api-gateway",
+      "node-type": "network",
+      "name": "Zero-Trust Edge API Gateway",
+      "description": "Envoy-based ingress gateway terminating TLS 1.3 and enforcing OIDC bearer tokens.",
+      "interfaces": [
+        {
+          "unique-id": "gateway-https",
+          "host": "api.traderx.internal",
+          "port": 443
+        }
+      ]
+    },
+    {
+      "unique-id": "ping-oidc-idp",
+      "node-type": "system",
+      "name": "Enterprise OIDC Identity Provider",
+      "description": "Issues short-lived FAPI-compliant OAuth 2.1 / OIDC tokens for trading desks."
+    },
+    {
+      "unique-id": "kafka-event-bus",
+      "node-type": "queue",
+      "name": "Kafka Order Event Backbone",
+      "description": "Partitioned low-latency event log carrying order commands, risk approvals, and execution fills."
+    },
+    {
+      "unique-id": "order-router-svc",
+      "node-type": "service",
+      "name": "Stateless Order Router",
+      "description": "Validates FIX/REST order payloads, assigns clOrdId, and orchestrates routing.",
+      "interfaces": [
+        {
+          "unique-id": "router-grpc",
+          "host": "order-router.internal",
+          "port": 9443
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "trader-uses-web",
+      "description": "Trader submits and monitors orders via web blotter.",
+      "relationship-type": {
+        "interacts": {
+          "actor": "trader-actor",
+          "nodes": [
+            "traderx-web"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "monolith-to-oracle",
+      "description": "Monolith persists orders and fills in Oracle.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "monolith-order-svc"
+          },
+          "destination": {
+            "node": "oracle-trades-db"
+          }
+        }
+      },
+      "protocol": "JDBC"
+    },
+    {
+      "unique-id": "web-to-gateway",
+      "description": "Web blotter sends authenticated order requests over HTTPS.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "traderx-web"
+          },
+          "destination": {
+            "node": "edge-api-gateway",
+            "interfaces": [
+              "gateway-https"
+            ]
+          }
+        }
+      },
+      "protocol": "HTTPS"
+    },
+    {
+      "unique-id": "web-to-oidc",
+      "description": "Web blotter performs OAuth 2.1 PKCE login handshake.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "traderx-web"
+          },
+          "destination": {
+            "node": "ping-oidc-idp"
+          }
+        }
+      },
+      "protocol": "HTTPS"
+    },
+    {
+      "unique-id": "gateway-to-oidc",
+      "description": "Gateway validates JWT signatures via OIDC JWKS endpoint.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "edge-api-gateway"
+          },
+          "destination": {
+            "node": "ping-oidc-idp"
+          }
+        }
+      },
+      "protocol": "HTTPS"
+    },
+    {
+      "unique-id": "gateway-to-router",
+      "description": "Gateway dispatches validated client orders to stateless router over mTLS.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "edge-api-gateway"
+          },
+          "destination": {
+            "node": "order-router-svc",
+            "interfaces": [
+              "router-grpc"
+            ]
+          }
+        }
+      },
+      "protocol": "mTLS"
+    },
+    {
+      "unique-id": "router-to-kafka",
+      "description": "Order router publishes normalized OrderSubmitted events.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "order-router-svc"
+          },
+          "destination": {
+            "node": "kafka-event-bus"
+          }
+        }
+      },
+      "protocol": "AMQP"
+    },
+    {
+      "unique-id": "kafka-to-monolith",
+      "description": "Legacy monolith consumes order events during strangler migration.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "kafka-event-bus"
+          },
+          "destination": {
+            "node": "monolith-order-svc"
+          }
+        }
+      },
+      "protocol": "AMQP"
+    }
+  ],
+  "controls": {
+    "mtls-everywhere": {
+      "description": "Requires SPIFFE/SPIRE mTLS certificates across internal service-to-service trading hops.",
+      "requirements": [
+        {
+          "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+          "config": {
+            "control-id": "mtls-everywhere",
+            "name": "East-West Mutual TLS Enforcement",
+            "description": "Requires SPIFFE/SPIRE mTLS certificates across internal service-to-service trading hops.",
+            "tlsVersion": "1.3",
+            "identityFramework": "SPIFFE"
+          }
+        }
+      ]
+    }
+  },
+  "flows": [
+    {
+      "unique-id": "order-submission-flow",
+      "name": "Client Order Submission Flow",
+      "description": "End-to-end ingress path from trader workstation blotter into the Kafka order event log.",
+      "transitions": [
+        {
+          "relationship-unique-id": "trader-uses-web",
+          "sequence-number": 1,
+          "description": "Trader stages equity order ticket in blotter."
+        },
+        {
+          "relationship-unique-id": "web-to-gateway",
+          "sequence-number": 2,
+          "description": "Blotter submits bearer-authenticated HTTPS order."
+        },
+        {
+          "relationship-unique-id": "gateway-to-router",
+          "sequence-number": 3,
+          "description": "Gateway forwards order over gRPC/mTLS to order router."
+        },
+        {
+          "relationship-unique-id": "router-to-kafka",
+          "sequence-number": 4,
+          "description": "Router appends normalized event to Kafka."
+        }
+      ]
+    }
+  ]
+}

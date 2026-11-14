@@ -1,0 +1,132 @@
+{
+  "schemaVersion": "1.0",
+  "sourceFile": "fluxnova-platform.architecture.json",
+  "latestCommitDate": "2026-07-29",
+  "stats": {
+    "totalCommitsScanned": 4,
+    "validSnapshotsParsed": 4,
+    "noiseCommitsFiltered": 1,
+    "structuralCommitsRetained": 3
+  },
+  "instructions": [
+    "Group the 3 structural commits below (indices 0..2) into cohesive architectural moments (phases).",
+    "Every commit index from 0 to 2 MUST be covered contiguously with zero gaps or overlaps: first startIndex=0, each next startIndex = previous endIndex + 1, final endIndex=2.",
+    "Group multi-commit sprints, node-addition + relationship-wiring sequences, protocol hardening, and coupled control/ADR rollouts into unified phases while keeping pivotal milestones distinct.",
+    "Write an executive `name` (3-7 words; no leading step numbers and no conventional-commit prefixes such as \"feat:\" or \"chore:\").",
+    "Write a 2-3 sentence narrative `description` explaining WHAT changed architecturally, HOW connectivity or security boundaries shifted, and WHY, citing concrete node IDs, protocols, controls, or ADRs. Do not output mechanical count strings such as \"+1 node(s)\".",
+    "Save the resulting JSON array to a `<name>.clusters.json` file and pass `--clusters <name>.clusters.json` back to `calm-timelapse`."
+  ],
+  "expectedClusterSchema": {
+    "type": "array",
+    "items": {
+      "type": "object",
+      "required": [
+        "startIndex",
+        "endIndex",
+        "uniqueId",
+        "name",
+        "description"
+      ],
+      "properties": {
+        "startIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2
+        },
+        "endIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2
+        },
+        "uniqueId": {
+          "type": "string",
+          "description": "kebab-case moment identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "Executive phase title (3-7 words)"
+        },
+        "description": {
+          "type": "string",
+          "description": "2-3 sentence architectural narrative"
+        }
+      }
+    }
+  },
+  "commits": [
+    {
+      "index": 0,
+      "sha": "14acb6029bb00ba5763ba01339555d22b25222bd",
+      "shortSha": "14acb602",
+      "date": "2026-04-11",
+      "author": "Matthew Bain",
+      "subject": "feat(calm-suite): add CALM Guard and CALM Studio projects",
+      "summaryLine": "Initial baseline with 7 node(s), 11 relationship(s), 2 control(s)",
+      "changes": [
+        "Added node FluxNova Platform (fluxnova-platform)",
+        "Added node FluxNova BPM Engine (fluxnova-engine)",
+        "Added node FluxNova REST API (fluxnova-rest-api)",
+        "Added node FluxNova Cockpit (fluxnova-cockpit)",
+        "Added node FluxNova Admin (fluxnova-admin)",
+        "Added node FluxNova Tasklist (fluxnova-tasklist)",
+        "Added node Process Database (fluxnova-process-db)",
+        "Added relationship engine-to-process-db",
+        "Added relationship rest-api-to-engine",
+        "Added relationship cockpit-to-rest-api",
+        "Added relationship admin-to-rest-api",
+        "Added relationship tasklist-to-rest-api",
+        "Added relationship platform-has-engine",
+        "Added relationship platform-has-rest-api",
+        "Added relationship platform-has-cockpit",
+        "Added relationship platform-has-admin",
+        "Added relationship platform-has-tasklist",
+        "Added relationship platform-has-process-db",
+        "Added control fluxnova-engine:audit-logging",
+        "Added control engine-to-process-db:encryption-in-transit"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 1,
+      "sha": "3b103fa9d7022576232094f997f13a8205bd701d",
+      "shortSha": "3b103fa9",
+      "date": "2026-06-05",
+      "author": "Gourav J. Shah",
+      "subject": "fix(calm-suite): align calm-studio with canonical CALM nested relationship form (#2550) (#2553)",
+      "summaryLine": "~1 node(s), ~11 rel(s), controls(+0/~2/-0)",
+      "changes": [
+        "Modified node FluxNova BPM Engine (fluxnova-engine) [controls]",
+        "Modified relationship engine-to-process-db",
+        "Modified relationship rest-api-to-engine",
+        "Modified relationship cockpit-to-rest-api",
+        "Modified relationship admin-to-rest-api",
+        "Modified relationship tasklist-to-rest-api",
+        "Modified relationship platform-has-engine",
+        "Modified relationship platform-has-rest-api",
+        "Modified relationship platform-has-cockpit",
+        "Modified relationship platform-has-admin",
+        "Modified relationship platform-has-tasklist",
+        "Modified relationship platform-has-process-db",
+        "Updated control fluxnova-engine:audit-logging",
+        "Updated control engine-to-process-db:encryption-in-transit"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 2,
+      "sha": "bf701c3e3122fdac54c615eaf4d3d0438249cdd9",
+      "shortSha": "bf701c3e",
+      "date": "2026-07-29",
+      "author": "jpgough-ms",
+      "subject": "feat(calm-hub): seed FluxNova example architectures into read-only hub (#2914)",
+      "summaryLine": "~1 node(s), ~1 rel(s), controls(+0/~2/-0)",
+      "changes": [
+        "Modified node FluxNova BPM Engine (fluxnova-engine) [controls]",
+        "Modified relationship engine-to-process-db",
+        "Updated control fluxnova-engine:audit-logging",
+        "Updated control engine-to-process-db:encryption-in-transit"
+      ],
+      "coChangedAdrs": []
+    }
+  ]
+}

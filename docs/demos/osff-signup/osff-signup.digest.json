@@ -1,0 +1,230 @@
+{
+  "schemaVersion": "1.0",
+  "sourceFile": "conference-secure-signup-amended.arch.json",
+  "latestCommitDate": "2025-08-04",
+  "stats": {
+    "totalCommitsScanned": 13,
+    "validSnapshotsParsed": 13,
+    "noiseCommitsFiltered": 5,
+    "structuralCommitsRetained": 8
+  },
+  "instructions": [
+    "Group the 8 structural commits below (indices 0..7) into cohesive architectural moments (phases).",
+    "Every commit index from 0 to 7 MUST be covered contiguously with zero gaps or overlaps: first startIndex=0, each next startIndex = previous endIndex + 1, final endIndex=7.",
+    "Group multi-commit sprints, node-addition + relationship-wiring sequences, protocol hardening, and coupled control/ADR rollouts into unified phases while keeping pivotal milestones distinct.",
+    "Write an executive `name` (3-7 words; no leading step numbers and no conventional-commit prefixes such as \"feat:\" or \"chore:\").",
+    "Write a 2-3 sentence narrative `description` explaining WHAT changed architecturally, HOW connectivity or security boundaries shifted, and WHY, citing concrete node IDs, protocols, controls, or ADRs. Do not output mechanical count strings such as \"+1 node(s)\".",
+    "Save the resulting JSON array to a `<name>.clusters.json` file and pass `--clusters <name>.clusters.json` back to `calm-timelapse`."
+  ],
+  "expectedClusterSchema": {
+    "type": "array",
+    "items": {
+      "type": "object",
+      "required": [
+        "startIndex",
+        "endIndex",
+        "uniqueId",
+        "name",
+        "description"
+      ],
+      "properties": {
+        "startIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 7
+        },
+        "endIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 7
+        },
+        "uniqueId": {
+          "type": "string",
+          "description": "kebab-case moment identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "Executive phase title (3-7 words)"
+        },
+        "description": {
+          "type": "string",
+          "description": "2-3 sentence architectural narrative"
+        }
+      }
+    }
+  },
+  "commits": [
+    {
+      "index": 0,
+      "sha": "cafb27c5fc8eb00b4ad5bce36023f7eeb7e503ba",
+      "shortSha": "cafb27c5",
+      "date": "2024-08-29",
+      "author": "jpgough-ms",
+      "subject": "Domains example (#369)",
+      "summaryLine": "Initial baseline with 5 node(s), 4 relationship(s), 4 control(s)",
+      "changes": [
+        "Added node Consumer (consumer)",
+        "Added node Load Balancer (load-balancer)",
+        "Added node Application (application)",
+        "Added node Postgres Database (postgres-database)",
+        "Added node Service Mesh Enabled Kubernetes Cluster (service-mesh-k8s-cluster)",
+        "Added relationship consumer-load-balancer",
+        "Added relationship load-balancer-application",
+        "Added relationship application-postgres-database",
+        "Added relationship deployed-in-service-mesh-k8s-cluster",
+        "Added control service-mesh-k8s-cluster:security",
+        "Added control consumer-load-balancer:security",
+        "Added control load-balancer-application:security",
+        "Added control application-postgres-database:security"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 1,
+      "sha": "936d86ba8b511bc24807bbab90757d7430750733",
+      "shortSha": "936d86ba",
+      "date": "2025-04-01",
+      "author": "LeighF",
+      "subject": "Fixes `calm generate` to support generic pattern instantiation (#1102)",
+      "summaryLine": "+4 node(s), ~1 node(s), -4 node(s), +4 rel(s), -4 rel(s), controls(+4/~0/-4)",
+      "changes": [
+        "Added node Conference Website (conference-website)",
+        "Added node Attendees Service (attendees-service)",
+        "Added node Attendees Store (attendees-store)",
+        "Added node Kubernetes Cluster (k8s-cluster)",
+        "Removed node Consumer (consumer)",
+        "Removed node Application (application)",
+        "Removed node Postgres Database (postgres-database)",
+        "Removed node Service Mesh Enabled Kubernetes Cluster (service-mesh-k8s-cluster)",
+        "Modified node Load Balancer (load-balancer) [node-type, description, interfaces]",
+        "Added relationship conference-website-load-balancer",
+        "Added relationship load-balancer-attendees-service",
+        "Added relationship attendees-service-attendees-store",
+        "Added relationship deployed-in-k8s-cluster",
+        "Removed relationship consumer-load-balancer",
+        "Removed relationship load-balancer-application",
+        "Removed relationship application-postgres-database",
+        "Removed relationship deployed-in-service-mesh-k8s-cluster",
+        "Added control k8s-cluster:security",
+        "Added control conference-website-load-balancer:security",
+        "Added control load-balancer-attendees-service:security",
+        "Added control attendees-service-attendees-store:security",
+        "Removed control service-mesh-k8s-cluster:security",
+        "Removed control consumer-load-balancer:security",
+        "Removed control load-balancer-application:security",
+        "Removed control application-postgres-database:security"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 2,
+      "sha": "4beddb019ea134be23f2569081f0ffe58d084723",
+      "shortSha": "4beddb01",
+      "date": "2025-04-02",
+      "author": "LeighF",
+      "subject": "Docify Enhancements for QCon (#1109)",
+      "summaryLine": "~5 node(s), ~2 rel(s), controls(+0/~3/-0)",
+      "changes": [
+        "Modified node Conference Website (conference-website) [interfaces]",
+        "Modified node Load Balancer (load-balancer) [interfaces]",
+        "Modified node Attendees Service (attendees-service) [interfaces]",
+        "Modified node Attendees Store (attendees-store) [interfaces]",
+        "Modified node Kubernetes Cluster (k8s-cluster) [controls]",
+        "Modified relationship conference-website-load-balancer",
+        "Modified relationship attendees-service-attendees-store",
+        "Updated control k8s-cluster:security",
+        "Updated control conference-website-load-balancer:security",
+        "Updated control attendees-service-attendees-store:security"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 3,
+      "sha": "2cfea4673ab733fbaab7ac298fedafc156cc1107",
+      "shortSha": "2cfea467",
+      "date": "2025-04-02",
+      "author": "LeighF",
+      "subject": "Add Infrastructure As Code Generation Example for QCon (#1119)",
+      "summaryLine": "~2 node(s), +2 rel(s), ~2 rel(s), -2 rel(s), controls(+2/~2/-2)",
+      "changes": [
+        "Renamed node attendees-service → attendees",
+        "Modified node Kubernetes Cluster (k8s-cluster) [controls]",
+        "Added relationship load-balancer-attendees",
+        "Added relationship attendees-attendees-store",
+        "Removed relationship load-balancer-attendees-service",
+        "Removed relationship attendees-service-attendees-store",
+        "Modified relationship conference-website-load-balancer",
+        "Modified relationship deployed-in-k8s-cluster",
+        "Updated control k8s-cluster:security",
+        "Updated control conference-website-load-balancer:security",
+        "Added control load-balancer-attendees:security",
+        "Added control attendees-attendees-store:security",
+        "Removed control load-balancer-attendees-service:security",
+        "Removed control attendees-service-attendees-store:security"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 4,
+      "sha": "ac14029a9415b88c6a6e7a974ee705b59fce814d",
+      "shortSha": "ac14029a",
+      "date": "2025-04-09",
+      "author": "jpgough-ms",
+      "subject": "Final demo (#1153)",
+      "summaryLine": "~4 node(s)",
+      "changes": [
+        "Modified node Conference Website (conference-website) [interfaces]",
+        "Modified node Load Balancer (load-balancer) [interfaces]",
+        "Modified node Attendees Service (attendees) [description, interfaces]",
+        "Modified node Attendees Store (attendees-store) [interfaces]"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 5,
+      "sha": "a13f51d7dbef91fa22c442b95dbad1c19f061049",
+      "shortSha": "a13f51d7",
+      "date": "2025-04-10",
+      "author": "Aidan McPhelim",
+      "subject": "made conference examples consistent to fix tests",
+      "summaryLine": "~1 node(s)",
+      "changes": [
+        "Modified node Load Balancer (load-balancer) [description]"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 6,
+      "sha": "717350bec736a7f931c7c09df6b0b0b56e51612f",
+      "shortSha": "717350be",
+      "date": "2025-07-20",
+      "author": "LeighF",
+      "subject": "Update types, models and tooling to meet RC2 definition (#1284)",
+      "summaryLine": "~1 node(s), ~3 rel(s), controls(+0/~4/-0)",
+      "changes": [
+        "Modified node Kubernetes Cluster (k8s-cluster) [controls]",
+        "Modified relationship conference-website-load-balancer",
+        "Modified relationship load-balancer-attendees",
+        "Modified relationship attendees-attendees-store",
+        "Updated control k8s-cluster:security",
+        "Updated control conference-website-load-balancer:security",
+        "Updated control load-balancer-attendees:security",
+        "Updated control attendees-attendees-store:security"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 7,
+      "sha": "e449e63d9bda3072468d9df1ba914422e1a9b1c2",
+      "shortSha": "e449e63d",
+      "date": "2025-08-04",
+      "author": "LeighF",
+      "subject": "Create new business model that allows for native dererencing via Resolvable and ResolvableAndAdaptable. Creates new CanonicalModel which is leveraged by the DefaultTransformer by default (#1471)",
+      "summaryLine": "flows(+1/~0/-0)",
+      "changes": [
+        "Added flow Conference Signup Flow"
+      ],
+      "coChangedAdrs": []
+    }
+  ]
+}

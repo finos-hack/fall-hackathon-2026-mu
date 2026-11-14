@@ -1,0 +1,72 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm-timeline.json",
+  "moments": [
+    {
+      "unique-id": "initial-fluxnova-bpm-platform",
+      "node-type": "moment",
+      "name": "Initial FluxNova BPM Platform",
+      "description": "Establishes the seven-node FluxNova workflow platform composing fluxnova-engine, fluxnova-rest-api, fluxnova-cockpit, fluxnova-admin, fluxnova-tasklist, and fluxnova-process-db with audit-logging and encryption-in-transit controls.",
+      "valid-from": "2026-04-11",
+      "details": {
+        "detailed-architecture": "snapshots/01-14acb602-initial-fluxnova-bpm-platform.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "14acb602"
+        ],
+        "commit-messages": [
+          "feat(calm-suite): add CALM Guard and CALM Studio projects"
+        ],
+        "commit-count": 1
+      }
+    },
+    {
+      "unique-id": "canonical-nested-relationship-alignment",
+      "node-type": "moment",
+      "name": "Canonical Nested Relationship Alignment",
+      "description": "Refactors all eleven platform composition and connectivity relationships into canonical nested CALM 1.2 relationship-type structures while updating control bindings on fluxnova-engine and engine-to-process-db.",
+      "valid-from": "2026-06-05",
+      "details": {
+        "detailed-architecture": "snapshots/02-3b103fa9-canonical-nested-relationship-alignment.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "3b103fa9"
+        ],
+        "commit-messages": [
+          "fix(calm-suite): align calm-studio with canonical CALM nested relationship form (#2550) (#2553)"
+        ],
+        "commit-count": 1
+      }
+    },
+    {
+      "unique-id": "calm-hub-curated-control-seeding",
+      "node-type": "moment",
+      "name": "CALM Hub Curated Control Seeding",
+      "description": "Hardens control requirement metadata on fluxnova-engine and engine-to-process-db so the FluxNova reference architecture validates cleanly when seeded into read-only CALM Hub deployments.",
+      "valid-from": "2026-07-29",
+      "details": {
+        "detailed-architecture": "snapshots/03-bf701c3e-calm-hub-curated-control-seeding.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "bf701c3e"
+        ],
+        "commit-messages": [
+          "feat(calm-hub): seed FluxNova example architectures into read-only hub (#2914)"
+        ],
+        "commit-count": 1
+      }
+    }
+  ],
+  "metadata": {
+    "title": "Git Architecture Timeline — fluxnova-platform.architecture.json",
+    "description": "Automatically synthesized from Git commit history of fluxnova-platform.architecture.json",
+    "generator": "calm-timelapse",
+    "clustering-engine": "clusters-file",
+    "total-commits-scanned": "4",
+    "noise-commits-filtered": "1",
+    "structural-commits-retained": "3"
+  },
+  "current-moment": "calm-hub-curated-control-seeding"
+}

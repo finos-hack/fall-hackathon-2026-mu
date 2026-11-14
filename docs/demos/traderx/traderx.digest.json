@@ -1,0 +1,559 @@
+{
+  "schemaVersion": "1.0",
+  "sourceFile": "traderx.calm.json",
+  "latestCommitDate": "2025-08-22",
+  "stats": {
+    "totalCommitsScanned": 40,
+    "validSnapshotsParsed": 40,
+    "noiseCommitsFiltered": 5,
+    "structuralCommitsRetained": 35
+  },
+  "instructions": [
+    "Group the 35 structural commits below (indices 0..34) into cohesive architectural moments (phases).",
+    "Every commit index from 0 to 34 MUST be covered contiguously with zero gaps or overlaps: first startIndex=0, each next startIndex = previous endIndex + 1, final endIndex=34.",
+    "Group multi-commit sprints, node-addition + relationship-wiring sequences, protocol hardening, and coupled control/ADR rollouts into unified phases while keeping pivotal milestones distinct.",
+    "Write an executive `name` (3-7 words; no leading step numbers and no conventional-commit prefixes such as \"feat:\" or \"chore:\").",
+    "Write a 2-3 sentence narrative `description` explaining WHAT changed architecturally, HOW connectivity or security boundaries shifted, and WHY, citing concrete node IDs, protocols, controls, or ADRs. Do not output mechanical count strings such as \"+1 node(s)\".",
+    "Save the resulting JSON array to a `<name>.clusters.json` file and pass `--clusters <name>.clusters.json` back to `calm-timelapse`."
+  ],
+  "expectedClusterSchema": {
+    "type": "array",
+    "items": {
+      "type": "object",
+      "required": [
+        "startIndex",
+        "endIndex",
+        "uniqueId",
+        "name",
+        "description"
+      ],
+      "properties": {
+        "startIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 34
+        },
+        "endIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 34
+        },
+        "uniqueId": {
+          "type": "string",
+          "description": "kebab-case moment identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "Executive phase title (3-7 words)"
+        },
+        "description": {
+          "type": "string",
+          "description": "2-3 sentence architectural narrative"
+        }
+      }
+    }
+  },
+  "commits": [
+    {
+      "index": 0,
+      "sha": "e1be46193bb1d0ee25fad9b759a15539f03157dd",
+      "shortSha": "e1be461",
+      "date": "2025-01-06",
+      "author": "Elena Rostova",
+      "subject": "feat(arch): capture initial TraderX legacy order desk baseline",
+      "summaryLine": "Initial baseline with 4 node(s), 3 relationship(s)",
+      "changes": [
+        "Added node Institutional Equity Trader (trader-actor)",
+        "Added node TraderX Blotter Web UI (traderx-web)",
+        "Added node Legacy Order Monolith (monolith-order-svc)",
+        "Added node Legacy Oracle Trades DB (oracle-trades-db)",
+        "Added relationship trader-uses-web",
+        "Added relationship web-to-monolith",
+        "Added relationship monolith-to-oracle"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 1,
+      "sha": "0f9808977cb775c10d549bfd7ed685b7526b152e",
+      "shortSha": "0f98089",
+      "date": "2025-01-14",
+      "author": "Marcus Vance",
+      "subject": "feat(security): introduce edge API gateway and OIDC identity provider",
+      "summaryLine": "+2 node(s)",
+      "changes": [
+        "Added node Zero-Trust Edge API Gateway (edge-api-gateway)",
+        "Added node Enterprise OIDC Identity Provider (ping-oidc-idp)"
+      ],
+      "coChangedAdrs": [
+        "docs/adr/ADR-001-zero-trust-api-gateway.md"
+      ]
+    },
+    {
+      "index": 2,
+      "sha": "f9a2a6fda4356a45c353cf23e825aed6f911e42f",
+      "shortSha": "f9a2a6f",
+      "date": "2025-01-16",
+      "author": "Marcus Vance",
+      "subject": "refactor(ingress): route traderx-web traffic exclusively through edge-api-gateway",
+      "summaryLine": "+2 rel(s), -1 rel(s)",
+      "changes": [
+        "Added relationship web-to-gateway",
+        "Added relationship gateway-to-monolith",
+        "Removed relationship web-to-monolith"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 3,
+      "sha": "1af0200ef66bc88827f114a07c81098d26d0ef4d",
+      "shortSha": "1af0200",
+      "date": "2025-01-20",
+      "author": "Marcus Vance",
+      "subject": "feat(auth): wire OIDC PKCE and JWKS validation links",
+      "summaryLine": "+2 rel(s)",
+      "changes": [
+        "Added relationship web-to-oidc",
+        "Added relationship gateway-to-oidc"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 4,
+      "sha": "53fa85677569d31b8429f7e3ba79e226f4ace46c",
+      "shortSha": "53fa856",
+      "date": "2025-01-22",
+      "author": "Elena Rostova",
+      "subject": "feat(controls): upgrade east-west gateway hop to mTLS and enforce mtls-everywhere",
+      "summaryLine": "~1 rel(s), controls(+1/~0/-0)",
+      "changes": [
+        "Modified relationship gateway-to-monolith",
+        "Added architecture control mtls-everywhere"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 5,
+      "sha": "72452ddb8e3978f2005165adc63282d7465e187b",
+      "shortSha": "72452dd",
+      "date": "2025-02-03",
+      "author": "Priya Nair",
+      "subject": "feat(messaging): provision Kafka order event backbone",
+      "summaryLine": "+1 node(s)",
+      "changes": [
+        "Added node Kafka Order Event Backbone (kafka-event-bus)"
+      ],
+      "coChangedAdrs": [
+        "docs/adr/ADR-002-kafka-event-backbone.md"
+      ]
+    },
+    {
+      "index": 6,
+      "sha": "0e07245ec02eba558e0b467e91e6ac8b5fa431e4",
+      "shortSha": "0e07245",
+      "date": "2025-02-06",
+      "author": "Priya Nair",
+      "subject": "feat(routing): extract stateless order-router-svc behind API gateway",
+      "summaryLine": "+1 node(s), +1 rel(s), -1 rel(s)",
+      "changes": [
+        "Added node Stateless Order Router (order-router-svc)",
+        "Added relationship gateway-to-router",
+        "Removed relationship gateway-to-monolith"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 7,
+      "sha": "5adcc621a5e3767709c39cee27c0d2f94db3ecbe",
+      "shortSha": "5adcc62",
+      "date": "2025-02-10",
+      "author": "Priya Nair",
+      "subject": "feat(routing): stream router events through kafka-event-bus into monolith consumer",
+      "summaryLine": "+2 rel(s)",
+      "changes": [
+        "Added relationship router-to-kafka",
+        "Added relationship kafka-to-monolith"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 8,
+      "sha": "55c7c93f16bc316f396ce99570f200f44dc0fd3d",
+      "shortSha": "55c7c93",
+      "date": "2025-02-14",
+      "author": "Elena Rostova",
+      "subject": "feat(flows): codify order-submission-flow across ingress pipeline",
+      "summaryLine": "flows(+1/~0/-0)",
+      "changes": [
+        "Added flow Client Order Submission Flow"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 9,
+      "sha": "c152dc151677e375dcee326c2904f6beddd68d44",
+      "shortSha": "c152dc1",
+      "date": "2025-03-03",
+      "author": "Devon Brooks",
+      "subject": "feat(risk): add SEC 15c3-5 pretrade-risk-svc node",
+      "summaryLine": "+1 node(s)",
+      "changes": [
+        "Added node Pre-Trade Risk Engine (pretrade-risk-svc)"
+      ],
+      "coChangedAdrs": [
+        "docs/adr/ADR-003-pretrade-risk-circuit-breaker.md"
+      ]
+    },
+    {
+      "index": 10,
+      "sha": "cc7f9f8497e8333e9509ab7d2086295cb1466b8d",
+      "shortSha": "cc7f9f8",
+      "date": "2025-03-06",
+      "author": "Devon Brooks",
+      "subject": "feat(risk): back pretrade-risk-svc with redis-position-cache",
+      "summaryLine": "+1 node(s), +1 rel(s)",
+      "changes": [
+        "Added node In-Memory Intraday Position Cache (redis-position-cache)",
+        "Added relationship risk-to-redis"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 11,
+      "sha": "9f43d64000a3e7358504be9688bdeae8fec0e000",
+      "shortSha": "9f43d64",
+      "date": "2025-03-10",
+      "author": "Devon Brooks",
+      "subject": "feat(risk): wire synchronous gRPC/mTLS pre-trade risk gate from order-router-svc",
+      "summaryLine": "+1 rel(s)",
+      "changes": [
+        "Added relationship router-to-risk"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 12,
+      "sha": "726ca5d9c75368a39c898c876319b4c6b5e64445",
+      "shortSha": "726ca5d",
+      "date": "2025-03-14",
+      "author": "Devon Brooks",
+      "subject": "feat(flows): insert pre-trade risk verification steps into order-submission-flow",
+      "summaryLine": "flows(+0/~1/-0)",
+      "changes": [
+        "Modified flow Risk-Gated Client Order Submission Flow"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 13,
+      "sha": "98368510e8f7c34ba1157be052dcb49da60499b5",
+      "shortSha": "9836851",
+      "date": "2025-03-31",
+      "author": "Priya Nair",
+      "subject": "feat(execution): introduce fix-execution-gateway and external-liquidity-venue",
+      "summaryLine": "+2 node(s)",
+      "changes": [
+        "Added node FIX 4.4 Venue Execution Gateway (fix-execution-gateway)",
+        "Added node External Equity Exchange Venue (external-liquidity-venue)"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 14,
+      "sha": "5b2d1036d71514eacb40fab0c62d09a3c05f6abd",
+      "shortSha": "5b2d103",
+      "date": "2025-04-03",
+      "author": "Priya Nair",
+      "subject": "feat(execution): connect Kafka approved order topic through FIX gateway to venue",
+      "summaryLine": "+2 rel(s)",
+      "changes": [
+        "Added relationship kafka-to-fix",
+        "Added relationship fix-to-venue"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 15,
+      "sha": "d3aa2b8cb8387a06c9244dd3812927c10caae1a5",
+      "shortSha": "d3aa2b8",
+      "date": "2025-04-08",
+      "author": "Devon Brooks",
+      "subject": "feat(marketdata): wire live NBBO market-data-feed into risk and position cache",
+      "summaryLine": "+1 node(s), +2 rel(s)",
+      "changes": [
+        "Added node Consolidated NBBO Market Data Ticker (market-data-feed)",
+        "Added relationship marketdata-to-redis",
+        "Added relationship marketdata-to-risk"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 16,
+      "sha": "4729bf6e0879174396f097f6d7389f7faf76602a",
+      "shortSha": "4729bf6",
+      "date": "2025-04-10",
+      "author": "Priya Nair",
+      "subject": "feat(execution): publish venue ExecutionReports to Kafka and add execution-fill-flow",
+      "summaryLine": "+1 rel(s), flows(+1/~0/-0)",
+      "changes": [
+        "Added relationship fix-to-kafka",
+        "Added flow Exchange Execution Fill Capture Flow"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 17,
+      "sha": "e78c782a99c56eb0520227ad43544c763d0df3e7",
+      "shortSha": "e78c782",
+      "date": "2025-04-14",
+      "author": "Priya Nair",
+      "subject": "feat(execution): expose dedicated fix-dropcopy-session interface on FIX gateway",
+      "summaryLine": "~1 node(s)",
+      "changes": [
+        "Modified node FIX 4.4 Venue Execution Gateway (fix-execution-gateway) [description, interfaces]"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 18,
+      "sha": "51991fd7e7c778c062d1fdcb26246debccb01957",
+      "shortSha": "51991fd",
+      "date": "2025-04-28",
+      "author": "Elena Rostova",
+      "subject": "feat(ledger): deploy trade-ledger-svc and postgres-trades-db alongside legacy monolith",
+      "summaryLine": "+2 node(s)",
+      "changes": [
+        "Added node Canonical Trade Ledger Service (trade-ledger-svc)",
+        "Added node Cloud-Native PostgreSQL Trade Store (postgres-trades-db)"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 19,
+      "sha": "e475f2af09d028e434cecae91511d4c85855ac05",
+      "shortSha": "e475f2a",
+      "date": "2025-05-02",
+      "author": "Elena Rostova",
+      "subject": "feat(ledger): wire Kafka fill consumer through trade-ledger-svc to PostgreSQL",
+      "summaryLine": "+2 rel(s)",
+      "changes": [
+        "Added relationship kafka-to-ledger",
+        "Added relationship ledger-to-postgres"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 20,
+      "sha": "215fd128ba9d6e85f5611e8c80ebfefefcaa2a6b",
+      "shortSha": "215fd12",
+      "date": "2025-05-06",
+      "author": "Elena Rostova",
+      "subject": "feat(clearing): add T+1 settlement-clearing-svc backed by PostgreSQL trade store",
+      "summaryLine": "+1 node(s), +2 rel(s)",
+      "changes": [
+        "Added node DTCC Clearing & Settlement Adapter (settlement-clearing-svc)",
+        "Added relationship kafka-to-clearing",
+        "Added relationship clearing-to-postgres"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 21,
+      "sha": "78f76492ad280c622d0877a2cf80eee8dabec3ee",
+      "shortSha": "78f7649",
+      "date": "2025-05-09",
+      "author": "Elena Rostova",
+      "subject": "refactor(decommission): retire legacy monolith-order-svc and oracle-trades-db",
+      "summaryLine": "-2 node(s), -2 rel(s)",
+      "changes": [
+        "Removed node Legacy Order Monolith (monolith-order-svc)",
+        "Removed node Legacy Oracle Trades DB (oracle-trades-db)",
+        "Removed relationship monolith-to-oracle",
+        "Removed relationship kafka-to-monolith"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 22,
+      "sha": "94f7e9fea2d2fa42b0f1023d7b6af1337b3dc000",
+      "shortSha": "94f7e9f",
+      "date": "2025-05-26",
+      "author": "Marcus Vance",
+      "subject": "feat(compliance): introduce worm-audit-archiver and s3-object-lock-vault",
+      "summaryLine": "+2 node(s)",
+      "changes": [
+        "Added node Immutable Audit Archiver (worm-audit-archiver)",
+        "Added node SEC 17a-4 WORM Object-Lock Vault (s3-object-lock-vault)"
+      ],
+      "coChangedAdrs": [
+        "docs/adr/ADR-004-sec-17a4-worm-ledger.md"
+      ]
+    },
+    {
+      "index": 23,
+      "sha": "7456e8dff7c8b5a435ccdda701289552c98ad572",
+      "shortSha": "7456e8d",
+      "date": "2025-05-30",
+      "author": "Marcus Vance",
+      "subject": "feat(compliance): stream Kafka lifecycle events into WORM Object-Lock vault",
+      "summaryLine": "+2 rel(s)",
+      "changes": [
+        "Added relationship kafka-to-archiver",
+        "Added relationship archiver-to-worm"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 24,
+      "sha": "e833512517980a8076a954d54c7169425b9c1024",
+      "shortSha": "e833512",
+      "date": "2025-06-03",
+      "author": "Marcus Vance",
+      "subject": "feat(controls): bind sec-17a4-worm 7-year compliance retention control",
+      "summaryLine": "controls(+1/~0/-0)",
+      "changes": [
+        "Added architecture control sec-17a4-worm"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 25,
+      "sha": "12a9d7509a84b9f4a351cf377a8e8280bfed838e",
+      "shortSha": "12a9d75",
+      "date": "2025-06-06",
+      "author": "Marcus Vance",
+      "subject": "feat(compliance): model compliance-officer supervisory access to worm-audit-archiver",
+      "summaryLine": "+1 node(s), +1 rel(s)",
+      "changes": [
+        "Added node Surveillance & Compliance Officer (compliance-officer)",
+        "Added relationship compliance-queries-archiver"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 26,
+      "sha": "649ed2c568d2d8e3280ee5fbc27b450243d2a02e",
+      "shortSha": "649ed2c",
+      "date": "2025-06-23",
+      "author": "Devon Brooks",
+      "subject": "feat(resilience): add otel-observability-hub and dr-standby-cluster",
+      "summaryLine": "+2 node(s)",
+      "changes": [
+        "Added node OpenTelemetry Tracing & SLO Hub (otel-observability-hub)",
+        "Added node Warm-Standby Secondary Region Cluster (dr-standby-cluster)"
+      ],
+      "coChangedAdrs": [
+        "docs/adr/ADR-005-dora-multi-region-failover.md"
+      ]
+    },
+    {
+      "index": 27,
+      "sha": "e6007fe008a58521520c17e3a4a7446bcba7f71e",
+      "shortSha": "e6007fe",
+      "date": "2025-06-27",
+      "author": "Devon Brooks",
+      "subject": "feat(resilience): enable cross-region WAL and Kafka replication to dr-standby-cluster",
+      "summaryLine": "+2 rel(s)",
+      "changes": [
+        "Added relationship postgres-to-dr",
+        "Added relationship kafka-to-dr"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 28,
+      "sha": "6c169fe84ce6a5a4f88833847a3e36f4a60b0e3b",
+      "shortSha": "6c169fe",
+      "date": "2025-07-02",
+      "author": "Devon Brooks",
+      "subject": "feat(observability): stream OTLP telemetry from router, risk, and FIX gateway",
+      "summaryLine": "+3 rel(s)",
+      "changes": [
+        "Added relationship router-to-otel",
+        "Added relationship risk-to-otel",
+        "Added relationship fix-to-otel"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 29,
+      "sha": "a664e44da744bfbe1e790ddead30c3ea6000417e",
+      "shortSha": "a664e44",
+      "date": "2025-07-07",
+      "author": "Elena Rostova",
+      "subject": "feat(controls): add dora-ict-resilience control for multi-region failover readiness",
+      "summaryLine": "controls(+1/~0/-0)",
+      "changes": [
+        "Added architecture control dora-ict-resilience"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 30,
+      "sha": "fe2164161dd7e421c2cd0c7dc29aa7bdad0c5135",
+      "shortSha": "fe21641",
+      "date": "2025-07-21",
+      "author": "Marcus Vance",
+      "subject": "feat(cat): introduce cat-regulatory-reporter and external finra-cat-portal",
+      "summaryLine": "+2 node(s)",
+      "changes": [
+        "Added node FINRA CAT Regulatory Reporter (cat-regulatory-reporter)",
+        "Added node FINRA CAT Central Repository (finra-cat-portal)"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 31,
+      "sha": "0851a1bb178d16b54ad2074dbf049c5971bcbe12",
+      "shortSha": "0851a1b",
+      "date": "2025-07-28",
+      "author": "Marcus Vance",
+      "subject": "feat(cat): reconcile cat-regulatory-reporter against WORM vault and trade ledger",
+      "summaryLine": "+2 rel(s)",
+      "changes": [
+        "Added relationship reporter-reads-worm",
+        "Added relationship reporter-reads-ledger"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 32,
+      "sha": "bae4c852f9d6c8bd93cbfa1671f0db1a1176974a",
+      "shortSha": "bae4c85",
+      "date": "2025-08-04",
+      "author": "Marcus Vance",
+      "subject": "feat(cat): wire SFTP/mTLS submission channel to finra-cat-portal",
+      "summaryLine": "+1 rel(s)",
+      "changes": [
+        "Added relationship reporter-to-finra"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 33,
+      "sha": "dfccbd1094aa5c9d250deed85e958d30f80d3364",
+      "shortSha": "dfccbd1",
+      "date": "2025-08-14",
+      "author": "Marcus Vance",
+      "subject": "feat(flows): define regulatory-cat-submission-flow across WORM, ledger, and FINRA CAT",
+      "summaryLine": "flows(+1/~0/-0)",
+      "changes": [
+        "Added flow FINRA CAT T+1 Regulatory Submission Flow"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 34,
+      "sha": "1e91d007d99f27072886bf0be356c75c289a3461",
+      "shortSha": "1e91d00",
+      "date": "2025-08-22",
+      "author": "Elena Rostova",
+      "subject": "feat(controls): enforce finra-cat-sla T+1 08:00 ET reporting control",
+      "summaryLine": "controls(+1/~0/-0)",
+      "changes": [
+        "Added architecture control finra-cat-sla"
+      ],
+      "coChangedAdrs": []
+    }
+  ]
+}

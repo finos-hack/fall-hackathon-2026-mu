@@ -1,0 +1,99 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm-timeline.json",
+  "moments": [
+    {
+      "unique-id": "2024-08-29-initial-architecture-domains-example",
+      "node-type": "moment",
+      "name": "Initial Architecture: Domains example",
+      "description": "Establishes the initial architecture baseline with Consumer (consumer), Load Balancer (load-balancer), Application (application), Postgres Database (postgres-database), and 1 more, connected via consumer-load-balancer, load-balancer-application, application-postgres-database, and deployed-in-service-mesh-k8s-cluster (1 commit: cafb27c5). Applies controls service-mesh-k8s-cluster:security, consumer-load-balancer:security, load-balancer-application:security, and application-postgres-database:security.",
+      "valid-from": "2024-08-29",
+      "details": {
+        "detailed-architecture": "snapshots/01-cafb27c5-2024-08-29-initial-architecture-domains-example.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "cafb27c5"
+        ],
+        "commit-messages": [
+          "Domains example (#369)"
+        ],
+        "commit-count": 1
+      }
+    },
+    {
+      "unique-id": "2025-04-10-fixes-calm-generate-to-support-generi",
+      "node-type": "moment",
+      "name": "Fixes `calm generate` to support generic pattern instantiation",
+      "description": "This phase introduces Conference Website (conference-website), Attendees Service (attendees), Attendees Store (attendees-store), and Kubernetes Cluster (k8s-cluster), updates Load Balancer (load-balancer), and retires Consumer (consumer), Application (application), Postgres Database (postgres-database), and Service Mesh Enabled Kubernetes Cluster (service-mesh-k8s-cluster) (5 commits: 936d86ba..a13f51d7). Connectivity shifts through new links conference-website-load-balancer, load-balancer-attendees, attendees-attendees-store, and deployed-in-k8s-cluster and retired links consumer-load-balancer, load-balancer-application, application-postgres-database, and deployed-in-service-mesh-k8s-cluster. Applies controls k8s-cluster:security, conference-website-load-balancer:security, load-balancer-attendees:security, attendees-attendees-store:security, and 4 more.",
+      "valid-from": "2025-04-10",
+      "details": {
+        "detailed-architecture": "snapshots/02-a13f51d7-2025-04-10-fixes-calm-generate-to-support-generi.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "936d86ba",
+          "4beddb01",
+          "2cfea467",
+          "ac14029a",
+          "a13f51d7"
+        ],
+        "commit-messages": [
+          "Fixes `calm generate` to support generic pattern instantiation (#1102)",
+          "Docify Enhancements for QCon (#1109)",
+          "Add Infrastructure As Code Generation Example for QCon (#1119)",
+          "Final demo (#1153)",
+          "made conference examples consistent to fix tests"
+        ],
+        "commit-count": 5
+      }
+    },
+    {
+      "unique-id": "2025-07-20-update-types-models-and-tooling-to-me",
+      "node-type": "moment",
+      "name": "Update types, models and tooling to meet RC2 definition",
+      "description": "This phase updates Kubernetes Cluster (k8s-cluster) (1 commit: 717350be). Connectivity shifts through updated links conference-website-load-balancer, load-balancer-attendees, and attendees-attendees-store. Applies controls k8s-cluster:security, conference-website-load-balancer:security, load-balancer-attendees:security, and attendees-attendees-store:security.",
+      "valid-from": "2025-07-20",
+      "details": {
+        "detailed-architecture": "snapshots/03-717350be-2025-07-20-update-types-models-and-tooling-to-me.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "717350be"
+        ],
+        "commit-messages": [
+          "Update types, models and tooling to meet RC2 definition (#1284)"
+        ],
+        "commit-count": 1
+      }
+    },
+    {
+      "unique-id": "2025-08-04-create-new-business-model-that-allows",
+      "node-type": "moment",
+      "name": "Create new business model that allows for native dererencing via Resolvable and ResolvableAndAdaptable. Creates new CanonicalModel which is leveraged by the DefaultTransformer by default",
+      "description": "This phase updates architecture governance and runtime definitions (1 commit: e449e63d). Covers flows Conference Signup Flow.",
+      "valid-from": "2025-08-04",
+      "details": {
+        "detailed-architecture": "snapshots/04-e449e63d-2025-08-04-create-new-business-model-that-allows.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "e449e63d"
+        ],
+        "commit-messages": [
+          "Create new business model that allows for native dererencing via Resolvable and ResolvableAndAdaptable. Creates new CanonicalModel which is leveraged by the DefaultTransformer by default (#1471)"
+        ],
+        "commit-count": 1
+      }
+    }
+  ],
+  "metadata": {
+    "title": "Git Architecture Timeline — conference-secure-signup-amended.arch.json",
+    "description": "Automatically synthesized from Git commit history of conference-secure-signup-amended.arch.json",
+    "generator": "calm-timelapse",
+    "clustering-engine": "deterministic",
+    "total-commits-scanned": "13",
+    "noise-commits-filtered": "5",
+    "structural-commits-retained": "8"
+  },
+  "current-moment": "2025-08-04-create-new-business-model-that-allows"
+}
