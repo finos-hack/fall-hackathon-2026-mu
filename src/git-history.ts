@@ -20,8 +20,21 @@ export const defaultGitRunner: GitCommandRunner = (args: string[], cwd: string):
 
 export interface ExtractGitHistoryOptions {
     maxCommits?: number;
+    firstParent?: boolean;
     gitRunner?: GitCommandRunner;
     onDebug?: (message: string) => void;
+}
+
+function findNearestExistingDirectory(startDir: string): string | null {
+    let cursor = startDir;
+    while (!existsSync(cursor)) {
+        const parent = path.dirname(cursor);
+        if (parent === cursor) {
+            return null;
+        }
+        cursor = parent;
+    }
+    return cursor;
 }
 
 export function extractGitHistory(
@@ -30,30 +43,56 @@ export function extractGitHistory(
 ): { commits: GitCommitSnapshot[]; totalCommitsScanned: number; repoRoot: string; relPath: string } {
     const runGit = options.gitRunner ?? defaultGitRunner;
     const rawAbsTarget = path.resolve(targetFilePath);
-    const absTarget = existsSync(rawAbsTarget) ? realpathSync(rawAbsTarget) : rawAbsTarget;
-    const targetDir = existsSync(absTarget) ? path.dirname(absTarget) : path.dirname(rawAbsTarget);
+    const targetExistsOnDisk = existsSync(rawAbsTarget);
+    const absTarget = targetExistsOnDisk ? realpathSync(rawAbsTarget) : rawAbsTarget;
+    const desiredDir = targetExistsOnDisk ? path.dirname(absTarget) : path.dirname(rawAbsTarget);
+    const probeDir = options.gitRunner ? desiredDir : findNearestExistingDirectory(desiredDir);
 
-    const rawRepoRoot = runGit(['rev-parse', '--show-toplevel'], targetDir).trim();
+    if (!probeDir) {
+        throw new Error(`Path does not exist: "${targetFilePath}"`);
+    }
+
+    const canonicalTarget = targetExistsOnDisk
+        ? absTarget
+        : existsSync(probeDir)
+          ? path.join(realpathSync(probeDir), path.relative(probeDir, rawAbsTarget))
+          : rawAbsTarget;
+
+    let rawRepoRoot: string;
+    try {
+        rawRepoRoot = runGit(['rev-parse', '--show-toplevel'], probeDir).trim();
+    } catch {
+        if (!targetExistsOnDisk) {
+            throw new Error(`Path does not exist: "${targetFilePath}"`);
+        }
+        throw new Error(`Not inside a Git repository: "${targetFilePath}"`);
+    }
+
     const repoRoot = existsSync(rawRepoRoot) ? realpathSync(rawRepoRoot) : rawRepoRoot;
-    const relTarget = path.relative(repoRoot, absTarget).split(path.sep).join('/');
-    const maxCommits = options.maxCommits ?? 200;
+    const relTarget = path.relative(repoRoot, canonicalTarget).split(path.sep).join('/');
 
-    const logArgs = [
-        'log',
-        '--follow',
-        '-M30%',
-        '-n',
-        String(maxCommits),
+    const logArgs = ['log'];
+    if (options.firstParent) {
+        logArgs.push('--first-parent');
+    }
+    logArgs.push('--follow', '-M30%');
+    if (options.maxCommits !== undefined) {
+        logArgs.push('-n', String(options.maxCommits));
+    }
+    logArgs.push(
         '--format=%x1e%H%x1f%h%x1f%cs%x1f%an%x1f%s%x1f%b%x1f%cI%x1d',
         '--name-only',
         '--',
         relTarget,
-    ];
+    );
     const rawLog = runGit(logArgs, repoRoot);
     const records = rawLog.split('\x1e').filter((chunk) => chunk.trim().length > 0);
     const totalCommitsScanned = records.length;
 
     if (totalCommitsScanned === 0) {
+        if (!targetExistsOnDisk) {
+            throw new Error(`Path does not exist (and has no Git history): "${targetFilePath}"`);
+        }
         throw new Error(`No Git commit history found for '${relTarget}'.`);
     }
 
@@ -94,22 +133,26 @@ export function extractGitHistory(
     const adrMap = new Map<string, string[]>();
     if (parsedNewestFirst.length > 0) {
         try {
-            const showOut = runGit(
-                ['show', '--format=%x1e%H', '--name-only', ...parsedNewestFirst.map((r) => r.sha)],
-                repoRoot,
-            );
-            for (const block of showOut.split('\x1e')) {
-                const lines = block
-                    .split(/\r?\n/)
-                    .map((l) => l.trim())
-                    .filter(Boolean);
-                if (lines.length === 0) continue;
-                const commitSha = lines[0];
-                const changedFiles = lines.slice(1);
-                if (changedFiles.length <= 20) {
-                    const adrs = changedFiles.filter((filePath) => ADR_PATH_PATTERN.test(filePath));
-                    if (adrs.length > 0) {
-                        adrMap.set(commitSha, adrs);
+            const batchSize = 200;
+            for (let start = 0; start < parsedNewestFirst.length; start += batchSize) {
+                const batchShas = parsedNewestFirst.slice(start, start + batchSize).map((r) => r.sha);
+                const showOut = runGit(
+                    ['show', '--format=%x1e%H', '--name-only', ...batchShas],
+                    repoRoot,
+                );
+                for (const block of showOut.split('\x1e')) {
+                    const lines = block
+                        .split(/\r?\n/)
+                        .map((l) => l.trim())
+                        .filter(Boolean);
+                    if (lines.length === 0) continue;
+                    const commitSha = lines[0];
+                    const changedFiles = lines.slice(1);
+                    if (changedFiles.length <= 20) {
+                        const adrs = changedFiles.filter((filePath) => ADR_PATH_PATTERN.test(filePath));
+                        if (adrs.length > 0) {
+                            adrMap.set(commitSha, adrs);
+                        }
                     }
                 }
             }

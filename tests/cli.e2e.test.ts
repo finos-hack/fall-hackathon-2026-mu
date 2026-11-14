@@ -470,4 +470,23 @@ describe('calm-timelapse CLI e2e', () => {
     expect(res.status).not.toBe(0);
     expect(res.stderr).toContain('Specify either --from-git <files...> or --timeline <files...>');
   });
+
+  it('reports clear errors for nonexistent --from-git and --timeline paths without spawnSync ENOENT', () => {
+    const missingGitRes = spawnSync(
+      process.execPath,
+      [cliPath, '--from-git', '/nonexistent-calm-dir/no-such-arch.calm.json'],
+      { encoding: 'utf8' },
+    );
+    expect(missingGitRes.status).not.toBe(0);
+    expect(missingGitRes.stderr).toContain('Path does not exist');
+    expect(missingGitRes.stderr).not.toContain('spawnSync git ENOENT');
+
+    const missingTlRes = spawnSync(
+      process.execPath,
+      [cliPath, '--timeline', '/nonexistent-calm-dir/no-such.timeline.json', '--validate'],
+      { encoding: 'utf8' },
+    );
+    expect(missingTlRes.status).not.toBe(0);
+    expect(missingTlRes.stderr).toContain('Timeline file does not exist');
+  });
 });

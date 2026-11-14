@@ -556,6 +556,7 @@ function parseSortableTimestamp(commit: GitCommitSnapshot): number {
 
 export interface SynchronizeGitSourcesOptions {
     maxCommits?: number;
+    firstParent?: boolean;
     includeMetadataChanges?: boolean;
     resolveDetails?: boolean;
     gitRunner?: GitCommandRunner;
@@ -591,6 +592,7 @@ export function extractAndSynchronizeGitSources(
     for (const spec of parsedSpecs) {
         const hist = extractGitHistory(spec.filePath, {
             maxCommits: options.maxCommits,
+            firstParent: options.firstParent,
             gitRunner: options.gitRunner,
             onDebug: options.onDebug,
         });
@@ -627,6 +629,7 @@ export function extractAndSynchronizeGitSources(
                     try {
                         const childHist = extractGitHistory(candidateAbs, {
                             maxCommits: options.maxCommits,
+                            firstParent: options.firstParent,
                             gitRunner: options.gitRunner,
                             onDebug: options.onDebug,
                         });

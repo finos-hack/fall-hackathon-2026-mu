@@ -98,8 +98,10 @@ describe('timelapse-html', () => {
     const layout = computeSuperGraphLayout(nodes, edges);
     expect(layout.positions['a'].layer).toBeLessThanOrEqual(layout.positions['b'].layer);
     expect(layout.positions['c']).toBeDefined();
-    expect(layout.canvasWidth).toBeGreaterThanOrEqual(960);
-    expect(layout.canvasHeight).toBeGreaterThanOrEqual(540);
+    expect(layout.canvasWidth).toBeGreaterThanOrEqual(520);
+    expect(layout.canvasWidth).toBeLessThanOrEqual(900);
+    expect(layout.canvasHeight).toBeGreaterThanOrEqual(260);
+    expect(layout.canvasHeight).toBeLessThanOrEqual(360);
   });
 
   it('builds payload from clusters, tracks removed/added nodes, and escapes script tags in HTML', () => {

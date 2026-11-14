@@ -42,6 +42,7 @@ export interface GenerateTimelineOptions {
   clustersPath?: string;
   clusterSpecs?: unknown;
   maxCommits?: number;
+  firstParent?: boolean;
   includeMetadataChanges?: boolean;
   resolveDetails?: boolean;
   validate?: boolean;
@@ -85,6 +86,7 @@ export async function generateTimelineFromGit(
   if (useFederatedMode) {
     const syncResult = extractAndSynchronizeGitSources(targets, {
       maxCommits: options.maxCommits,
+      firstParent: options.firstParent,
       includeMetadataChanges: options.includeMetadataChanges,
       resolveDetails: options.resolveDetails,
       gitRunner: options.gitRunner,
@@ -100,6 +102,7 @@ export async function generateTimelineFromGit(
     const targetFilePath = targets[0];
     const extracted = extractGitHistory(targetFilePath, {
       maxCommits: options.maxCommits,
+      firstParent: options.firstParent,
       gitRunner: options.gitRunner,
       onDebug: options.onDebug,
     });

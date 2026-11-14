@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // SPDX-License-Identifier: Apache-2.0
 
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { Command } from 'commander';
 import {
@@ -23,6 +23,7 @@ interface CliOptions {
   emitDigest?: string;
   clusters?: string;
   maxCommits?: string;
+  firstParent?: boolean;
   includeMetadataChanges?: boolean;
   resolveDetails?: boolean;
   validate?: boolean;
@@ -81,7 +82,15 @@ export function createProgram(): Command {
       '--clusters <file>',
       'Apply pre-authored or AI-assistant-generated moment cluster definitions JSON (contiguous 0..N-1)',
     )
-    .option('--max-commits <n>', 'Maximum number of Git commits to scan per architecture file')
+    .option(
+      '--max-commits <n>',
+      'Optional cap on Git commits to scan per architecture file (unlimited by default)',
+    )
+    .option(
+      '--first-parent',
+      'Follow only first-parent mainline commits across merges when walking Git history',
+      false,
+    )
     .option(
       '--include-metadata-changes',
       'Retain commits that only modify metadata/descriptions',
@@ -145,6 +154,7 @@ export function createProgram(): Command {
         emitDigestPath: opts.emitDigest,
         clustersPath: opts.clusters,
         maxCommits,
+        firstParent: opts.firstParent,
         includeMetadataChanges: opts.includeMetadataChanges,
         resolveDetails: opts.resolveDetails,
         validate: opts.validate,
@@ -179,6 +189,12 @@ export function createProgram(): Command {
     }
 
     if (hasTimeline && opts.timeline) {
+      for (const rawTimelinePath of opts.timeline) {
+        const resolvedCheck = path.resolve(rawTimelinePath);
+        if (!existsSync(resolvedCheck)) {
+          throw new Error(`Timeline file does not exist: "${rawTimelinePath}"`);
+        }
+      }
       const resolvedTimelines = opts.timeline.map((t) => path.resolve(t));
       if (opts.validate || opts.validateSnapshots) {
         const allErrors: string[] = [];
@@ -192,7 +208,9 @@ export function createProgram(): Command {
           if (opts.validateSnapshots && Array.isArray(parsed.moments)) {
             const baseDir = path.dirname(resolvedTimeline);
             for (const m of parsed.moments) {
-              const archRef = m.details?.['detailed-architecture']?.trim();
+              const archRef = (
+                m.details?.['detailed-architecture'] ?? m.details?.['required-pattern']
+              )?.trim();
               if (!archRef || /^https?:\/\//i.test(archRef)) continue;
               const snapPath = path.resolve(baseDir, archRef);
               try {
