@@ -1,0 +1,265 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm.json",
+  "unique-id": "traderx-007-observability-lgtm-compose",
+  "name": "FINOS TraderX — Observability with LGTM on Compose",
+  "description": "Containerized TraderX runtime (state 006) with an LGTM observability layer for local learning.",
+  "nodes": [
+    {
+      "unique-id": "developer",
+      "node-type": "actor",
+      "name": "Developer",
+      "description": "Local developer using this state."
+    },
+    {
+      "unique-id": "app_runtime",
+      "node-type": "network",
+      "name": "TraderX App Runtime (State 006)",
+      "description": "Baseline containerized TraderX services.",
+      "metadata": {
+        "traderx-kind": "boundary"
+      }
+    },
+    {
+      "unique-id": "obs_runtime",
+      "node-type": "network",
+      "name": "Observability Runtime",
+      "description": "LGTM + OTel stack for metrics/logs/traces.",
+      "metadata": {
+        "traderx-kind": "boundary"
+      }
+    },
+    {
+      "unique-id": "ingress",
+      "node-type": "service",
+      "name": "NGINX Ingress",
+      "description": "Edge entrypoint for UI and service proxy."
+    },
+    {
+      "unique-id": "core_services",
+      "node-type": "service",
+      "name": "Core Services",
+      "description": "Account, position, trade, processor, people, reference-data, nats-broker, database, UI."
+    },
+    {
+      "unique-id": "prometheus",
+      "node-type": "service",
+      "name": "Prometheus",
+      "description": "Scrapes probe and collector metrics."
+    },
+    {
+      "unique-id": "blackbox",
+      "node-type": "service",
+      "name": "Blackbox Exporter",
+      "description": "HTTP probe exporter for service availability/latency."
+    },
+    {
+      "unique-id": "loki",
+      "node-type": "service",
+      "name": "Loki",
+      "description": "Log aggregation backend."
+    },
+    {
+      "unique-id": "promtail",
+      "node-type": "service",
+      "name": "Promtail",
+      "description": "Docker log collector to Loki."
+    },
+    {
+      "unique-id": "tempo",
+      "node-type": "service",
+      "name": "Tempo",
+      "description": "Trace backend."
+    },
+    {
+      "unique-id": "otel",
+      "node-type": "service",
+      "name": "OpenTelemetry Collector",
+      "description": "OTLP ingest and telemetry routing."
+    },
+    {
+      "unique-id": "grafana",
+      "node-type": "service",
+      "name": "Grafana",
+      "description": "Unified dashboards for metrics, logs, traces."
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "rel-developer-ingress",
+      "description": "Uses TraderX",
+      "relationship-type": {
+        "interacts": {
+          "actor": "developer",
+          "nodes": [
+            "ingress"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "rel-ingress-core_services",
+      "description": "Routes API/UI traffic",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "ingress"
+          },
+          "destination": {
+            "node": "core_services"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-blackbox-core_services",
+      "description": "HTTP probes",
+      "protocol": "HTTP",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "blackbox"
+          },
+          "destination": {
+            "node": "core_services"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-prometheus-blackbox",
+      "description": "Scrapes probe metrics",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "prometheus"
+          },
+          "destination": {
+            "node": "blackbox"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-promtail-loki",
+      "description": "Ships logs",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "promtail"
+          },
+          "destination": {
+            "node": "loki"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-otel-tempo",
+      "description": "Exports traces",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "otel"
+          },
+          "destination": {
+            "node": "tempo"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-developer-grafana",
+      "description": "Views observability dashboards",
+      "relationship-type": {
+        "interacts": {
+          "actor": "developer",
+          "nodes": [
+            "grafana"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "rel-grafana-prometheus",
+      "description": "Queries metrics",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "grafana"
+          },
+          "destination": {
+            "node": "prometheus"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-grafana-loki",
+      "description": "Queries logs",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "grafana"
+          },
+          "destination": {
+            "node": "loki"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-grafana-tempo",
+      "description": "Queries traces",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "grafana"
+          },
+          "destination": {
+            "node": "tempo"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-deployed-in-app_runtime",
+      "description": "Workloads deployed in app_runtime.",
+      "relationship-type": {
+        "deployed-in": {
+          "container": "app_runtime",
+          "nodes": [
+            "ingress",
+            "core_services"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "rel-deployed-in-obs_runtime",
+      "description": "Workloads deployed in obs_runtime.",
+      "relationship-type": {
+        "deployed-in": {
+          "container": "obs_runtime",
+          "nodes": [
+            "prometheus",
+            "blackbox",
+            "loki",
+            "promtail",
+            "tempo",
+            "otel",
+            "grafana"
+          ]
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "source-project": "finos/traderx",
+    "state-id": "007-observability-lgtm-compose",
+    "track": "nonfunctional",
+    "status": "implemented"
+  },
+  "adrs": [
+    "docs/adr/007-state-007-adopt-lgtm-observability-stack.md"
+  ]
+}

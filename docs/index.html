@@ -200,6 +200,7 @@
           <div class="meta-row">
             <span class="pill teal">2 Real Git Repos · --resolve-details</span>
             <span class="pill">3 Synchronized Architectures</span>
+            <span class="pill">19 Commits → 8 Moments (4 Noise Filtered)</span>
           </div>
           <h3>FINOS CALM Core (<code>calm-3.json</code> + <code>calm-hub-detail</code>) &amp; CALM Timelapse</h3>
           <p>
@@ -217,20 +218,48 @@
       </article>
     </div>
 
-    <h2>Featured Enterprise Simulation</h2>
+    <h2>Upstream FINOS Project Integration (<code>finos/traderx</code> + FINOS FDC3)</h2>
     <div class="grid">
       <article class="card featured">
         <div>
           <div class="meta-row">
-            <span class="pill teal">40 Git Commits → 9 Moments</span>
-            <span class="pill">5 Formatting Commits Filtered</span>
+            <span class="pill teal">Real Upstream finos/traderx · --from-traderx</span>
+            <span class="pill">13 Progressive States (001–014) · 135 Commit Refs</span>
+            <span class="pill">8 Real ADRs · FINOS FDC3 Interop</span>
+          </div>
+          <h3>FINOS TraderX Progressive Reference Architecture &amp; FDC3 Desktop Interop</h3>
+          <p>
+            Imported directly from upstream <code>finos/traderx</code> (<code>catalog/state-catalog.json</code>,
+            <code>specs/*/system/architecture.model.json</code>, and <code>docs/adr/*.md</code>) into schema-valid CALM 1.3:
+            traces TraderX from uncontainerized baseline services through gRPC internal transport, Angular SPA migration,
+            Docker Compose runtime boundaries, OpenTelemetry/Jaeger/Prometheus observability, Kubernetes, and
+            <strong>FINOS FDC3</strong> desktop agent intent interoperability on C3.
+          </p>
+        </div>
+        <div class="links">
+          <a class="btn" href="./demos/finos-traderx/finos-traderx.timelapse.html">Open FINOS TraderX Player →</a>
+          <a class="btn secondary" href="./demos/finos-traderx/finos-traderx.timelapse.html#feed">☰ Architecture Feed</a>
+          <a class="btn secondary" href="./demos/finos-traderx/finos-traderx.timeline.json">calm-timeline.json</a>
+          <a class="btn secondary" href="./demos/finos-traderx/finos-traderx.digest.json">Diff Digest</a>
+        </div>
+      </article>
+    </div>
+
+    <h2>Simulated Compliance Benchmark (Synthetic 40-Commit Seed)</h2>
+    <div class="grid">
+      <article class="card featured">
+        <div>
+          <div class="meta-row">
+            <span class="pill teal">Synthetic Seed · scripts/seed-traderx-demo.sh</span>
+            <span class="pill">40 Git Commits → 9 Moments (5 Noise Filtered)</span>
             <span class="pill">5 Co-Changed ADRs · 4 CALM 1.3 Controls</span>
           </div>
-          <h3>TraderX Institutional Equities Platform Evolution</h3>
+          <h3>Simulated Institutional Equities Platform Benchmark</h3>
           <p>
-            Follows an 8-sprint modernization from a single-region HTTP/Oracle order monolith to a zero-trust mTLS,
-            Kafka-backed trading architecture with SEC 15c3-5 pre-trade risk gating, FIX 4.4 venue execution,
-            SEC 17a-4 WORM audit archiving, DORA warm-standby replication, and T+1 FINRA CAT reporting.
+            Reproducible synthetic stress-test benchmark (<code>npm run demo:traderx</code>) modeling an 8-sprint
+            modernization from a single-region HTTP/Oracle order monolith to a zero-trust mTLS, Kafka-backed trading
+            architecture with SEC 15c3-5 pre-trade risk gating, FIX 4.4 venue execution, SEC 17a-4 WORM archiving,
+            DORA warm-standby replication, and T+1 FINRA CAT reporting.
           </p>
         </div>
         <div class="links">
@@ -291,12 +320,12 @@
         <div>
           <div class="meta-row">
             <span class="pill teal">Self-Dogfooding</span>
-            <span class="pill">5 PR Stages → 5 Moments</span>
+            <span class="pill">6 PR Stages → 6 Moments</span>
           </div>
           <h3>CALM Timelapse Own Architecture</h3>
           <p>
             Extracted directly from this repository's own <code>architecture.calm.json</code> commit history,
-            modeling the zero-network CLI pipeline and workspace file handoff controls.
+            modeling the zero-network CLI pipeline, upstream TraderX importer, and workspace file handoff controls.
           </p>
         </div>
         <div class="links">
@@ -310,13 +339,14 @@
       <article class="card">
         <div>
           <div class="meta-row">
-            <span class="pill">23 Commits → 4 Moments</span>
-            <span class="pill">9 Noise Commits Filtered</span>
+            <span class="pill teal">CALM Pattern Schema (*.pattern.json)</span>
+            <span class="pill">23 Commits → 4 Moments (6 Noise Filtered)</span>
           </div>
           <h3>FINOS API Gateway Reference Pattern</h3>
           <p>
-            Two years of real schema migrations, Spectral interface refinements, and direct consumer-to-IdP
-            authentication across <code>api-gateway.json</code> in <code>finos/architecture-as-code</code>.
+            Two years of legacy <code>items</code>-to-<code>prefixItems</code> pattern schema migrations, Spectral
+            interface refinements, and direct consumer-to-IdP authentication across <code>api-gateway.json</code>,
+            emitted via <code>details.required-pattern</code>.
           </p>
         </div>
         <div class="links">
@@ -331,12 +361,12 @@
         <div>
           <div class="meta-row">
             <span class="pill teal">Zero-AI Deterministic Mode</span>
-            <span class="pill">13 Commits → 4 Moments (5 Noise Filtered)</span>
+            <span class="pill">13 Commits → 5 Moments (4 Noise Filtered)</span>
           </div>
           <h3>OSFF London Secure Signup Workshop</h3>
           <p>
             Grouped automatically without <code>--clusters</code> using deterministic 14-day same-author commit
-            heuristics on <code>conference-secure-signup-amended.arch.json</code>.
+            heuristics on <code>conference-secure-signup-amended.arch.json</code>, including referenced flow URL additions.
           </p>
         </div>
         <div class="links">

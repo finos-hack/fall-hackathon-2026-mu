@@ -1,0 +1,525 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm-timeline.json",
+  "moments": [
+    {
+      "unique-id": "state-001-baseline-uncontainerized-parity",
+      "node-type": "moment",
+      "name": "State 001: Simple App - Base Uncontainerized App",
+      "description": "Baseline pre-containerized architecture with direct browser-to-service calls and Socket.IO trade/position subscriptions.",
+      "valid-from": "2026-11-11",
+      "details": {
+        "detailed-architecture": "snapshots/01-1d6222a-state-001-baseline-uncontainerized-parity.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "9f8dda5",
+          "de58b8f",
+          "dd1ffe3",
+          "a159d6b",
+          "bbd6408",
+          "f3e7226",
+          "1d6222a"
+        ],
+        "commit-messages": [
+          "TraderX v2.0: merge agentic renovation into main (#354)",
+          "[codex] fix generated dependency CVE targets (#390)",
+          "Add runtime start metadata to About page (#454)",
+          "Fix H2 booking constraints and publish trade events after commit",
+          "Bring dependency-security remediation into main (#469)",
+          "Make TraderX states an incremental, book-style learning journey (#477)",
+          "snapshot: 001-baseline-uncontainerized-parity generated from 44573889eb1410e1cc9898d52977c6dc14d1046e"
+        ],
+        "commit-count": 7
+      },
+      "adrs": [
+        "docs/adr/001-adopt-github-speckit.md",
+        "docs/adr/002-generated-state-branching-strategy.md",
+        "docs/adr/003-baseline-intentionally-simplistic-legacy-shaped.md"
+      ]
+    },
+    {
+      "unique-id": "state-002-edge-proxy-uncontainerized",
+      "node-type": "moment",
+      "name": "State 002: Edge Proxy Uncontainerized",
+      "description": "State 002 keeps uncontainerized services and introduces an edge proxy as the single browser-facing entrypoint.",
+      "valid-from": "2026-11-11",
+      "details": {
+        "detailed-architecture": "snapshots/02-0f23b0b-state-002-edge-proxy-uncontainerized.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "9f8dda5",
+          "de58b8f",
+          "c51034e",
+          "f3e7226",
+          "b86f609",
+          "0f23b0b"
+        ],
+        "commit-messages": [
+          "TraderX v2.0: merge agentic renovation into main (#354)",
+          "[codex] fix generated dependency CVE targets (#390)",
+          "Fix edge proxy http-proxy-middleware CVEs (#455)",
+          "Make TraderX states an incremental, book-style learning journey (#477)",
+          "Remove vulnerable frontend test dependencies and refresh edge proxy lock",
+          "snapshot: 002-edge-proxy-uncontainerized generated from 44573889eb1410e1cc9898d52977c6dc14d1046e"
+        ],
+        "commit-count": 6
+      }
+    },
+    {
+      "unique-id": "state-004-containerized-compose-runtime",
+      "node-type": "moment",
+      "name": "State 004: Containerized Compose Runtime (NGINX Ingress)",
+      "description": "State 004 preserves state 002 routing semantics while moving runtime to Docker Compose and NGINX ingress.",
+      "valid-from": "2026-11-13",
+      "details": {
+        "detailed-architecture": "snapshots/03-f150d69-state-004-containerized-compose-runtime.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "9f8dda5",
+          "37b993f",
+          "de58b8f",
+          "8490dde",
+          "d8d779c",
+          "54f6111",
+          "48a0366",
+          "176c7d2",
+          "12c6802",
+          "c86d975",
+          "dd1ffe3",
+          "a159d6b",
+          "5787861",
+          "bbd6408",
+          "f3e7226",
+          "4f9fda1",
+          "cbda232",
+          "c8448f1",
+          "b86f609",
+          "3932b3d",
+          "504141f",
+          "f150d69"
+        ],
+        "commit-messages": [
+          "TraderX v2.0: merge agentic renovation into main (#354)",
+          "Expose Grafana/Prometheus ingress routes for states 007/008/009 (#362)",
+          "[codex] fix generated dependency CVE targets (#390)",
+          "Align generated dependency patchsets",
+          "Harden generated Grafana observability and runtime readiness",
+          "Refresh state 004 smoke script prune patch",
+          "Refresh compose frontend Angular CVE overlay (#424)",
+          "Remove stale state014 generator deletion hunks (#433)",
+          "Refresh state 004 overlay patch (#443)",
+          "github action and restart containers unless stopped (#453)",
+          "Add runtime start metadata to About page (#454)",
+          "Fix H2 booking constraints and publish trade events after commit",
+          "Harden generated snapshot security and deployment gates (#466) (#467)",
+          "Bring dependency-security remediation into main (#469)",
+          "Make TraderX states an incremental, book-style learning journey (#477)",
+          "Fix generated snapshot publishing and remediate Node vulnerabilities",
+          "Add complete infrastructure scan diagnostics and preflight-only deployment",
+          "Refresh compatible dependency baselines and retire redundant npm overrides",
+          "Remove vulnerable frontend test dependencies and refresh edge proxy lock",
+          "Track and patch both Jackson BOM families across generated states",
+          "Align transitive Kotlin through the canonical Spring Boot BOM property",
+          "snapshot: 004-containerized-compose-runtime generated from ca0f66429bdf95552da0655eed56e34c4af67185"
+        ],
+        "commit-count": 22
+      },
+      "adrs": [
+        "docs/adr/004-prefer-lightweight-default-infra-and-swappable-components.md"
+      ]
+    },
+    {
+      "unique-id": "state-005-postgres-database-replacement",
+      "node-type": "moment",
+      "name": "State 005: PostgreSQL Database Replacement",
+      "description": "State 005 replaces H2 database runtime with PostgreSQL while preserving state 004 containerized ingress topology and baseline flows.",
+      "valid-from": "2026-11-13",
+      "details": {
+        "detailed-architecture": "snapshots/04-92af021-state-005-postgres-database-replacement.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "9f8dda5",
+          "8490dde",
+          "4ffe3dc",
+          "5c1cbdd",
+          "c86d975",
+          "bbd6408",
+          "f3e7226",
+          "92af021"
+        ],
+        "commit-messages": [
+          "TraderX v2.0: merge agentic renovation into main (#354)",
+          "Align generated dependency patchsets",
+          "Refresh state 005 generated overlay patch",
+          "Update generated PostgreSQL JDBC driver target",
+          "github action and restart containers unless stopped (#453)",
+          "Bring dependency-security remediation into main (#469)",
+          "Make TraderX states an incremental, book-style learning journey (#477)",
+          "snapshot: 005-postgres-database-replacement generated from ca0f66429bdf95552da0655eed56e34c4af67185"
+        ],
+        "commit-count": 8
+      },
+      "adrs": [
+        "docs/adr/006-state-005-use-postgres-for-database-replacement.md"
+      ]
+    },
+    {
+      "unique-id": "state-006-messaging-nats-replacement",
+      "node-type": "moment",
+      "name": "State 006: Messaging Layer Replacement with NATS",
+      "description": "State 006 replaces Socket.IO trade-feed messaging with NATS while preserving state 005 containerized runtime and ingress entry model.",
+      "valid-from": "2026-11-13",
+      "details": {
+        "detailed-architecture": "snapshots/05-aaa8507-state-006-messaging-nats-replacement.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "9f8dda5",
+          "37b993f",
+          "8490dde",
+          "f0056d6",
+          "5c1cbdd",
+          "b2618b7",
+          "dd1ffe3",
+          "bbd6408",
+          "f3e7226",
+          "4f9fda1",
+          "c8448f1",
+          "6dceb6f",
+          "aaa8507"
+        ],
+        "commit-messages": [
+          "TraderX v2.0: merge agentic renovation into main (#354)",
+          "Expose Grafana/Prometheus ingress routes for states 007/008/009 (#362)",
+          "Align generated dependency patchsets",
+          "Align NATS image targets in state specs",
+          "Update generated PostgreSQL JDBC driver target",
+          "Refresh state 006 generated overlay patch (#447)",
+          "Add runtime start metadata to About page (#454)",
+          "Bring dependency-security remediation into main (#469)",
+          "Make TraderX states an incremental, book-style learning journey (#477)",
+          "Fix generated snapshot publishing and remediate Node vulnerabilities",
+          "Refresh compatible dependency baselines and retire redundant npm overrides",
+          "Correct state006 volume schema and retain inventory failure diagnostics",
+          "snapshot: 006-messaging-nats-replacement generated from ca0f66429bdf95552da0655eed56e34c4af67185"
+        ],
+        "commit-count": 13
+      },
+      "adrs": [
+        "docs/adr/005-state-006-use-nats-for-messaging-replacement.md"
+      ]
+    },
+    {
+      "unique-id": "state-007-observability-lgtm-compose",
+      "node-type": "moment",
+      "name": "State 007: Observability with LGTM on Compose",
+      "description": "Containerized TraderX runtime (state 006) with an LGTM observability layer for local learning.",
+      "valid-from": "2026-11-13",
+      "details": {
+        "detailed-architecture": "snapshots/06-471891e-state-007-observability-lgtm-compose.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "9f8dda5",
+          "37b993f",
+          "8490dde",
+          "d8d779c",
+          "f0056d6",
+          "b38fba2",
+          "5c1cbdd",
+          "bbd6408",
+          "f3e7226",
+          "471891e"
+        ],
+        "commit-messages": [
+          "TraderX v2.0: merge agentic renovation into main (#354)",
+          "Expose Grafana/Prometheus ingress routes for states 007/008/009 (#362)",
+          "Align generated dependency patchsets",
+          "Harden generated Grafana observability and runtime readiness",
+          "Align NATS image targets in state specs",
+          "Fix runtime health probe targets (#428)",
+          "Update generated PostgreSQL JDBC driver target",
+          "Bring dependency-security remediation into main (#469)",
+          "Make TraderX states an incremental, book-style learning journey (#477)",
+          "snapshot: 007-observability-lgtm-compose generated from ca0f66429bdf95552da0655eed56e34c4af67185"
+        ],
+        "commit-count": 10
+      },
+      "adrs": [
+        "docs/adr/007-state-007-adopt-lgtm-observability-stack.md"
+      ]
+    },
+    {
+      "unique-id": "state-008-pricing-awareness-market-data",
+      "node-type": "moment",
+      "name": "State 008: Pricing Awareness and Market Data Streaming",
+      "description": "State 008 builds on NATS-based runtime from 006 and adds synthetic market pricing, trade execution price stamping, position cost basis aggregation, and frontend valuation.",
+      "valid-from": "2026-11-13",
+      "details": {
+        "detailed-architecture": "snapshots/07-d6e7fe4-state-008-pricing-awareness-market-data.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "9f8dda5",
+          "37b993f",
+          "de58b8f",
+          "d8d779c",
+          "f0056d6",
+          "b38fba2",
+          "c0703b3",
+          "15b7e25",
+          "f218c8e",
+          "dd1ffe3",
+          "a159d6b",
+          "bbd6408",
+          "f3e7226",
+          "c8448f1",
+          "ccee876",
+          "bc1f14a",
+          "4971855",
+          "d6e7fe4"
+        ],
+        "commit-messages": [
+          "TraderX v2.0: merge agentic renovation into main (#354)",
+          "Expose Grafana/Prometheus ingress routes for states 007/008/009 (#362)",
+          "[codex] fix generated dependency CVE targets (#390)",
+          "Harden generated Grafana observability and runtime readiness",
+          "Align NATS image targets in state specs",
+          "Fix runtime health probe targets (#428)",
+          "Fix pricing UI inheritance across generated states",
+          "Address PR 436 review feedback",
+          "Refresh state 008 generated overlay patch (#448)",
+          "Add runtime start metadata to About page (#454)",
+          "Fix H2 booking constraints and publish trade events after commit",
+          "Bring dependency-security remediation into main (#469)",
+          "Make TraderX states an incremental, book-style learning journey (#477)",
+          "Refresh compatible dependency baselines and retire redundant npm overrides",
+          "Align state008 Compose patch with corrected state006 volume schema",
+          "Load Yahoo Finance through ESM and test price publisher startup",
+          "Keep appended price startup test outside preceding patch hunk",
+          "snapshot: 008-pricing-awareness-market-data generated from ca0f66429bdf95552da0655eed56e34c4af67185"
+        ],
+        "commit-count": 18
+      }
+    },
+    {
+      "unique-id": "state-009-order-management-matcher",
+      "node-type": "moment",
+      "name": "State 009: Order Management and Matcher",
+      "description": "Pricing + observability runtime extended with order management, matcher flow, and order-specific telemetry.",
+      "valid-from": "2026-11-13",
+      "details": {
+        "detailed-architecture": "snapshots/08-90555d9-state-009-order-management-matcher.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "9f8dda5",
+          "37b993f",
+          "8490dde",
+          "d8d779c",
+          "f0056d6",
+          "b38fba2",
+          "c0703b3",
+          "15b7e25",
+          "5c1cbdd",
+          "0059e48",
+          "146ccba",
+          "f60def6",
+          "dd1ffe3",
+          "a159d6b",
+          "bbd6408",
+          "f3e7226",
+          "787f632",
+          "10d0807",
+          "c8448f1",
+          "3932b3d",
+          "504141f",
+          "90555d9"
+        ],
+        "commit-messages": [
+          "TraderX v2.0: merge agentic renovation into main (#354)",
+          "Expose Grafana/Prometheus ingress routes for states 007/008/009 (#362)",
+          "Align generated dependency patchsets",
+          "Harden generated Grafana observability and runtime readiness",
+          "Align NATS image targets in state specs",
+          "Fix runtime health probe targets (#428)",
+          "Fix pricing UI inheritance across generated states",
+          "Address PR 436 review feedback",
+          "Update generated PostgreSQL JDBC driver target",
+          "Refresh state 009 generated overlay patch (#450)",
+          "Declare state 009 order matcher environment URL (#451)",
+          "Import Jackson BOM in state 009 order matcher (#452)",
+          "Add runtime start metadata to About page (#454)",
+          "Fix H2 booking constraints and publish trade events after commit",
+          "Bring dependency-security remediation into main (#469)",
+          "Make TraderX states an incremental, book-style learning journey (#477)",
+          "fix(009): relabel limit price from STRIKE to LIMIT PRICE (#480) (#484)",
+          "Rebuild state 009 infrastructure and preserve database recovery safeguards",
+          "Refresh compatible dependency baselines and retire redundant npm overrides",
+          "Track and patch both Jackson BOM families across generated states",
+          "Align transitive Kotlin through the canonical Spring Boot BOM property",
+          "snapshot: 009-order-management-matcher generated from ca0f66429bdf95552da0655eed56e34c4af67185"
+        ],
+        "commit-count": 22
+      }
+    },
+    {
+      "unique-id": "state-010-kubernetes-runtime",
+      "node-type": "moment",
+      "name": "State 010: Kubernetes Runtime on C2",
+      "description": "State 010 preserves state 009 browser/API routing behavior while running all services on a local Kubernetes cluster.",
+      "valid-from": "2026-11-13",
+      "details": {
+        "detailed-architecture": "snapshots/09-1c468ac-state-010-kubernetes-runtime.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "9f8dda5",
+          "d8d779c",
+          "f0056d6",
+          "b38fba2",
+          "f3e7226",
+          "1c468ac"
+        ],
+        "commit-messages": [
+          "TraderX v2.0: merge agentic renovation into main (#354)",
+          "Harden generated Grafana observability and runtime readiness",
+          "Align NATS image targets in state specs",
+          "Fix runtime health probe targets (#428)",
+          "Make TraderX states an incremental, book-style learning journey (#477)",
+          "snapshot: 010-kubernetes-runtime generated from ca0f66429bdf95552da0655eed56e34c4af67185"
+        ],
+        "commit-count": 6
+      }
+    },
+    {
+      "unique-id": "state-011-tilt-kubernetes-dev-loop",
+      "node-type": "moment",
+      "name": "State 011: Tilt Local Dev on Kubernetes",
+      "description": "State 011 preserves state 010 Kubernetes runtime while introducing Tilt for local developer automation.",
+      "valid-from": "2026-11-13",
+      "details": {
+        "detailed-architecture": "snapshots/10-a51cf67-state-011-tilt-kubernetes-dev-loop.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "9f8dda5",
+          "d8d779c",
+          "f0056d6",
+          "b38fba2",
+          "f3e7226",
+          "a51cf67"
+        ],
+        "commit-messages": [
+          "TraderX v2.0: merge agentic renovation into main (#354)",
+          "Harden generated Grafana observability and runtime readiness",
+          "Align NATS image targets in state specs",
+          "Fix runtime health probe targets (#428)",
+          "Make TraderX states an incremental, book-style learning journey (#477)",
+          "snapshot: 011-tilt-kubernetes-dev-loop generated from ca0f66429bdf95552da0655eed56e34c4af67185"
+        ],
+        "commit-count": 6
+      }
+    },
+    {
+      "unique-id": "state-012-platform-convergence-c3",
+      "node-type": "moment",
+      "name": "State 012: Platform Convergence C3",
+      "description": "State 012 is the C3 convergence checkpoint: Kubernetes + Tilt platform profile on top of C2 functional behavior.",
+      "valid-from": "2026-11-13",
+      "details": {
+        "detailed-architecture": "snapshots/11-cfa6992-state-012-platform-convergence-c3.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "9f8dda5",
+          "d8d779c",
+          "f3e7226",
+          "cfa6992"
+        ],
+        "commit-messages": [
+          "TraderX v2.0: merge agentic renovation into main (#354)",
+          "Harden generated Grafana observability and runtime readiness",
+          "Make TraderX states an incremental, book-style learning journey (#477)",
+          "snapshot: 012-platform-convergence-c3 generated from ca0f66429bdf95552da0655eed56e34c4af67185"
+        ],
+        "commit-count": 4
+      },
+      "adrs": [
+        "docs/adr/008-convergence-state-model.md"
+      ]
+    },
+    {
+      "unique-id": "state-013-radius-kubernetes-platform",
+      "node-type": "moment",
+      "name": "State 013: Radius Platform on Kubernetes (Optional)",
+      "description": "State 013 preserves state 012 C3 runtime while adding Radius application/resource abstractions.",
+      "valid-from": "2026-11-13",
+      "details": {
+        "detailed-architecture": "snapshots/12-1cc519e-state-013-radius-kubernetes-platform.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "9f8dda5",
+          "d8d779c",
+          "f0056d6",
+          "b38fba2",
+          "f3e7226",
+          "1cc519e"
+        ],
+        "commit-messages": [
+          "TraderX v2.0: merge agentic renovation into main (#354)",
+          "Harden generated Grafana observability and runtime readiness",
+          "Align NATS image targets in state specs",
+          "Fix runtime health probe targets (#428)",
+          "Make TraderX states an incremental, book-style learning journey (#477)",
+          "snapshot: 013-radius-kubernetes-platform generated from ca0f66429bdf95552da0655eed56e34c4af67185"
+        ],
+        "commit-count": 6
+      }
+    },
+    {
+      "unique-id": "state-014-fdc3-intent-interoperability",
+      "node-type": "moment",
+      "name": "State 014: FDC3 Intent Interoperability on C3",
+      "description": "State 014 layers FDC3 context and intent interoperability onto the C3 TraderX runtime and adds a local Sail sidecar demo environment.",
+      "valid-from": "2026-11-13",
+      "details": {
+        "detailed-architecture": "snapshots/13-c3e935b-state-014-fdc3-intent-interoperability.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "9f8dda5",
+          "a23db1e",
+          "f3e7226",
+          "787f632",
+          "dabf4a7",
+          "c3e935b"
+        ],
+        "commit-messages": [
+          "TraderX v2.0: merge agentic renovation into main (#354)",
+          "Make FDC3 blotter ticker filtering opt-in (#464)",
+          "Make TraderX states an incremental, book-style learning journey (#477)",
+          "fix(009): relabel limit price from STRIKE to LIMIT PRICE (#480) (#484)",
+          "Freeze and audit the compatible web-only Sail dependency graph",
+          "snapshot: 014-fdc3-intent-interoperability generated from ca0f66429bdf95552da0655eed56e34c4af67185"
+        ],
+        "commit-count": 6
+      }
+    }
+  ],
+  "metadata": {
+    "title": "Git Architecture Timeline — FINOS TraderX (v2.0 Progressive States + FDC3)",
+    "description": "Extracted directly from upstream finos/traderx catalog/state-catalog.json, specs/*/system/architecture.model.json, docs/adr/*.md, and Git history.",
+    "generator": "calm-timelapse",
+    "source-repository": "https://github.com/finos/traderx",
+    "clustering-engine": "traderx-state-catalog",
+    "total-commits-scanned": "135",
+    "noise-commits-filtered": "1",
+    "structural-commits-retained": "13"
+  },
+  "current-moment": "state-014-fdc3-intent-interoperability"
+}

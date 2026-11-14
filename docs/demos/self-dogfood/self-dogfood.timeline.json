@@ -95,6 +95,25 @@
         ],
         "commit-count": 1
       }
+    },
+    {
+      "unique-id": "moment-06-finos-traderx-importer",
+      "node-type": "moment",
+      "name": "Upstream FINOS TraderX & FDC3 State Importer",
+      "description": "Integrates upstream finos/traderx progressive architecture states (States 001-014 including FINOS FDC3 intent interoperability), ADRs, and Git commits into CALM 1.3.",
+      "valid-from": "2026-11-13",
+      "details": {
+        "detailed-architecture": "snapshots/06-151d9e3-moment-06-finos-traderx-importer.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "151d9e3"
+        ],
+        "commit-messages": [
+          "feat(traderx): import upstream finos/traderx progressive states and FDC3 into CALM 1.3"
+        ],
+        "commit-count": 1
+      }
     }
   ],
   "metadata": {
@@ -102,9 +121,9 @@
     "description": "Automatically synthesized from Git commit history of architecture.calm.json",
     "generator": "calm-timelapse",
     "clustering-engine": "clusters-file",
-    "total-commits-scanned": "5",
+    "total-commits-scanned": "6",
     "noise-commits-filtered": "0",
-    "structural-commits-retained": "5"
+    "structural-commits-retained": "6"
   },
-  "current-moment": "moment-05-architecture-feed-mode"
+  "current-moment": "moment-06-finos-traderx-importer"
 }

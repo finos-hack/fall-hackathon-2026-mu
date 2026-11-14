@@ -26,14 +26,14 @@
   ],
   "latestCommitDate": "2026-11-13",
   "stats": {
-    "totalCommitsScanned": 17,
-    "validSnapshotsParsed": 16,
+    "totalCommitsScanned": 19,
+    "validSnapshotsParsed": 18,
     "noiseCommitsFiltered": 4,
-    "structuralCommitsRetained": 9
+    "structuralCommitsRetained": 11
   },
   "instructions": [
-    "Group the 9 structural commits below (indices 0..8) into cohesive architectural moments (phases).",
-    "Every commit index from 0 to 8 MUST be covered contiguously with zero gaps or overlaps: first startIndex=0, each next startIndex = previous endIndex + 1, final endIndex=8.",
+    "Group the 11 structural commits below (indices 0..10) into cohesive architectural moments (phases).",
+    "Every commit index from 0 to 10 MUST be covered contiguously with zero gaps or overlaps: first startIndex=0, each next startIndex = previous endIndex + 1, final endIndex=10.",
     "Group multi-commit sprints, node-addition + relationship-wiring sequences, protocol hardening, and coupled control/ADR rollouts into unified phases while keeping pivotal milestones distinct.",
     "Write an executive `name` (3-7 words; no leading step numbers and no conventional-commit prefixes such as \"feat:\" or \"chore:\").",
     "Write a 2-3 sentence narrative `description` explaining WHAT changed architecturally, HOW connectivity or security boundaries shifted, and WHY, citing concrete node IDs, protocols, controls, or ADRs. Do not output mechanical count strings such as \"+1 node(s)\".",
@@ -54,12 +54,12 @@
         "startIndex": {
           "type": "integer",
           "minimum": 0,
-          "maximum": 8
+          "maximum": 10
         },
         "endIndex": {
           "type": "integer",
           "minimum": 0,
-          "maximum": 8
+          "maximum": 10
         },
         "uniqueId": {
           "type": "string",
@@ -199,11 +199,11 @@
     },
     {
       "index": 5,
-      "sha": "669cfa1f19b995f5a8f9f26a7f9d4a2060c80b00",
-      "shortSha": "669cfa1",
+      "sha": "a47bcb9edf88895c2f71016f37422d2f64907931",
+      "shortSha": "a47bcb9",
       "date": "2026-11-13",
       "author": "Akshar Prabhu Desai",
-      "subject": "[CALM Timelapse] feat(diff): scaffold TypeScript project and add structural CALM diff engine",
+      "subject": "[CALM Timelapse] feat(diff): scaffold TypeScript workspace and structural CALM diff engine",
       "summaryLine": "[CALM Timelapse] +3 node(s), +2 rel(s)",
       "changes": [
         "[CALM Timelapse] Added node Git Repository (calm-timelapse--git-repo)",
@@ -219,11 +219,11 @@
     },
     {
       "index": 6,
-      "sha": "915ba00a2bfe9541a4d4ec8084b66f94736dd9f8",
-      "shortSha": "915ba00",
+      "sha": "08b45490e785cae360e9f35369cbf7f2c29e80c6",
+      "shortSha": "08b4549",
       "date": "2026-11-13",
       "author": "Akshar Prabhu Desai",
-      "subject": "[CALM Timelapse] feat(timeline): add git history walker, cluster validator, and CALM timeline emitter",
+      "subject": "[CALM Timelapse] feat(timeline): add Git history walker, cluster validator, and CALM timeline emitter",
       "summaryLine": "[CALM Timelapse] +4 node(s), +4 rel(s), controls(+1/~0/-0)",
       "changes": [
         "[CALM Timelapse] Added node Commit Diff Digest Exporter (calm-timelapse--digest-exporter)",
@@ -243,11 +243,11 @@
     },
     {
       "index": 7,
-      "sha": "bfd01991cae2879ca7bcd169f7da8effc918d4e1",
-      "shortSha": "bfd0199",
+      "sha": "85654fda18fab8c2d013518c92914b68d3e763e0",
+      "shortSha": "85654fd",
       "date": "2026-11-13",
       "author": "Akshar Prabhu Desai",
-      "subject": "[CALM Timelapse] feat(timelapse): add interactive SVG player, CLI, and calm-ai skill",
+      "subject": "[CALM Timelapse] feat(timelapse): add interactive SVG stage player, CLI, and IDE skill",
       "summaryLine": "[CALM Timelapse] +2 node(s), ~1 node(s), +2 rel(s), controls(+1/~0/-0)",
       "changes": [
         "[CALM Timelapse] Added node HTML Timelapse Renderer (calm-timelapse--timelapse-renderer)",
@@ -264,11 +264,11 @@
     },
     {
       "index": 8,
-      "sha": "d89fe61a1896852692f29ff14262b0c96c24c592",
-      "shortSha": "d89fe61",
+      "sha": "0e983b8703c6405b653494524782ef176641cade",
+      "shortSha": "0e983b8",
       "date": "2026-11-13",
       "author": "Akshar Prabhu Desai",
-      "subject": "[CALM Timelapse] feat(federation): synchronize multi-repo CALM timelines and resolve detailed-architecture",
+      "subject": "[CALM Timelapse] feat(federation): synchronize multi-repo timelines and resolve detailed-architecture",
       "summaryLine": "[CALM Timelapse] +1 node(s), ~1 node(s), +2 rel(s), -1 rel(s), controls(+1/~0/-0)",
       "changes": [
         "[CALM Timelapse] Added node Multi-Repo Federation Engine (calm-timelapse--federation-engine)",
@@ -277,6 +277,43 @@
         "[CALM Timelapse] Added relationship calm-timelapse--rel-federation-to-diff",
         "[CALM Timelapse] Removed relationship calm-timelapse--rel-extractor-to-diff",
         "[CALM Timelapse] Added architecture control calm-timelapse--strict-peer-namespace-isolation"
+      ],
+      "coChangedAdrs": [],
+      "sourceId": "calm-timelapse",
+      "sourceLabel": "CALM Timelapse",
+      "repoName": "fall-hackathon-2026-mu"
+    },
+    {
+      "index": 9,
+      "sha": "0f4a060d879d8b29b069f6ffd2a27de13356ce46",
+      "shortSha": "0f4a060",
+      "date": "2026-11-13",
+      "author": "Akshar Prabhu Desai",
+      "subject": "[CALM Timelapse] feat(player): add reverse-chronological Architecture Feed mode (--feed / #feed)",
+      "summaryLine": "[CALM Timelapse] +1 node(s), ~1 node(s), +1 rel(s), ~1 rel(s)",
+      "changes": [
+        "[CALM Timelapse] Added node Architecture Feed Renderer (calm-timelapse--architecture-feed-renderer)",
+        "[CALM Timelapse] Modified node Timelapse Stage SVG Renderer (calm-timelapse--timelapse-renderer) [name, description]",
+        "[CALM Timelapse] Added relationship calm-timelapse--rel-cluster-to-feed",
+        "[CALM Timelapse] Modified relationship calm-timelapse--rel-user-views-timelapse"
+      ],
+      "coChangedAdrs": [],
+      "sourceId": "calm-timelapse",
+      "sourceLabel": "CALM Timelapse",
+      "repoName": "fall-hackathon-2026-mu"
+    },
+    {
+      "index": 10,
+      "sha": "151d9e36cd73bc6bddb315f0fba53c1316608fd5",
+      "shortSha": "151d9e3",
+      "date": "2026-11-13",
+      "author": "Akshar Prabhu Desai",
+      "subject": "[CALM Timelapse] feat(traderx): import upstream finos/traderx progressive states and FDC3 into CALM 1.3",
+      "summaryLine": "[CALM Timelapse] +1 node(s), +2 rel(s)",
+      "changes": [
+        "[CALM Timelapse] Added node FINOS TraderX State Importer (calm-timelapse--traderx-state-importer)",
+        "[CALM Timelapse] Added relationship calm-timelapse--rel-traderx-importer-to-git",
+        "[CALM Timelapse] Added relationship calm-timelapse--rel-traderx-importer-to-diff"
       ],
       "coChangedAdrs": [],
       "sourceId": "calm-timelapse",

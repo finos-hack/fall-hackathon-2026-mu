@@ -1,0 +1,254 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm.json",
+  "unique-id": "traderx-014-fdc3-intent-interoperability",
+  "name": "FINOS TraderX — FDC3 Intent Interoperability on C3",
+  "description": "State 014 layers FDC3 context and intent interoperability onto the C3 TraderX runtime and adds a local Sail sidecar demo environment.",
+  "nodes": [
+    {
+      "unique-id": "trader",
+      "node-type": "actor",
+      "name": "Trader",
+      "description": "User interacting with TraderX blotters and tickets."
+    },
+    {
+      "unique-id": "traderxUi",
+      "node-type": "service",
+      "name": "TraderX Angular UI",
+      "description": "Trade/order/position views plus FDC3 integration adapter."
+    },
+    {
+      "unique-id": "traderxIngress",
+      "node-type": "service",
+      "name": "TraderX Ingress",
+      "description": "NGINX ingress for TraderX UI/API traffic.",
+      "metadata": {
+        "traderx-kind": "gateway"
+      }
+    },
+    {
+      "unique-id": "sailSidecar",
+      "node-type": "service",
+      "name": "Sail Sidecar",
+      "description": "Local Sail desktop-agent runtime hosted outside TraderX ingress."
+    },
+    {
+      "unique-id": "sailDirectory",
+      "node-type": "service",
+      "name": "Sail App Directory Profile",
+      "description": "Seeded app-directory records for TraderX and demo apps.",
+      "metadata": {
+        "traderx-kind": "component"
+      }
+    },
+    {
+      "unique-id": "demoApps",
+      "node-type": "service",
+      "name": "Demo FDC3 Apps",
+      "description": "Chart/quote/workbench apps participating in ticker workflows."
+    },
+    {
+      "unique-id": "orderApi",
+      "node-type": "service",
+      "name": "Order Matcher API",
+      "description": "Order listing and lifecycle endpoints used by order flows."
+    },
+    {
+      "unique-id": "tradeApi",
+      "node-type": "service",
+      "name": "Trade Service API",
+      "description": "Trade creation/query endpoints used by trade ticket flows."
+    },
+    {
+      "unique-id": "positionApi",
+      "node-type": "service",
+      "name": "Position Service API",
+      "description": "Position/blotter data source for symbol-selected rows."
+    },
+    {
+      "unique-id": "nats",
+      "node-type": "service",
+      "name": "NATS Broker",
+      "description": "Realtime ticker and lifecycle updates via websocket gateway."
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "rel-trader-traderxUi",
+      "description": "Selects blotter rows and launches tickets",
+      "relationship-type": {
+        "interacts": {
+          "actor": "trader",
+          "nodes": [
+            "traderxUi"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "rel-trader-sailSidecar",
+      "description": "Uses Sail app launcher/resolver",
+      "relationship-type": {
+        "interacts": {
+          "actor": "trader",
+          "nodes": [
+            "sailSidecar"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "rel-sailDirectory-sailSidecar",
+      "description": "Provides app/intents/context metadata",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "sailDirectory"
+          },
+          "destination": {
+            "node": "sailSidecar"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-sailSidecar-traderxUi",
+      "description": "Routes contexts/intents to TraderX",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "sailSidecar"
+          },
+          "destination": {
+            "node": "traderxUi"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-traderxUi-sailSidecar",
+      "description": "Broadcasts fdc3.instrument and raises intents",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "traderxUi"
+          },
+          "destination": {
+            "node": "sailSidecar"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-sailSidecar-demoApps",
+      "description": "Hosts/resolves demo app workflows",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "sailSidecar"
+          },
+          "destination": {
+            "node": "demoApps"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-demoApps-sailSidecar",
+      "description": "Raises ticket-launch and view intents",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "demoApps"
+          },
+          "destination": {
+            "node": "sailSidecar"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-traderxUi-traderxIngress",
+      "description": "Uses existing UI/API routes",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "traderxUi"
+          },
+          "destination": {
+            "node": "traderxIngress"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-traderxIngress-tradeApi",
+      "description": "Trade ticket workflows",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "traderxIngress"
+          },
+          "destination": {
+            "node": "tradeApi"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-traderxIngress-orderApi",
+      "description": "Order ticket and order blotter workflows",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "traderxIngress"
+          },
+          "destination": {
+            "node": "orderApi"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-traderxIngress-positionApi",
+      "description": "Position blotter queries",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "traderxIngress"
+          },
+          "destination": {
+            "node": "positionApi"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-traderxUi-nats",
+      "description": "Receives realtime pricing/order updates via nats-ws",
+      "protocol": "WebSocket",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "traderxUi"
+          },
+          "destination": {
+            "node": "nats"
+          }
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "source-project": "finos/traderx",
+    "state-id": "014-fdc3-intent-interoperability",
+    "track": "functional",
+    "status": "implemented",
+    "inherits-from": "012-platform-convergence-c3",
+    "notes": [
+      "FDC3 integration is additive and frontend-scoped.",
+      "No backend API or schema changes are required for core interoperability behavior.",
+      "Sail sidecar is intentionally outside TraderX ingress to keep concerns separated.",
+      "Degraded mode preserves baseline workflows when DesktopAgent is unavailable."
+    ]
+  }
+}

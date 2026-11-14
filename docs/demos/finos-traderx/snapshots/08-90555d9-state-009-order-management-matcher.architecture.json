@@ -1,0 +1,340 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm.json",
+  "unique-id": "traderx-009-order-management-matcher",
+  "name": "FINOS TraderX — Order Management and Matcher",
+  "description": "Pricing + observability runtime extended with order management, matcher flow, and order-specific telemetry.",
+  "nodes": [
+    {
+      "unique-id": "developer",
+      "node-type": "actor",
+      "name": "Developer",
+      "description": "Local developer using this state."
+    },
+    {
+      "unique-id": "app_runtime",
+      "node-type": "network",
+      "name": "TraderX App Runtime",
+      "description": "State 009 pricing/runtime baseline with order-management extensions.",
+      "metadata": {
+        "traderx-kind": "boundary"
+      }
+    },
+    {
+      "unique-id": "obs_runtime",
+      "node-type": "network",
+      "name": "Observability Runtime",
+      "description": "LGTM + OTel stack from state 007 carried forward with order telemetry coverage.",
+      "metadata": {
+        "traderx-kind": "boundary"
+      }
+    },
+    {
+      "unique-id": "ingress",
+      "node-type": "service",
+      "name": "NGINX Ingress",
+      "description": "Routes UI, API, and order admin traffic."
+    },
+    {
+      "unique-id": "trade_ui",
+      "node-type": "service",
+      "name": "Angular Trade UI",
+      "description": "Trade ticket, blotters, and admin tab."
+    },
+    {
+      "unique-id": "order_api",
+      "node-type": "service",
+      "name": "Order Management API",
+      "description": "Order create/query/edit/cancel/force-fill endpoints."
+    },
+    {
+      "unique-id": "order_matcher",
+      "node-type": "service",
+      "name": "Order Matcher",
+      "description": "Matches open orders and emits order lifecycle + fill events."
+    },
+    {
+      "unique-id": "nats",
+      "node-type": "service",
+      "name": "NATS Broker",
+      "description": "Realtime transport for pricing, trade, position, and order subjects."
+    },
+    {
+      "unique-id": "trade_processor",
+      "node-type": "service",
+      "name": "Trade Processor",
+      "description": "Consumes fills and persists trades/positions."
+    },
+    {
+      "unique-id": "prometheus",
+      "node-type": "service",
+      "name": "Prometheus",
+      "description": "Scrapes order metrics and blackbox probes."
+    },
+    {
+      "unique-id": "blackbox",
+      "node-type": "service",
+      "name": "Blackbox Exporter",
+      "description": "Probes order endpoints and inherited runtime endpoints."
+    },
+    {
+      "unique-id": "loki",
+      "node-type": "service",
+      "name": "Loki",
+      "description": "Aggregates order and runtime logs."
+    },
+    {
+      "unique-id": "grafana",
+      "node-type": "service",
+      "name": "Grafana",
+      "description": "Dashboards for queue depth, open orders, events, and matcher latency."
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "rel-developer-ingress",
+      "description": "Uses app and admin UI",
+      "relationship-type": {
+        "interacts": {
+          "actor": "developer",
+          "nodes": [
+            "ingress"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "rel-ingress-trade_ui",
+      "description": "Serves UI",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "ingress"
+          },
+          "destination": {
+            "node": "trade_ui"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-trade_ui-order_api",
+      "description": "Calls order APIs",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "trade_ui"
+          },
+          "destination": {
+            "node": "order_api"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-order_api-order_matcher",
+      "description": "Submits and updates orders",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "order_api"
+          },
+          "destination": {
+            "node": "order_matcher"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-order_api-nats",
+      "description": "Publishes lifecycle events",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "order_api"
+          },
+          "destination": {
+            "node": "nats"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-order_matcher-nats",
+      "description": "Publishes fills and status",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "order_matcher"
+          },
+          "destination": {
+            "node": "nats"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-nats-trade_processor",
+      "description": "Delivers matcher-generated fills",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nats"
+          },
+          "destination": {
+            "node": "trade_processor"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-prometheus-order_matcher",
+      "description": "Scrapes /metrics",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "prometheus"
+          },
+          "destination": {
+            "node": "order_matcher"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-prometheus-blackbox",
+      "description": "Scrapes probe metrics",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "prometheus"
+          },
+          "destination": {
+            "node": "blackbox"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-blackbox-order_api",
+      "description": "HTTP probes",
+      "protocol": "HTTP",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "blackbox"
+          },
+          "destination": {
+            "node": "order_api"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-blackbox-order_matcher",
+      "description": "HTTP probes",
+      "protocol": "HTTP",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "blackbox"
+          },
+          "destination": {
+            "node": "order_matcher"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-order_matcher-loki",
+      "description": "Structured logs via promtail",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "order_matcher"
+          },
+          "destination": {
+            "node": "loki"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-developer-grafana",
+      "description": "Views order observability",
+      "relationship-type": {
+        "interacts": {
+          "actor": "developer",
+          "nodes": [
+            "grafana"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "rel-grafana-prometheus",
+      "description": "Queries metrics",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "grafana"
+          },
+          "destination": {
+            "node": "prometheus"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-grafana-loki",
+      "description": "Queries logs",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "grafana"
+          },
+          "destination": {
+            "node": "loki"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-deployed-in-app_runtime",
+      "description": "Workloads deployed in app_runtime.",
+      "relationship-type": {
+        "deployed-in": {
+          "container": "app_runtime",
+          "nodes": [
+            "ingress",
+            "trade_ui",
+            "order_api",
+            "order_matcher",
+            "nats",
+            "trade_processor"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "rel-deployed-in-obs_runtime",
+      "description": "Workloads deployed in obs_runtime.",
+      "relationship-type": {
+        "deployed-in": {
+          "container": "obs_runtime",
+          "nodes": [
+            "prometheus",
+            "blackbox",
+            "loki",
+            "grafana"
+          ]
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "source-project": "finos/traderx",
+    "state-id": "009-order-management-matcher",
+    "track": "functional",
+    "status": "implemented"
+  }
+}

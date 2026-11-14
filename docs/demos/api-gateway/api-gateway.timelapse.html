@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CALM Architecture Timelapse — api-gateway.timeline.json</title>
+  <title>CALM Architecture Timelapse — api-gateway.json</title>
   <style>
     :root {
       --bg: #0b1020;
@@ -323,6 +323,7 @@
     }
     .node-group { transition: opacity 280ms ease, transform 280ms ease; cursor: pointer; }
     .edge-group { transition: opacity 280ms ease; }
+    #viewport-layer.smooth-cam { transition: transform 240ms ease-out; }
     .audit-banner {
       background: rgba(56, 189, 248, 0.12);
       border: 1px solid rgba(56, 189, 248, 0.4);
@@ -348,11 +349,23 @@
     }
     .gov-section { margin-top: 8px; }
     .gov-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
-    @media (max-width: 980px) {
+    @media (max-width: 1180px) {
+      main {
+        grid-template-columns: minmax(0, 1fr) 310px;
+      }
+    }
+    @media (max-width: 900px) {
       body {
         height: auto;
         min-height: 100vh;
         overflow: auto;
+      }
+      header {
+        padding: 7px 12px;
+        gap: 8px;
+      }
+      #badge-keys, #badge-engine {
+        display: none !important;
       }
       main {
         grid-template-columns: 1fr;
@@ -360,15 +373,25 @@
       }
       .stage {
         height: auto;
+        padding: 8px;
+        gap: 6px;
         overflow: visible;
       }
+      .stage-toolbar {
+        padding: 5px 8px;
+        gap: 6px;
+      }
+      .toolbar-sep {
+        display: none !important;
+      }
       .canvas-wrap {
-        height: 56vh;
+        height: clamp(340px, 62dvh, 540px);
         min-height: 320px;
         flex: none;
       }
       .controls {
         flex-wrap: wrap;
+        padding: 6px 10px;
       }
       .canvas-hint, .scrubber-label {
         display: none;
@@ -581,7 +604,7 @@
     }
     .feed-svg-wrap {
       width: 100%;
-      height: 300px;
+      height: clamp(220px, 42vw, 310px);
       position: relative;
       cursor: pointer;
     }
@@ -639,7 +662,7 @@
 <body>
   <header>
     <div class="header-left">
-      <h1>CALM Architecture Timelapse — api-gateway.timeline.json</h1>
+      <h1>CALM Architecture Timelapse — api-gateway.json</h1>
       <div class="mode-switch" role="tablist" aria-label="View mode">
         <button id="btn-mode-stage" type="button" class="mode-btn active" role="tab" aria-selected="true">▶ Timelapse Stage</button>
         <button id="btn-mode-feed" type="button" class="mode-btn" role="tab" aria-selected="false">☰ Architecture Feed</button>
@@ -648,7 +671,7 @@
     <div class="meta-badges">
       <span class="badge" id="badge-moments">0 moments</span>
       <span class="badge" id="badge-sources" style="display:none;"></span>
-      <span class="badge badge-funnel" id="badge-funnel">23 commits -&gt; 9 noise filtered -&gt; 4 moments</span>
+      <span class="badge badge-funnel" id="badge-funnel">23 commits -&gt; 6 noise filtered -&gt; 4 moments</span>
       <span class="badge" id="badge-engine">engine: clusters-file</span>
       <span class="badge" id="badge-keys">Keys: Space Play/Pause · ←/→ Step</span>
     </div>
@@ -696,7 +719,7 @@
           </div>
           <span class="canvas-hint">Click node to inspect · Wheel/Drag to zoom &amp; pan</span>
         </div>
-        <svg id="graph" viewBox="0 0 960 644" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+        <svg id="graph" viewBox="0 0 810 260" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <marker id="arrow-normal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
               <path d="M 0 1 L 10 5 L 0 9 z" fill="#64748b" />
@@ -797,7 +820,7 @@
     <div class="feed-stream" id="feed-stream"></div>
   </section>
 
-  <script id="timelapse-data" type="application/json">{"title":"CALM Architecture Timelapse — api-gateway.timeline.json","generatedAt":"2026-11-13T23:14:03.364Z","sourceFile":"api-gateway.timeline.json","engine":"clusters-file","canvasWidth":960,"canvasHeight":644,"positions":{"api-consumer":{"id":"api-consumer","name":"API Consumer","nodeType":"system","description":"The API Consumer making an authenticated and authorized request","x":480,"y":115,"layer":0},"api-gateway":{"id":"api-gateway","name":"API Gateway","nodeType":"system","description":"The API Gateway used to verify authorization and access to downstream system","x":480,"y":253,"layer":0},"api-producer":{"id":"api-producer","name":"API Producer","nodeType":"system","description":"The API Producer serving content","x":480,"y":391,"layer":0},"idp":{"id":"idp","name":"Identity Provider","nodeType":"system","description":"The Identity Provider used to verify the bearer token","x":480,"y":529,"layer":0}},"frames":[{"id":"initial-gateway-topology","name":"Initial Gateway Pattern Topology","description":"Introduces the foundational four-node API Gateway pattern linking api-consumer through api-gateway to api-producer and idp, then standardizes node-type classifications across all services.","validFrom":"2024-04-02","commitCount":3,"commits":["3ace47c9","0cf60641","ba39ab47"],"commitMessages":["Major refactor - migrating CALM to a specific JSON vocabulary (#15)","#74 - Updating the api-gateway.json pattern to use prefixItems (#79)","Pattern flag and fixing api-gateway pattern sample (#91)"],"adrs":[],"summary":"Initial baseline with 4 node(s), 3 relationship(s)","changes":[{"kind":"add","category":"node","id":"api-gateway","text":"Added node API Gateway (api-gateway)"},{"kind":"add","category":"node","id":"api-consumer","text":"Added node Python Based API Consumer (api-consumer)"},{"kind":"add","category":"node","id":"api-producer","text":"Added node Java Based API Producer (api-producer)"},{"kind":"add","category":"node","id":"idp","text":"Added node Identity Provider (idp)"},{"kind":"add","category":"relationship","id":"api-consumer-api-gateway","text":"Added relationship api-consumer-api-gateway"},{"kind":"add","category":"relationship","id":"api-gateway-idp","text":"Added relationship api-gateway-idp"},{"kind":"add","category":"relationship","id":"api-gateway-api-producer","text":"Added relationship api-gateway-api-producer"}],"nodes":[{"id":"api-gateway","name":"API Gateway","nodeType":"system","description":"The API Gateway used to verify authorization and access to downstream system"},{"id":"api-consumer","name":"Python Based API Consumer","nodeType":"system","description":"The API Consumer making an authenticated and authorized request"},{"id":"api-producer","name":"Java Based API Producer","nodeType":"system","description":"The API Producer serving content"},{"id":"idp","name":"Identity Provider","nodeType":"system","description":"The Identity Provider used to verify the bearer token"}],"edges":[],"controls":[],"addedNodeIds":["api-gateway","api-consumer","api-producer","idp"],"modifiedNodeIds":[],"removedNodeIds":[],"addedEdgeIds":[],"modifiedEdgeIds":[],"removedEdgeIds":[]},{"id":"typed-interfaces-and-finos-namespace","name":"Typed Interfaces and FINOS Namespace","description":"Enriches api-gateway and api-producer with explicit interface definitions, aligns relationship wiring with Spectral validation rules, and migrates schema URIs from finos-labs to canonical finos namespaces.","validFrom":"2024-05-20","commitCount":5,"commits":["a1c8e580","90121e0a","08fee195","a4de5e95","97ae376f"],"commitMessages":["Update API Gateway Pattern to Add Interface (#109)","Lint and insert missing properties block","#100 visualizer works with patterns","Update spectral rules to use new interface format","replace finos-labs with finos (#195)"],"adrs":[],"summary":"~2 node(s), ~3 rel(s)","changes":[{"kind":"mod","category":"node","id":"api-gateway","text":"Modified node API Gateway (api-gateway) [interfaces]"},{"kind":"mod","category":"node","id":"api-producer","text":"Modified node Java Based API Producer (api-producer) [interfaces]"},{"kind":"mod","category":"relationship","id":"api-consumer-api-gateway","text":"Modified relationship api-consumer-api-gateway"},{"kind":"mod","category":"relationship","id":"api-gateway-idp","text":"Modified relationship api-gateway-idp"},{"kind":"mod","category":"relationship","id":"api-gateway-api-producer","text":"Modified relationship api-gateway-api-producer"}],"nodes":[{"id":"api-gateway","name":"API Gateway","nodeType":"system","description":"The API Gateway used to verify authorization and access to downstream system"},{"id":"api-consumer","name":"Python Based API Consumer","nodeType":"system","description":"The API Consumer making an authenticated and authorized request"},{"id":"api-producer","name":"Java Based API Producer","nodeType":"system","description":"The API Producer serving content"},{"id":"idp","name":"Identity Provider","nodeType":"system","description":"The Identity Provider used to verify the bearer token"}],"edges":[],"controls":[],"addedNodeIds":[],"modifiedNodeIds":["api-gateway","api-producer"],"removedNodeIds":[],"addedEdgeIds":[],"modifiedEdgeIds":[],"removedEdgeIds":[]},{"id":"direct-consumer-identity-handshake","name":"Direct Consumer Identity Handshake","description":"Adds the api-consumer-idp relationship so consumers authenticate directly against the Identity Provider before presenting tokens to api-gateway, while generalizing language-agnostic node names.","validFrom":"2024-06-10","commitCount":1,"commits":["f7f7ee7b"],"commitMessages":["Visualizer improvments (#278)"],"adrs":[],"summary":"~2 node(s), +1 rel(s), ~3 rel(s)","changes":[{"kind":"mod","category":"node","id":"api-consumer","text":"Modified node API Consumer (api-consumer) [name]"},{"kind":"mod","category":"node","id":"api-producer","text":"Modified node API Producer (api-producer) [name]"},{"kind":"add","category":"relationship","id":"api-consumer-idp","text":"Added relationship api-consumer-idp"},{"kind":"mod","category":"relationship","id":"api-consumer-api-gateway","text":"Modified relationship api-consumer-api-gateway"},{"kind":"mod","category":"relationship","id":"api-gateway-idp","text":"Modified relationship api-gateway-idp"},{"kind":"mod","category":"relationship","id":"api-gateway-api-producer","text":"Modified relationship api-gateway-api-producer"}],"nodes":[{"id":"api-gateway","name":"API Gateway","nodeType":"system","description":"The API Gateway used to verify authorization and access to downstream system"},{"id":"api-consumer","name":"API Consumer","nodeType":"system","description":"The API Consumer making an authenticated and authorized request"},{"id":"api-producer","name":"API Producer","nodeType":"system","description":"The API Producer serving content"},{"id":"idp","name":"Identity Provider","nodeType":"system","description":"The Identity Provider used to verify the bearer token"}],"edges":[],"controls":[],"addedNodeIds":[],"modifiedNodeIds":["api-consumer","api-producer"],"removedNodeIds":[],"addedEdgeIds":[],"modifiedEdgeIds":[],"removedEdgeIds":[]},{"id":"calm-release-schema-standardization","name":"CALM Release Schema Standardization","description":"Progressively upgrades interface schemas on api-gateway and api-producer from 2024-10 drafts through RC-1 candidates to stable CALM release specifications as legacy draft bundles are retired.","validFrom":"2026-10-25","commitCount":5,"commits":["7e2a7178","fd445f23","619f45a1","6d4976fe","472e5e34"],"commitMessages":["#446 - Upgrade CLI to 2024-10. (#696)","Ensure SchemaDirectory works with latest CALM draft","Update endpoints and test files related to validate/generate endpoints to use release RC-1 candidate schema (finos#1284)","fix(cli): fix test pattern to consistent use a single schema version","feat(calm-server): stop bundling the CALM 1.0 release candidates and the 2025-03 draft"],"adrs":[],"summary":"~2 node(s)","changes":[{"kind":"mod","category":"node","id":"api-gateway","text":"Modified node API Gateway (api-gateway) [interfaces]"},{"kind":"mod","category":"node","id":"api-producer","text":"Modified node API Producer (api-producer) [interfaces]"}],"nodes":[{"id":"api-gateway","name":"API Gateway","nodeType":"system","description":"The API Gateway used to verify authorization and access to downstream system"},{"id":"api-consumer","name":"API Consumer","nodeType":"system","description":"The API Consumer making an authenticated and authorized request"},{"id":"api-producer","name":"API Producer","nodeType":"system","description":"The API Producer serving content"},{"id":"idp","name":"Identity Provider","nodeType":"system","description":"The Identity Provider used to verify the bearer token"}],"edges":[],"controls":[],"addedNodeIds":[],"modifiedNodeIds":["api-gateway","api-producer"],"removedNodeIds":[],"addedEdgeIds":[],"modifiedEdgeIds":[],"removedEdgeIds":[]}],"stats":{"totalCommitsScanned":23,"noiseCommitsFiltered":9,"structuralCommitsRetained":14,"momentsGenerated":4}}</script>
+  <script id="timelapse-data" type="application/json">{"title":"CALM Architecture Timelapse — api-gateway.json","generatedAt":"2026-11-14T03:18:03.378Z","sourceFile":"api-gateway.json","engine":"clusters-file","canvasWidth":810,"canvasHeight":260,"positions":{"api-consumer":{"id":"api-consumer","name":"API Consumer","nodeType":"system","description":"The API Consumer making an authenticated and authorized request","x":115,"y":130,"layer":0},"api-gateway":{"id":"api-gateway","name":"API Gateway","nodeType":"system","description":"The API Gateway used to verify authorization and access to downstream system","x":405,"y":130,"layer":1},"api-producer":{"id":"api-producer","name":"API Producer","nodeType":"system","description":"The API Producer serving content","x":695,"y":64,"layer":2},"idp":{"id":"idp","name":"Identity Provider","nodeType":"system","description":"The Identity Provider used to verify the bearer token","x":695,"y":196,"layer":2}},"frames":[{"id":"legacy-items-to-prefixitems-migration","name":"Legacy items Tuple, unique-id Rename \u0026 prefixItems Migration","description":"Introduces the initial four-node API Gateway pattern using legacy JSON Schema items tuples, refines relationship-type const endpoints, renames uniqueId to canonical unique-id (#46), and migrates tuple definitions to JSON Schema 2020-12 prefixItems (#79).","validFrom":"2024-03-26","commitCount":5,"commits":["3ace47c9","53346add","547e86ff","cc4021bd","0cf60641"],"commitMessages":["Major refactor - migrating CALM to a specific JSON vocabulary (#15)","Fixes #26 (#27)","Issue#29 New Specification for 2024-03 (#44)","Ensure consistent naming convention in CALM (#46)","#74 - Updating the api-gateway.json pattern to use prefixItems (#79)"],"adrs":[],"summary":"~4 node(s), ~3 rel(s)","changes":[{"kind":"add","category":"node","id":"api-gateway","text":"Added node API Gateway (api-gateway)"},{"kind":"add","category":"node","id":"api-consumer","text":"Added node Python Based API Consumer (api-consumer)"},{"kind":"add","category":"node","id":"api-producer","text":"Added node Java Based API Producer (api-producer)"},{"kind":"add","category":"node","id":"idp","text":"Added node Identity Provider (idp)"},{"kind":"add","category":"relationship","id":"api-consumer-api-gateway","text":"Added relationship api-consumer-api-gateway"},{"kind":"add","category":"relationship","id":"api-gateway-idp","text":"Added relationship api-gateway-idp"},{"kind":"add","category":"relationship","id":"api-gateway-api-producer","text":"Added relationship api-gateway-api-producer"}],"nodes":[{"id":"api-gateway","name":"API Gateway","nodeType":"system","description":"The API Gateway used to verify authorization and access to downstream system"},{"id":"api-consumer","name":"Python Based API Consumer","nodeType":"system","description":"The API Consumer making an authenticated and authorized request"},{"id":"api-producer","name":"Java Based API Producer","nodeType":"system","description":"The API Producer serving content"},{"id":"idp","name":"Identity Provider","nodeType":"system","description":"The Identity Provider used to verify the bearer token"}],"edges":[{"id":"api-consumer-api-gateway","source":"api-consumer","target":"api-gateway","label":"HTTPS","relType":"connects"},{"id":"api-gateway-idp","source":"api-gateway","target":"idp","label":"HTTPS","relType":"connects"},{"id":"api-gateway-api-producer","source":"api-gateway","target":"api-producer","label":"HTTPS","relType":"connects"}],"controls":[],"addedNodeIds":["api-gateway","api-consumer","api-producer","idp"],"modifiedNodeIds":[],"removedNodeIds":[],"addedEdgeIds":["api-consumer-api-gateway","api-gateway-idp","api-gateway-api-producer"],"modifiedEdgeIds":[],"removedEdgeIds":[]},{"id":"typed-interfaces-and-finos-namespace","name":"Typed Interfaces, Spectral Wiring \u0026 FINOS Namespace","description":"Standardizes node-type classifications, adds explicit interface definitions on api-gateway and api-producer, aligns relationship wiring with Spectral rules, and migrates schema URIs from finos-labs to canonical finos namespaces.","validFrom":"2024-05-20","commitCount":6,"commits":["ba39ab47","a1c8e580","90121e0a","08fee195","a4de5e95","97ae376f"],"commitMessages":["Pattern flag and fixing api-gateway pattern sample (#91)","Update API Gateway Pattern to Add Interface (#109)","Lint and insert missing properties block","#100 visualizer works with patterns","Update spectral rules to use new interface format","replace finos-labs with finos (#195)"],"adrs":[],"summary":"~2 node(s)","changes":[{"kind":"mod","category":"node","id":"api-gateway","text":"Modified node API Gateway (api-gateway) [node-type, type, interfaces, pattern-schema]"},{"kind":"mod","category":"node","id":"api-consumer","text":"Modified node Python Based API Consumer (api-consumer) [node-type, type]"},{"kind":"mod","category":"node","id":"api-producer","text":"Modified node Java Based API Producer (api-producer) [node-type, type, interfaces, pattern-schema]"},{"kind":"mod","category":"node","id":"idp","text":"Modified node Identity Provider (idp) [node-type, type]"},{"kind":"mod","category":"relationship","id":"api-consumer-api-gateway","text":"Modified relationship api-consumer-api-gateway"},{"kind":"mod","category":"relationship","id":"api-gateway-idp","text":"Modified relationship api-gateway-idp"},{"kind":"mod","category":"relationship","id":"api-gateway-api-producer","text":"Modified relationship api-gateway-api-producer"}],"nodes":[{"id":"api-gateway","name":"API Gateway","nodeType":"system","description":"The API Gateway used to verify authorization and access to downstream system"},{"id":"api-consumer","name":"Python Based API Consumer","nodeType":"system","description":"The API Consumer making an authenticated and authorized request"},{"id":"api-producer","name":"Java Based API Producer","nodeType":"system","description":"The API Producer serving content"},{"id":"idp","name":"Identity Provider","nodeType":"system","description":"The Identity Provider used to verify the bearer token"}],"edges":[{"id":"api-consumer-api-gateway","source":"api-consumer","target":"api-gateway","label":"HTTPS","relType":"connects"},{"id":"api-gateway-idp","source":"api-gateway","target":"idp","label":"HTTPS","relType":"connects"},{"id":"api-gateway-api-producer","source":"api-gateway","target":"api-producer","label":"HTTPS","relType":"connects"}],"controls":[],"addedNodeIds":[],"modifiedNodeIds":["api-gateway","api-consumer","api-producer","idp"],"removedNodeIds":[],"addedEdgeIds":[],"modifiedEdgeIds":["api-consumer-api-gateway","api-gateway-idp","api-gateway-api-producer"],"removedEdgeIds":[]},{"id":"direct-consumer-identity-handshake","name":"Direct Consumer Identity Handshake","description":"Adds the api-consumer-idp relationship so consumers authenticate directly against the Identity Provider before presenting tokens to api-gateway, while generalizing language-agnostic node names.","validFrom":"2024-06-10","commitCount":1,"commits":["f7f7ee7b"],"commitMessages":["Visualizer improvments (#278)"],"adrs":[],"summary":"~2 node(s), +1 rel(s), ~3 rel(s)","changes":[{"kind":"mod","category":"node","id":"api-consumer","text":"Modified node API Consumer (api-consumer) [name]"},{"kind":"mod","category":"node","id":"api-producer","text":"Modified node API Producer (api-producer) [name]"},{"kind":"add","category":"relationship","id":"api-consumer-idp","text":"Added relationship api-consumer-idp"},{"kind":"mod","category":"relationship","id":"api-consumer-api-gateway","text":"Modified relationship api-consumer-api-gateway"},{"kind":"mod","category":"relationship","id":"api-gateway-idp","text":"Modified relationship api-gateway-idp"},{"kind":"mod","category":"relationship","id":"api-gateway-api-producer","text":"Modified relationship api-gateway-api-producer"}],"nodes":[{"id":"api-gateway","name":"API Gateway","nodeType":"system","description":"The API Gateway used to verify authorization and access to downstream system"},{"id":"api-consumer","name":"API Consumer","nodeType":"system","description":"The API Consumer making an authenticated and authorized request"},{"id":"api-producer","name":"API Producer","nodeType":"system","description":"The API Producer serving content"},{"id":"idp","name":"Identity Provider","nodeType":"system","description":"The Identity Provider used to verify the bearer token"}],"edges":[{"id":"api-consumer-api-gateway","source":"api-consumer","target":"api-gateway","label":"Issue calculation request","relType":"connects"},{"id":"api-gateway-idp","source":"api-gateway","target":"idp","label":"Validate bearer token","relType":"connects"},{"id":"api-gateway-api-producer","source":"api-gateway","target":"api-producer","label":"Forward request","relType":"connects"},{"id":"api-consumer-idp","source":"api-consumer","target":"idp","label":"Acquire a bearer token","relType":"connects"}],"controls":[],"addedNodeIds":[],"modifiedNodeIds":["api-consumer","api-producer"],"removedNodeIds":[],"addedEdgeIds":["api-consumer-idp"],"modifiedEdgeIds":["api-consumer-api-gateway","api-gateway-idp","api-gateway-api-producer"],"removedEdgeIds":[]},{"id":"calm-release-schema-standardization","name":"CALM Release Schema Standardization","description":"Progressively upgrades pattern and interface schemas on api-gateway and api-producer from 2024-10 drafts through RC-1 candidates to stable CALM release specifications.","validFrom":"2026-10-25","commitCount":5,"commits":["7e2a7178","fd445f23","619f45a1","6d4976fe","472e5e34"],"commitMessages":["#446 - Upgrade CLI to 2024-10. (#696)","Ensure SchemaDirectory works with latest CALM draft","Update endpoints and test files related to validate/generate endpoints to use release RC-1 candidate schema (finos#1284)","fix(cli): fix test pattern to consistent use a single schema version","feat(calm-server): stop bundling the CALM 1.0 release candidates and the 2025-03 draft"],"adrs":[],"summary":"~1 node(s)","changes":[{"kind":"mod","category":"node","id":"api-gateway","text":"Modified node API Gateway (api-gateway) [interfaces]"},{"kind":"mod","category":"node","id":"api-producer","text":"Modified node API Producer (api-producer) [interfaces]"}],"nodes":[{"id":"api-gateway","name":"API Gateway","nodeType":"system","description":"The API Gateway used to verify authorization and access to downstream system"},{"id":"api-consumer","name":"API Consumer","nodeType":"system","description":"The API Consumer making an authenticated and authorized request"},{"id":"api-producer","name":"API Producer","nodeType":"system","description":"The API Producer serving content"},{"id":"idp","name":"Identity Provider","nodeType":"system","description":"The Identity Provider used to verify the bearer token"}],"edges":[{"id":"api-consumer-api-gateway","source":"api-consumer","target":"api-gateway","label":"Issue calculation request","relType":"connects"},{"id":"api-gateway-idp","source":"api-gateway","target":"idp","label":"Validate bearer token","relType":"connects"},{"id":"api-gateway-api-producer","source":"api-gateway","target":"api-producer","label":"Forward request","relType":"connects"},{"id":"api-consumer-idp","source":"api-consumer","target":"idp","label":"Acquire a bearer token","relType":"connects"}],"controls":[],"addedNodeIds":[],"modifiedNodeIds":["api-gateway","api-producer"],"removedNodeIds":[],"addedEdgeIds":[],"modifiedEdgeIds":[],"removedEdgeIds":[]}],"stats":{"totalCommitsScanned":23,"noiseCommitsFiltered":6,"structuralCommitsRetained":17,"momentsGenerated":4}}</script>
   <script>
     (function () {
       const payload = JSON.parse(document.getElementById('timelapse-data').textContent);
@@ -916,9 +939,13 @@
       let timer = null;
       let focusedNodeId = '';
       let selectedProjectId = '';
+      let viewW = canvasWidth;
+      let viewH = canvasHeight;
       let zoomScale = 1;
       let panX = 0;
       let panY = 0;
+      let autoFit = true;
+      let hasInitialFit = false;
       let isPanning = false;
       let dragStartX = 0;
       let dragStartY = 0;
@@ -935,29 +962,106 @@
         return nodeOrPos.sourceId === selectedProjectId;
       }
 
-      function applyTransform() {
+      function syncSvgViewBox() {
+        if (!canvasWrap || typeof canvasWrap.getBoundingClientRect !== 'function') return;
+        const rect = canvasWrap.getBoundingClientRect();
+        if (rect && rect.width >= 120 && rect.height >= 120) {
+          viewW = Math.round(rect.width);
+          viewH = Math.round(rect.height);
+          svgGraph.setAttribute('viewBox', '0 0 ' + viewW + ' ' + viewH);
+        }
+      }
+
+      function applyTransform(animate) {
+        if (viewportLayer && viewportLayer.classList) {
+          viewportLayer.classList.toggle('smooth-cam', Boolean(animate));
+        }
         viewportLayer.setAttribute(
           'transform',
           'translate(' + panX.toFixed(2) + ',' + panY.toFixed(2) + ') scale(' + zoomScale.toFixed(4) + ')',
         );
       }
 
+      function computeActiveFrameBounds() {
+        const frame = frames[currentIndex];
+        const isolateMode = Boolean(focusIsolate && focusIsolate.checked);
+        const ids = [];
+        if (frame) {
+          const neighborhood = new Set();
+          if (focusedNodeId) {
+            neighborhood.add(focusedNodeId);
+            for (const edge of frame.edges || []) {
+              if (edge.source === focusedNodeId) neighborhood.add(edge.target);
+              if (edge.target === focusedNodeId) neighborhood.add(edge.source);
+            }
+          }
+          const candidateIds = new Set([
+            ...(frame.nodes || []).map((n) => n.id),
+            ...(frame.removedNodeIds || []),
+          ]);
+          for (const id of candidateIds) {
+            const p = positions[id];
+            if (!p) continue;
+            if (focusedNodeId && isolateMode && !neighborhood.has(id)) continue;
+            if (selectedProjectId && !nodeMatchesProject(p)) continue;
+            ids.push(id);
+          }
+        }
+        const useIds = ids.length > 0 ? ids : Object.keys(positions);
+        let minX = Infinity;
+        let minY = Infinity;
+        let maxX = -Infinity;
+        let maxY = -Infinity;
+        for (const id of useIds) {
+          const p = positions[id];
+          if (!p) continue;
+          if (p.x - 94 < minX) minX = p.x - 94;
+          if (p.y - 46 < minY) minY = p.y - 46;
+          if (p.x + 94 > maxX) maxX = p.x + 94;
+          if (p.y + 40 > maxY) maxY = p.y + 40;
+        }
+        if (!Number.isFinite(minX)) {
+          return { minX: 0, minY: 0, maxX: canvasWidth, maxY: canvasHeight };
+        }
+        return { minX, minY, maxX, maxY };
+      }
+
+      function fitCurrentFrame(animate) {
+        syncSvgViewBox();
+        const bounds = computeActiveFrameBounds();
+        const padX = Math.min(28, Math.round(viewW * 0.045));
+        const padTop = Math.min(48, Math.max(36, Math.round(viewH * 0.09)));
+        const padBottom = Math.min(44, Math.max(24, Math.round(viewH * 0.07)));
+        const availW = Math.max(100, viewW - padX * 2);
+        const availH = Math.max(100, viewH - padTop - padBottom);
+        const bw = Math.max(200, bounds.maxX - bounds.minX);
+        const bh = Math.max(96, bounds.maxY - bounds.minY);
+        const scale = Math.max(0.12, Math.min(availW / bw, availH / bh, 1.32));
+        const cx = (bounds.minX + bounds.maxX) / 2;
+        const cy = (bounds.minY + bounds.maxY) / 2;
+        zoomScale = scale;
+        panX = viewW / 2 - cx * scale;
+        panY = padTop + availH / 2 - cy * scale;
+        applyTransform(animate && hasInitialFit);
+        hasInitialFit = true;
+      }
+
       function setZoom(nextScale, anchorX, anchorY) {
-        const clamped = Math.max(0.4, Math.min(2.8, nextScale));
-        const ax = anchorX !== undefined ? anchorX : canvasWidth / 2;
-        const ay = anchorY !== undefined ? anchorY : canvasHeight / 2;
+        autoFit = false;
+        syncSvgViewBox();
+        const clamped = Math.max(0.10, Math.min(3.2, nextScale));
+        const ax = anchorX !== undefined ? anchorX : viewW / 2;
+        const ay = anchorY !== undefined ? anchorY : viewH / 2;
         const ratio = clamped / zoomScale;
         panX = ax - (ax - panX) * ratio;
         panY = ay - (ay - panY) * ratio;
         zoomScale = clamped;
-        applyTransform();
+        applyTransform(false);
       }
 
       function resetZoom() {
-        zoomScale = 1;
-        panX = 0;
-        panY = 0;
-        applyTransform();
+        autoFit = true;
+        fitCurrentFrame(true);
       }
 
       Object.values(positions)
@@ -1302,6 +1406,10 @@
           },
         });
 
+        if (autoFit) {
+          fitCurrentFrame(true);
+        }
+
         changeList.innerHTML = '';
         if (liveDiff && compareBase) {
           const bannerLi = document.createElement('li');
@@ -1413,8 +1521,8 @@
           }
         }
         const rect = svgGraph.getBoundingClientRect();
-        const scaleX = canvasWidth / (rect.width || 1);
-        const scaleY = canvasHeight / (rect.height || 1);
+        const scaleX = viewW / (rect.width || 1);
+        const scaleY = viewH / (rect.height || 1);
         return {
           x: (clientX - rect.left) * scaleX,
           y: (clientY - rect.top) * scaleY,
@@ -1436,6 +1544,7 @@
           return;
         }
         isPanning = true;
+        autoFit = false;
         dragStartX = e.clientX;
         dragStartY = e.clientY;
         panStartX = panX;
@@ -1450,7 +1559,7 @@
         const dy = e.clientY - dragStartY;
         panX = panStartX + dx * pt.scaleX;
         panY = panStartY + dy * pt.scaleY;
-        applyTransform();
+        applyTransform(false);
       });
 
       window.addEventListener('mouseup', () => {
@@ -1460,10 +1569,12 @@
       });
 
       btnZoomIn.addEventListener('click', () => {
-        setZoom(zoomScale * 1.2, canvasWidth / 2, canvasHeight / 2);
+        syncSvgViewBox();
+        setZoom(zoomScale * 1.2, viewW / 2, viewH / 2);
       });
       btnZoomOut.addEventListener('click', () => {
-        setZoom(zoomScale / 1.2, canvasWidth / 2, canvasHeight / 2);
+        syncSvgViewBox();
+        setZoom(zoomScale / 1.2, viewW / 2, viewH / 2);
       });
       btnZoomFit.addEventListener('click', () => {
         resetZoom();
@@ -1854,12 +1965,12 @@
         if (!Number.isFinite(minX)) {
           minX = 0; minY = 0; maxX = canvasWidth; maxY = canvasHeight;
         }
-        const padX = 135;
-        const padY = 72;
+        const padX = 108;
+        const padY = 52;
         const rawW = (maxX - minX) + padX * 2;
         const rawH = (maxY - minY) + padY * 2;
-        const vbW = Math.max(580, rawW);
-        const vbH = Math.max(240, rawH);
+        const vbW = Math.max(380, rawW);
+        const vbH = Math.max(175, rawH);
         const cx = (minX + maxX) / 2;
         const cy = (minY + maxY) / 2;
         const vbX = Math.round(cx - vbW / 2);
@@ -2232,6 +2343,8 @@
 
         if (isFeed) {
           renderFeed();
+        } else if (autoFit) {
+          fitCurrentFrame(false);
         }
         if (updateHash && window.history && window.history.replaceState) {
           const base = window.location.pathname + window.location.search;
@@ -2290,6 +2403,21 @@
           renderFrame(currentIndex + 1);
         }
       });
+
+      const handleViewportResize = () => {
+        if (currentViewMode !== 'stage') return;
+        syncSvgViewBox();
+        if (autoFit) {
+          fitCurrentFrame(false);
+        } else {
+          applyTransform(false);
+        }
+      };
+      window.addEventListener('resize', handleViewportResize);
+      if (typeof ResizeObserver === 'function' && canvasWrap) {
+        const ro = new ResizeObserver(() => handleViewportResize());
+        ro.observe(canvasWrap);
+      }
 
       renderFrame(0);
       const urlWantsFeed =

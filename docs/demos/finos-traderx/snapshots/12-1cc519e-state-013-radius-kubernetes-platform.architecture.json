@@ -1,0 +1,138 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm.json",
+  "unique-id": "traderx-013-radius-kubernetes-platform",
+  "name": "FINOS TraderX — Radius Platform on Kubernetes (Optional)",
+  "description": "State 013 preserves state 012 C3 runtime while adding Radius application/resource abstractions.",
+  "nodes": [
+    {
+      "unique-id": "developer",
+      "node-type": "actor",
+      "name": "Developer",
+      "description": "Operates platform/application definitions through Radius."
+    },
+    {
+      "unique-id": "radius",
+      "node-type": "system",
+      "name": "Radius Control Plane",
+      "description": "Application-centric platform abstraction layer.",
+      "metadata": {
+        "traderx-kind": "platform"
+      }
+    },
+    {
+      "unique-id": "appModel",
+      "node-type": "service",
+      "name": "Radius App Model",
+      "description": "Declarative app/resource definitions for TraderX.",
+      "metadata": {
+        "traderx-kind": "component"
+      }
+    },
+    {
+      "unique-id": "cluster",
+      "node-type": "network",
+      "name": "Kubernetes Cluster",
+      "description": "Underlying runtime substrate inherited from state 012.",
+      "metadata": {
+        "traderx-kind": "boundary"
+      }
+    },
+    {
+      "unique-id": "edge",
+      "node-type": "service",
+      "name": "NGINX Edge Proxy",
+      "description": "Single browser/API entrypoint.",
+      "metadata": {
+        "traderx-kind": "gateway"
+      }
+    },
+    {
+      "unique-id": "workloads",
+      "node-type": "service",
+      "name": "TraderX Workloads",
+      "description": "Core services remain functionally equivalent to state 012."
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "rel-developer-radius",
+      "description": "Manages app model",
+      "relationship-type": {
+        "interacts": {
+          "actor": "developer",
+          "nodes": [
+            "radius"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "rel-radius-appModel",
+      "description": "Resolves resources",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "radius"
+          },
+          "destination": {
+            "node": "appModel"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-appModel-cluster",
+      "description": "Deploys workloads",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "appModel"
+          },
+          "destination": {
+            "node": "cluster"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-cluster-edge",
+      "description": "Runs ingress",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "cluster"
+          },
+          "destination": {
+            "node": "edge"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-edge-workloads",
+      "description": "Routes UI/API/WebSocket traffic",
+      "protocol": "WebSocket",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "edge"
+          },
+          "destination": {
+            "node": "workloads"
+          }
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "source-project": "finos/traderx",
+    "state-id": "013-radius-kubernetes-platform",
+    "track": "devex",
+    "status": "implemented",
+    "inherits-from": "012-platform-convergence-c3",
+    "notes": [
+      "State 013 is an optional child branch of state 012.",
+      "Primary delta is platform/deployment abstraction, not functional API behavior."
+    ]
+  }
+}

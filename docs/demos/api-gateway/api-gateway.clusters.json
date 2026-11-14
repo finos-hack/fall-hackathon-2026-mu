@@ -1,30 +1,30 @@
 [
   {
     "startIndex": 0,
-    "endIndex": 2,
-    "uniqueId": "initial-gateway-topology",
-    "name": "Initial Gateway Pattern Topology",
-    "description": "Introduces the foundational four-node API Gateway pattern linking api-consumer through api-gateway to api-producer and idp, then standardizes node-type classifications across all services."
+    "endIndex": 4,
+    "uniqueId": "legacy-items-to-prefixitems-migration",
+    "name": "Legacy items Tuple, unique-id Rename & prefixItems Migration",
+    "description": "Introduces the initial four-node API Gateway pattern using legacy JSON Schema items tuples, refines relationship-type const endpoints, renames uniqueId to canonical unique-id (#46), and migrates tuple definitions to JSON Schema 2020-12 prefixItems (#79)."
   },
   {
-    "startIndex": 3,
-    "endIndex": 7,
+    "startIndex": 5,
+    "endIndex": 10,
     "uniqueId": "typed-interfaces-and-finos-namespace",
-    "name": "Typed Interfaces and FINOS Namespace",
-    "description": "Enriches api-gateway and api-producer with explicit interface definitions, aligns relationship wiring with Spectral validation rules, and migrates schema URIs from finos-labs to canonical finos namespaces."
+    "name": "Typed Interfaces, Spectral Wiring & FINOS Namespace",
+    "description": "Standardizes node-type classifications, adds explicit interface definitions on api-gateway and api-producer, aligns relationship wiring with Spectral rules, and migrates schema URIs from finos-labs to canonical finos namespaces."
   },
   {
-    "startIndex": 8,
-    "endIndex": 8,
+    "startIndex": 11,
+    "endIndex": 11,
     "uniqueId": "direct-consumer-identity-handshake",
     "name": "Direct Consumer Identity Handshake",
     "description": "Adds the api-consumer-idp relationship so consumers authenticate directly against the Identity Provider before presenting tokens to api-gateway, while generalizing language-agnostic node names."
   },
   {
-    "startIndex": 9,
-    "endIndex": 13,
+    "startIndex": 12,
+    "endIndex": 16,
     "uniqueId": "calm-release-schema-standardization",
     "name": "CALM Release Schema Standardization",
-    "description": "Progressively upgrades interface schemas on api-gateway and api-producer from 2024-10 drafts through RC-1 candidates to stable CALM release specifications as legacy draft bundles are retired."
+    "description": "Progressively upgrades pattern and interface schemas on api-gateway and api-producer from 2024-10 drafts through RC-1 candidates to stable CALM release specifications."
   }
 ]

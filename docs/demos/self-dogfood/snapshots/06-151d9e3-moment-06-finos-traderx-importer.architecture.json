@@ -1,0 +1,293 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm.json",
+  "unique-id": "calm-timelapse-architecture",
+  "name": "CALM Timelapse Architecture",
+  "description": "Zero-network deterministic CALM timeline synthesis from Git history across single or multiple repositories, structural diff digest export, single-viewport SVG Timelapse Stage, and reverse-chronological Architecture Feed.",
+  "nodes": [
+    {
+      "unique-id": "git-repo",
+      "node-type": "database",
+      "name": "Git Repository",
+      "description": "Local commit history of CALM JSON files and co-changed Architecture Decision Records (ADRs)."
+    },
+    {
+      "unique-id": "git-history-extractor",
+      "node-type": "service",
+      "name": "Git History Extractor",
+      "description": "Traverses git log --follow -M30% locally across one or multiple Git repositories and extracts valid JSON snapshots plus co-changed ADRs."
+    },
+    {
+      "unique-id": "federation-engine",
+      "node-type": "service",
+      "name": "Multi-Repo Federation Engine",
+      "description": "Synchronizes chronological commits across repositories, enforces strict peer namespace isolation, and merges shared boundary nodes solely through details.detailed-architecture."
+    },
+    {
+      "unique-id": "traderx-state-importer",
+      "node-type": "service",
+      "name": "FINOS TraderX State Importer",
+      "description": "Converts upstream finos/traderx progressive state catalogs (States 001-014 including FINOS FDC3 interoperability), ADRs, and Git commits into validated CALM 1.3 architectures and timelines."
+    },
+    {
+      "unique-id": "structural-diff-engine",
+      "node-type": "service",
+      "name": "Structural Diff Engine",
+      "description": "Canonicalizes CALM documents and filters formatting/noise commits from genuine structural deltas."
+    },
+    {
+      "unique-id": "digest-exporter",
+      "node-type": "service",
+      "name": "Commit Diff Digest Exporter",
+      "description": "Emits compact, deterministic <arch>.digest.json summaries with embedded clustering schema for optional review by approved IDE AI assistants."
+    },
+    {
+      "unique-id": "moment-clusterer",
+      "node-type": "service",
+      "name": "Deterministic & Spec Clusterer",
+      "description": "Groups contiguous structural commits into architectural moments via deterministic heuristics or validated --clusters <clusters.json> specifications."
+    },
+    {
+      "unique-id": "timeline-emitter",
+      "node-type": "service",
+      "name": "CALM Timeline Emitter",
+      "description": "Emits CALM 1.3 calm-timeline.json documents and immutable Git-backed moment architecture snapshots."
+    },
+    {
+      "unique-id": "timelapse-renderer",
+      "node-type": "service",
+      "name": "Timelapse Stage SVG Renderer",
+      "description": "Computes layered super-graph coordinates and renders the interactive single-viewport SVG Timelapse Stage with zoom/pan, blast-radius focus, and as-of date queries."
+    },
+    {
+      "unique-id": "architecture-feed-renderer",
+      "node-type": "service",
+      "name": "Architecture Feed Renderer",
+      "description": "Renders architectural moments in reverse chronological order (Latest First, N -> 1) as scrollable story cards pairing auto-cropped SVG diagrams, narrative summaries, change/ADR chips, and standalone SVG export."
+    },
+    {
+      "unique-id": "ide-ai-assistant",
+      "node-type": "actor",
+      "name": "IDE AI Assistant (Optional)",
+      "description": "Enterprise-approved coding assistant (Copilot, Claude Code, Kiro, Codex, Bob, OpenCode) that optionally reads <arch>.digest.json and writes <arch>.clusters.json in the workspace."
+    },
+    {
+      "unique-id": "architect-user",
+      "node-type": "actor",
+      "name": "Architect / Reviewer",
+      "description": "Explores architectural evolution frame-by-frame with as-of compliance dates, baseline diffing, and ADR provenance."
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "rel-git-to-extractor",
+      "description": "Reads commit history and file blobs via local Git CLI.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "git-history-extractor"
+          },
+          "destination": {
+            "node": "git-repo"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-extractor-to-federation",
+      "description": "Streams per-repository CALM commit histories with ISO-8601 timestamps.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "git-history-extractor"
+          },
+          "destination": {
+            "node": "federation-engine"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-federation-to-diff",
+      "description": "Emits synchronized federated CALM snapshots with provenance metadata.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "federation-engine"
+          },
+          "destination": {
+            "node": "structural-diff-engine"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-traderx-importer-to-git",
+      "description": "Reads finos/traderx state-catalog.json, architecture.model.json states, ADRs, and Git commits.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "traderx-state-importer"
+          },
+          "destination": {
+            "node": "git-repo"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-traderx-importer-to-diff",
+      "description": "Feeds converted CALM 1.3 TraderX state snapshots into structural diffing and timeline emission.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "traderx-state-importer"
+          },
+          "destination": {
+            "node": "structural-diff-engine"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-diff-to-digest",
+      "description": "Serializes structural commit deltas into deterministic <arch>.digest.json files.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "structural-diff-engine"
+          },
+          "destination": {
+            "node": "digest-exporter"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-diff-to-cluster",
+      "description": "Sends filtered structural commit deltas.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "structural-diff-engine"
+          },
+          "destination": {
+            "node": "moment-clusterer"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-assistant-curates-clusters",
+      "description": "Reads <arch>.digest.json and authors <arch>.clusters.json locally in the workspace without CLI network calls.",
+      "relationship-type": {
+        "interacts": {
+          "actor": "ide-ai-assistant",
+          "nodes": [
+            "digest-exporter",
+            "moment-clusterer"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "rel-cluster-to-emitter",
+      "description": "Emits ordered, Git-verified MomentClusters.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "moment-clusterer"
+          },
+          "destination": {
+            "node": "timeline-emitter"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-cluster-to-renderer",
+      "description": "Feeds super-graph frames, governance controls, and structural diffs.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "moment-clusterer"
+          },
+          "destination": {
+            "node": "timelapse-renderer"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-cluster-to-feed",
+      "description": "Streams ordered MomentClusters into reverse-chronological Architecture Feed story cards.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "moment-clusterer"
+          },
+          "destination": {
+            "node": "architecture-feed-renderer"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-user-views-timelapse",
+      "description": "Explores architectural evolution in either Timelapse Stage or reverse-chronological Architecture Feed mode offline in browser.",
+      "relationship-type": {
+        "interacts": {
+          "actor": "architect-user",
+          "nodes": [
+            "timelapse-renderer",
+            "architecture-feed-renderer"
+          ]
+        }
+      }
+    }
+  ],
+  "controls": {
+    "zero-network-execution": {
+      "description": "Guarantees that calm-timelapse executes 100% offline with zero embedded HTTP clients, LLM SDKs, or external runtime network calls.",
+      "requirements": [
+        {
+          "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+          "config": {
+            "control-id": "zero-network-execution",
+            "name": "Zero-Network Deterministic CLI Execution",
+            "description": "Forbids outbound HTTP/LLM calls inside the CLI so regulated air-gapped CI pipelines run deterministically without credentials.",
+            "outboundNetworkAllowed": false,
+            "aiIntegrationPattern": "workspace-file-handoff"
+          }
+        }
+      ]
+    },
+    "contiguous-cluster-coverage": {
+      "description": "Validates any external --clusters JSON specification to ensure contiguous, non-overlapping coverage of structural commits 0..N-1 while sourcing every architecture snapshot strictly from Git.",
+      "requirements": [
+        {
+          "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+          "config": {
+            "control-id": "contiguous-cluster-coverage",
+            "name": "Contiguous Commit Coverage & Git Snapshot Integrity",
+            "description": "Enforces validateClusterSpecs(0..N-1) so external AI assistants cannot drop commits, overlap ranges, or hallucinate CALM JSON snapshots.",
+            "enforcedBy": "validateClusterSpecs"
+          }
+        }
+      ]
+    },
+    "strict-peer-namespace-isolation": {
+      "description": "Prevents unintended node merging across unlinked peer repositories while permitting canonical composition and boundary-node merging when explicitly linked via details.detailed-architecture.",
+      "requirements": [
+        {
+          "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+          "config": {
+            "control-id": "strict-peer-namespace-isolation",
+            "name": "Peer Namespace Isolation & Detailed-Architecture Resolution",
+            "description": "Namespaces unlinked nodes per source (<sourceId>--<id>) and merges shared nodes only across resolved details.detailed-architecture edges.",
+            "enforcedBy": "composeFederatedArchitecture"
+          }
+        }
+      ]
+    }
+  }
+}

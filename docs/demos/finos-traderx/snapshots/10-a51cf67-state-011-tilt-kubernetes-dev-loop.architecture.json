@@ -1,0 +1,115 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm.json",
+  "unique-id": "traderx-011-tilt-kubernetes-dev-loop",
+  "name": "FINOS TraderX — Tilt Local Dev on Kubernetes",
+  "description": "State 011 preserves state 010 Kubernetes runtime while introducing Tilt for local developer automation.",
+  "nodes": [
+    {
+      "unique-id": "developer",
+      "node-type": "actor",
+      "name": "Developer",
+      "description": "Iterates locally with fast feedback loops."
+    },
+    {
+      "unique-id": "tilt",
+      "node-type": "service",
+      "name": "Tilt Dev Loop",
+      "description": "Build/deploy/log orchestration for local k8s.",
+      "metadata": {
+        "traderx-kind": "tooling"
+      }
+    },
+    {
+      "unique-id": "cluster",
+      "node-type": "network",
+      "name": "Kubernetes Cluster",
+      "description": "Underlying runtime substrate inherited from state 010.",
+      "metadata": {
+        "traderx-kind": "boundary"
+      }
+    },
+    {
+      "unique-id": "edge",
+      "node-type": "service",
+      "name": "NGINX Edge Proxy",
+      "description": "Single browser/API entrypoint.",
+      "metadata": {
+        "traderx-kind": "gateway"
+      }
+    },
+    {
+      "unique-id": "workloads",
+      "node-type": "service",
+      "name": "TraderX Workloads",
+      "description": "Core services remain functionally equivalent to state 010."
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "rel-developer-tilt",
+      "description": "Runs tilt up",
+      "relationship-type": {
+        "interacts": {
+          "actor": "developer",
+          "nodes": [
+            "tilt"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "rel-tilt-cluster",
+      "description": "Applies k8s resources",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "tilt"
+          },
+          "destination": {
+            "node": "cluster"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-cluster-edge",
+      "description": "Runs ingress",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "cluster"
+          },
+          "destination": {
+            "node": "edge"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "rel-edge-workloads",
+      "description": "Routes UI/API/WebSocket traffic",
+      "protocol": "WebSocket",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "edge"
+          },
+          "destination": {
+            "node": "workloads"
+          }
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "source-project": "finos/traderx",
+    "state-id": "011-tilt-kubernetes-dev-loop",
+    "track": "devex",
+    "status": "implemented",
+    "inherits-from": "010-kubernetes-runtime",
+    "notes": [
+      "State 011 is the publish-lineage parent of state 012; state 013 branches from state 012.",
+      "Primary delta is developer workflow/tooling, not platform abstraction."
+    ]
+  }
+}

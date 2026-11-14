@@ -37,5 +37,12 @@ jobs:
       - name: Run test suite with coverage
         run: npm run test:coverage
 
-      - name: Validate self-architecture with official @finos/calm-cli
-        run: npx --yes @finos/calm-cli@1.72.0 validate -a architecture.calm.json
+      - name: Validate self-architecture and all demo timelines with official @finos/calm-cli
+        run: |
+          npx --yes --package=@finos/calm-cli@1.72.0 -c '
+            calm validate -a architecture.calm.json
+            for tl in docs/demos/*/*.timeline.json; do
+              echo "Validating $tl"
+              calm validate --timeline "$tl"
+            done
+          '
