@@ -209,4 +209,232 @@ describe('FINOS TraderX state catalog importer', () => {
     expect(cliRes.stdout).toContain('Imported 2 FINOS TraderX state(s)');
     expect(fs.existsSync(cliOutTimeline)).toBe(true);
   });
+
+  it('parses FDC3 contract-delta.md, appd.v2.json, and nonfunctional-delta.md into CALM 1.3 interfaces, flows, and controls', () => {
+    const repoDir = fs.mkdtempSync(path.join(os.tmpdir(), 'calm-traderx-fdc3-'));
+    tempDirs.push(repoDir);
+
+    fs.mkdirSync(path.join(repoDir, 'catalog'), { recursive: true });
+    fs.mkdirSync(path.join(repoDir, 'specs', '001-baseline', 'system'), { recursive: true });
+    fs.mkdirSync(path.join(repoDir, 'specs', '014-fdc3-intent-interoperability', 'system'), {
+      recursive: true,
+    });
+    fs.mkdirSync(path.join(repoDir, 'specs', '014-fdc3-intent-interoperability', 'contracts'), {
+      recursive: true,
+    });
+    fs.mkdirSync(path.join(repoDir, 'specs', '014-fdc3-intent-interoperability', 'requirements'), {
+      recursive: true,
+    });
+    fs.mkdirSync(
+      path.join(repoDir, 'specs', '014-fdc3-intent-interoperability', 'generation', 'static'),
+      { recursive: true },
+    );
+
+    fs.writeFileSync(
+      path.join(repoDir, 'catalog', 'state-catalog.json'),
+      JSON.stringify({
+        states: [
+          {
+            id: '001-baseline',
+            title: 'Baseline Parity',
+            featurePack: 'specs/001-baseline',
+          },
+          {
+            id: '014-fdc3-intent-interoperability',
+            title: 'FDC3 Intent Interoperability on C3',
+            featurePack: 'specs/014-fdc3-intent-interoperability',
+            previous: ['001-baseline'],
+          },
+        ],
+      }),
+    );
+
+    fs.writeFileSync(
+      path.join(repoDir, 'specs', '001-baseline', 'system', 'system-requirements.md'),
+      [
+        '# System Requirements',
+        '## Functional Requirements',
+        '- `SYS-FR-006` The trade-service SHALL validate account and ticker before publishing new trade orders.',
+        '## Non-Functional Requirements',
+        '- `SYS-NFR-009` Dependency upgrade targets SHALL be declared before template changes propagate.',
+      ].join('\n'),
+    );
+
+    fs.writeFileSync(
+      path.join(repoDir, 'specs', '001-baseline', 'system', 'architecture.model.json'),
+      JSON.stringify({
+        stateId: '001-baseline',
+        description: 'Baseline runtime.',
+        entrypoints: [{ name: 'web-front-end-angular', url: 'http://localhost:18093' }],
+        nodes: [
+          { id: 'trader', label: 'Trader', kind: 'actor' },
+          { id: 'web', label: 'Web UI', kind: 'frontend' },
+          { id: 'tradeService', label: 'Trade Service', kind: 'service' },
+        ],
+        edges: [
+          { from: 'trader', to: 'web', label: 'Uses UI' },
+          { from: 'web', to: 'tradeService', label: '/trades' },
+        ],
+      }),
+    );
+
+    fs.writeFileSync(
+      path.join(
+        repoDir,
+        'specs',
+        '014-fdc3-intent-interoperability',
+        'contracts',
+        'contract-delta.md',
+      ),
+      [
+        '# Contract Delta: 014-fdc3-intent-interoperability',
+        '### Supported Context Types',
+        '- Inbound: `fdc3.instrument`',
+        '- Outbound: `fdc3.instrument`',
+        '### Inbound Intents (TraderX Listens For)',
+        '- `ViewOrders` with `fdc3.instrument`',
+        '- `TraderX.CreateTradeTicket` with `fdc3.instrument`',
+        '- `TraderX.CreateOrderTicket` with `fdc3.instrument`',
+        '### Outbound Intents (TraderX Raises)',
+        '- `ViewChart` with `fdc3.instrument`',
+        '- `ViewQuote` with `fdc3.instrument`',
+        '### Context Mapping Rules',
+        '- Optional: `id.ISIN`, `id.FIGI`, `id.RIC`',
+        '- Account context is `{"type":"fdc3.account","id":{"accountId":"123"}}`.',
+      ].join('\n'),
+    );
+
+    fs.writeFileSync(
+      path.join(
+        repoDir,
+        'specs',
+        '014-fdc3-intent-interoperability',
+        'generation',
+        'static',
+        'appd.v2.json',
+      ),
+      JSON.stringify({
+        applications: [
+          {
+            appId: 'traderx-intent-launcher-1',
+            name: 'TraderX Intent Launcher',
+            details: { url: 'http://localhost:4040/' },
+            publisher: 'FINOS',
+            interop: {
+              intents: {
+                raises: {
+                  'TraderX.CreateTradeTicket': { contexts: ['fdc3.instrument'] },
+                  'TraderX.CreateOrderTicket': { contexts: ['fdc3.instrument'] },
+                },
+              },
+            },
+          },
+        ],
+      }),
+    );
+
+    fs.writeFileSync(
+      path.join(
+        repoDir,
+        'specs',
+        '014-fdc3-intent-interoperability',
+        'requirements',
+        'nonfunctional-delta.md',
+      ),
+      [
+        '# Non-Functional Delta',
+        '## Runtime / Operations',
+        '- TraderX must operate in two modes: interop-enabled and degraded local-only.',
+        '- Local Sail sidecar should run as an independent service outside TraderX ingress path on `http://localhost:8090`.',
+        '## Security / Compliance',
+        '- No authn/authz model changes are introduced.',
+        '- Outbound context payloads should include symbol identifiers only, excluding account/user-sensitive fields.',
+        '- Intent handlers must validate context shape before applying UI actions.',
+        '- Generated state-014 frontend manifests must enforce a scoped temporary npm override for `@robmoffat/fdc3-get-agent -> uuid:^14.0.0` to mitigate GHSA-w5hq-g745-h8pq.',
+        '## Reliability / Observability',
+        '- Interop failures must degrade safely and keep core TraderX workflows functional.',
+      ].join('\n'),
+    );
+
+    fs.writeFileSync(
+      path.join(
+        repoDir,
+        'specs',
+        '014-fdc3-intent-interoperability',
+        'system',
+        'architecture.model.json',
+      ),
+      JSON.stringify({
+        stateId: '014-fdc3-intent-interoperability',
+        inheritsFrom: '001-baseline',
+        entrypoints: [
+          { name: 'traderx-ui', url: 'http://localhost:8080' },
+          { name: 'sail-ui', url: 'http://localhost:8090' },
+        ],
+        nodes: [
+          { id: 'trader', label: 'Trader', kind: 'actor' },
+          { id: 'traderxUi', label: 'TraderX Angular UI', kind: 'service' },
+          { id: 'traderxIngress', label: 'TraderX Ingress', kind: 'gateway' },
+          { id: 'sailSidecar', label: 'Sail Sidecar', kind: 'service' },
+          { id: 'sailDirectory', label: 'Sail App Directory Profile', kind: 'component' },
+          { id: 'demoApps', label: 'Demo FDC3 Apps', kind: 'service' },
+          { id: 'orderApi', label: 'Order Matcher API', kind: 'service' },
+          { id: 'tradeApi', label: 'Trade Service API', kind: 'service' },
+          { id: 'nats', label: 'NATS Broker', kind: 'service' },
+        ],
+        edges: [
+          { from: 'trader', to: 'traderxUi', label: 'Selects blotter rows' },
+          { from: 'trader', to: 'sailSidecar', label: 'Uses Sail launcher' },
+          { from: 'sailDirectory', to: 'sailSidecar', label: 'Provides app/intents/context metadata' },
+          { from: 'sailSidecar', to: 'traderxUi', label: 'Routes contexts/intents to TraderX' },
+          { from: 'traderxUi', to: 'sailSidecar', label: 'Broadcasts fdc3.instrument and raises intents' },
+          { from: 'sailSidecar', to: 'demoApps', label: 'Hosts/resolves demo app workflows' },
+          { from: 'demoApps', to: 'sailSidecar', label: 'Raises ticket-launch and view intents' },
+          { from: 'traderxUi', to: 'traderxIngress', label: '/api' },
+          { from: 'traderxIngress', to: 'tradeApi', label: '/trades' },
+          { from: 'traderxIngress', to: 'orderApi', label: '/orders' },
+          { from: 'traderxUi', to: 'nats', label: 'nats-ws' },
+        ],
+      }),
+    );
+
+    const outHtml = path.join(repoDir, 'out', 'traderx.timelapse.html');
+    const res = generateTimelineFromTraderXRepo(repoDir, {
+      outputPath: path.join(repoDir, 'out', 'traderx.timeline.json'),
+      snapshotsDir: path.join(repoDir, 'out', 'snapshots'),
+      timelapsePath: outHtml,
+      validate: true,
+      validateSnapshots: true,
+    });
+
+    expect(res.validationErrors).toEqual([]);
+    const state14Doc = res.clusters[1].snapshotDocument;
+    const flows = state14Doc.flows as Array<Record<string, unknown>>;
+    expect(flows).toHaveLength(3);
+    expect(flows.map((f) => f['unique-id'])).toEqual([
+      'flow-fdc3-outbound-instrument-and-chart-intent',
+      'flow-fdc3-inbound-ticket-launch-to-execution',
+      'flow-fdc3-view-orders-and-realtime-blotter',
+    ]);
+
+    const controls = state14Doc.controls as Record<string, Record<string, unknown>>;
+    expect(Object.keys(controls)).toEqual(
+      expect.arrayContaining([
+        'traderx-001-pre-trade-and-account-validation',
+        'traderx-014-fdc3-context-data-minimization',
+        'traderx-014-sail-sidecar-isolation-and-supply-chain',
+        'traderx-014-fdc3-degraded-mode-resilience',
+      ]),
+    );
+
+    const state14Nodes = state14Doc.nodes as Array<Record<string, unknown>>;
+    const uiNode = state14Nodes.find((n) => n['unique-id'] === 'traderxUi')!;
+    const uiIfaces = uiNode.interfaces as Array<Record<string, unknown>>;
+    expect(uiIfaces.some((i) => Array.isArray(i['listens-for']) && i['listens-for'].includes('TraderX.CreateTradeTicket'))).toBe(true);
+    expect(uiIfaces.some((i) => Array.isArray(i.raises) && i.raises.includes('ViewChart'))).toBe(true);
+
+    const htmlContent = fs.readFileSync(outHtml, 'utf-8');
+    expect(htmlContent).toContain('Active CALM Flows');
+    expect(htmlContent).toContain('flow-fdc3-inbound-ticket-launch-to-execution');
+  });
 });

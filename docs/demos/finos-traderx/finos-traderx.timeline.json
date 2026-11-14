@@ -513,7 +513,7 @@
   ],
   "metadata": {
     "title": "Git Architecture Timeline — FINOS TraderX (v2.0 Progressive States + FDC3)",
-    "description": "Extracted directly from upstream finos/traderx catalog/state-catalog.json, specs/*/system/architecture.model.json, docs/adr/*.md, and Git history.",
+    "description": "Extracted directly from upstream finos/traderx catalog/state-catalog.json, specs/*/system/architecture.model.json, FDC3 contract-delta.md + appd.v2.json, nonfunctional-delta.md controls, docs/adr/*.md, and Git history.",
     "generator": "calm-timelapse",
     "source-repository": "https://github.com/finos/traderx",
     "clustering-engine": "traderx-state-catalog",

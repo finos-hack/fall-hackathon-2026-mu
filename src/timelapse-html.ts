@@ -18,12 +18,28 @@ export interface ControlInfo {
   requirementCount: number;
 }
 
+export interface NodeInterfaceInfo {
+  id: string;
+  summary: string;
+}
+
+export interface FlowInfo {
+  id: string;
+  name: string;
+  description: string;
+  transitionCount: number;
+  relationshipIds: string[];
+  intents?: string[];
+  contexts?: string[];
+}
+
 export interface GraphNode {
   id: string;
   name: string;
   nodeType: string;
   description?: string;
   controlCount?: number;
+  interfaces?: NodeInterfaceInfo[];
   sourceId?: string;
   sourceLabel?: string;
   sourceIds?: string[];
@@ -66,6 +82,7 @@ export interface TimelapseFrame {
   nodes: GraphNode[];
   edges: GraphEdge[];
   controls?: ControlInfo[];
+  flows?: FlowInfo[];
   addedNodeIds: string[];
   modifiedNodeIds: string[];
   removedNodeIds: string[];
@@ -249,6 +266,99 @@ function countNodeControls(rawControls: unknown): number {
   return 0;
 }
 
+function extractNodeInterfaces(rawInterfaces: unknown): NodeInterfaceInfo[] {
+  if (!Array.isArray(rawInterfaces)) return [];
+  const out: NodeInterfaceInfo[] = [];
+  for (const raw of rawInterfaces) {
+    const rec = asRecord(raw);
+    if (!rec) continue;
+    const id = typeof rec['unique-id'] === 'string' ? rec['unique-id'].trim() : '';
+    if (!id) continue;
+    const parts: string[] = [];
+    if (typeof rec['protocol'] === 'string' && rec['protocol'].trim()) {
+      parts.push(rec['protocol'].trim());
+    } else if (typeof rec['type'] === 'string' && rec['type'].trim()) {
+      parts.push(rec['type'].trim());
+    }
+    const urlVal =
+      typeof rec['url'] === 'string'
+        ? rec['url'].trim()
+        : typeof rec['value'] === 'string'
+          ? rec['value'].trim()
+          : '';
+    if (urlVal) parts.push(urlVal);
+    if (Array.isArray(rec['listens-for']) && rec['listens-for'].length > 0) {
+      parts.push(`listensFor=[${rec['listens-for'].join(', ')}]`);
+    }
+    if (Array.isArray(rec['raises']) && rec['raises'].length > 0) {
+      parts.push(`raises=[${rec['raises'].join(', ')}]`);
+    }
+    const ctxs = rec['context-types'] ?? rec['supported-contexts'] ?? rec['broadcasts-context'];
+    if (Array.isArray(ctxs) && ctxs.length > 0) {
+      parts.push(`contexts=[${ctxs.join(', ')}]`);
+    }
+    out.push({ id, summary: parts.join(' · ') || 'interface' });
+  }
+  return out;
+}
+
+export function extractActiveFlows(doc: Record<string, unknown>): FlowInfo[] {
+  const rawFlows = doc['flows'];
+  if (!Array.isArray(rawFlows)) return [];
+  const out: FlowInfo[] = [];
+  for (let i = 0; i < rawFlows.length; i++) {
+    const item = rawFlows[i];
+    if (typeof item === 'string' && item.trim()) {
+      const ref = item.trim();
+      out.push({
+        id: ref,
+        name: ref,
+        description: 'External CALM flow reference.',
+        transitionCount: 0,
+        relationshipIds: [],
+      });
+      continue;
+    }
+    const rec = asRecord(item);
+    if (!rec) continue;
+    const id =
+      typeof rec['unique-id'] === 'string' && rec['unique-id'].trim()
+        ? rec['unique-id'].trim()
+        : `flow-${i + 1}`;
+    const name =
+      typeof rec['name'] === 'string' && rec['name'].trim() ? rec['name'].trim() : id;
+    const description =
+      typeof rec['description'] === 'string' ? rec['description'].trim() : '';
+    const rawTransitions = Array.isArray(rec['transitions']) ? rec['transitions'] : [];
+    const relationshipIds: string[] = [];
+    for (const tr of rawTransitions) {
+      const trRec = asRecord(tr);
+      const relId =
+        typeof trRec?.['relationship-unique-id'] === 'string'
+          ? trRec['relationship-unique-id'].trim()
+          : '';
+      if (relId) relationshipIds.push(relId);
+    }
+    const meta = asRecord(rec['metadata']);
+    const intents = Array.isArray(meta?.['fdc3-intents'])
+      ? meta['fdc3-intents'].filter((x): x is string => typeof x === 'string')
+      : undefined;
+    const contexts = Array.isArray(meta?.['fdc3-contexts'])
+      ? meta['fdc3-contexts'].filter((x): x is string => typeof x === 'string')
+      : undefined;
+    out.push({
+      id,
+      name,
+      description,
+      transitionCount: rawTransitions.length,
+      relationshipIds,
+      ...(intents && intents.length > 0 ? { intents } : {}),
+      ...(contexts && contexts.length > 0 ? { contexts } : {}),
+    });
+  }
+  return out;
+}
+
 export function extractGraphNodes(doc: Record<string, unknown>): GraphNode[] {
   const rawNodes = doc['nodes'];
   if (!Array.isArray(rawNodes)) {
@@ -274,10 +384,14 @@ export function extractGraphNodes(doc: Record<string, unknown>): GraphNode[] {
     const description =
       typeof node['description'] === 'string' ? node['description'] : undefined;
     const controlCount = countNodeControls(node['controls']);
+    const interfaces = extractNodeInterfaces(node['interfaces']);
 
     const graphNode: GraphNode = { id, name, nodeType, description };
     if (controlCount > 0) {
       graphNode.controlCount = controlCount;
+    }
+    if (interfaces.length > 0) {
+      graphNode.interfaces = interfaces;
     }
     out.push(graphNode);
   }
@@ -759,6 +873,7 @@ export function buildTimelapsePayloadFromClusters(
     const nodes = attachProvenanceToNodes(extractGraphNodes(doc), cluster.nodeProvenance);
     const edges = extractGraphEdges(doc);
     const controls = extractActiveControls(doc);
+    const flows = extractActiveFlows(doc);
 
     for (const node of nodes) {
       unionNodes.set(node.id, node);
@@ -805,6 +920,7 @@ export function buildTimelapsePayloadFromClusters(
       nodes,
       edges,
       controls,
+      ...(flows.length > 0 ? { flows } : {}),
       addedNodeIds,
       modifiedNodeIds: [...new Set(modifiedNodeIds)],
       removedNodeIds,
@@ -883,6 +999,7 @@ export function buildTimelapsePayloadFromTimelineFile(
     const nodes = attachProvenanceToNodes(extractGraphNodes(doc), rawProvenance ?? undefined);
     const edges = extractGraphEdges(doc);
     const controls = extractActiveControls(doc);
+    const flows = extractActiveFlows(doc);
 
     for (const node of nodes) {
       unionNodes.set(node.id, node);
@@ -934,6 +1051,7 @@ export function buildTimelapsePayloadFromTimelineFile(
       nodes,
       edges,
       controls,
+      ...(flows.length > 0 ? { flows } : {}),
       addedNodeIds,
       modifiedNodeIds: [...new Set(modifiedNodeIds)],
       removedNodeIds,
@@ -2403,6 +2521,55 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
           adrSec.appendChild(ul);
         }
         governanceBody.appendChild(adrSec);
+
+        const activeFlows = frame.flows || [];
+        if (activeFlows.length > 0) {
+          const flowSec = document.createElement('div');
+          flowSec.className = 'gov-section';
+          const flowHeader = document.createElement('div');
+          flowHeader.className = 'gov-label';
+          flowHeader.textContent = 'Active CALM Flows (' + activeFlows.length + ')';
+          flowSec.appendChild(flowHeader);
+
+          const ul = document.createElement('ul');
+          ul.className = 'governance-list';
+          for (const fl of activeFlows) {
+            const li = document.createElement('li');
+            const titleStrong = document.createElement('strong');
+            titleStrong.style.color = '#e2e8f0';
+            titleStrong.textContent = fl.name;
+            li.appendChild(titleStrong);
+            if (fl.transitionCount > 0) {
+              const stepTag = document.createElement('span');
+              stepTag.className = 'tag tag-info';
+              stepTag.style.marginLeft = '6px';
+              stepTag.textContent = fl.transitionCount + ' steps';
+              li.appendChild(stepTag);
+            }
+            if (Array.isArray(fl.intents) && fl.intents.length > 0) {
+              const intentLine = document.createElement('div');
+              intentLine.style.color = '#5eead4';
+              intentLine.style.fontSize = '11.5px';
+              intentLine.textContent =
+                'FDC3 Intents: ' +
+                fl.intents.join(', ') +
+                (Array.isArray(fl.contexts) && fl.contexts.length > 0
+                  ? ' · Contexts: ' + fl.contexts.join(', ')
+                  : '');
+              li.appendChild(intentLine);
+            }
+            if (fl.description) {
+              const descDiv = document.createElement('div');
+              descDiv.style.color = '#cbd5e1';
+              descDiv.style.fontSize = '12px';
+              descDiv.textContent = fl.description;
+              li.appendChild(descDiv);
+            }
+            ul.appendChild(li);
+          }
+          flowSec.appendChild(ul);
+          governanceBody.appendChild(flowSec);
+        }
       }
 
       function renderFrame(index) {
@@ -2497,6 +2664,17 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
           nodeInspectorBody.appendChild(p2);
           nodeInspectorBody.appendChild(p3);
           nodeInspectorBody.appendChild(p4);
+          if (Array.isArray(fNode.interfaces) && fNode.interfaces.length > 0) {
+            const pIfaces = document.createElement('div');
+            pIfaces.style.marginTop = '6px';
+            pIfaces.style.color = '#5eead4';
+            pIfaces.textContent =
+              'CALM Interfaces (' +
+              fNode.interfaces.length +
+              '): ' +
+              fNode.interfaces.map((it) => it.id + ' (' + it.summary + ')').join(' | ');
+            nodeInspectorBody.appendChild(pIfaces);
+          }
         } else {
           nodeInspector.style.display = 'none';
         }
@@ -3241,6 +3419,16 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
             ...(f.changes || []).map((c) => c.text),
             ...(f.nodes || []).map((n) => n.name + ' ' + n.id),
             ...(f.controls || []).map((c) => c.id + ' ' + c.description),
+            ...(f.flows || []).map(
+              (fl) =>
+                fl.name +
+                ' ' +
+                fl.description +
+                ' ' +
+                (fl.intents || []).join(' ') +
+                ' ' +
+                (fl.contexts || []).join(' '),
+            ),
           ]
             .join(' ')
             .toLowerCase();
@@ -3303,7 +3491,8 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
           metaSub.textContent =
             commitInfo +
             ((f.adrs && f.adrs.length) ? ' · ' + f.adrs.length + ' ADR(s)' : '') +
-            ((f.controls && f.controls.length) ? ' · ' + f.controls.length + ' active control(s)' : '');
+            ((f.controls && f.controls.length) ? ' · ' + f.controls.length + ' active control(s)' : '') +
+            ((f.flows && f.flows.length) ? ' · ' + f.flows.length + ' CALM flow(s)' : '');
 
           metaTextWrap.appendChild(metaTitle);
           metaTextWrap.appendChild(metaSub);

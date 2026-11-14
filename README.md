@@ -108,7 +108,7 @@ Example `clusters.json` covering structural commit indices `0..2`:
 
 ### 4. Upstream FINOS TraderX + FINOS FDC3 Import (`--from-traderx <repoDir>`)
 
-Import a local clone of [`finos/traderx`](https://github.com/finos/traderx) directly into CALM `1.3` snapshots, a Spectral-clean `calm-timeline`, and an interactive player—bridging **FINOS CALM**, **FINOS TraderX** (`catalog/state-catalog.json` + `specs/*/system/architecture.model.json` + `docs/adr/*.md`), and **FINOS FDC3** (State `014`):
+Import a local clone of [`finos/traderx`](https://github.com/finos/traderx) directly into CALM `1.3` snapshots, a Spectral-clean `calm-timeline`, and an interactive player—translating **FINOS TraderX** Spec-Kit artifacts (`catalog/state-catalog.json`, `specs/*/system/architecture.model.json`, `system-requirements.md`, `requirements/nonfunctional-delta.md`, `docs/adr/*.md`) and **FINOS FDC3 2.2 / AppD 2.0** specs (`specs/014-fdc3-intent-interoperability/contracts/contract-delta.md` + `appd.v2.json`) into typed CALM `interfaces`, `flows`, and `controls`:
 
 ```sh
 node dist/cli.js \
@@ -120,6 +120,9 @@ node dist/cli.js \
   --validate \
   --validate-snapshots
 ```
+
+- **FDC3 2.2 Intents, Contexts & AppD → CALM `interfaces` & `flows`:** Parses `contract-delta.md` and `appd.v2.json` (`traderx-intent-launcher-1`) into CALM `1.3` node `interfaces` wired across `connects` relationships (`listens-for`: `ViewOrders`, `TraderX.CreateTradeTicket`, `TraderX.CreateOrderTicket`; `raises`: `ViewChart`, `ViewQuote`; contexts: `fdc3.instrument`, `fdc3.account`) plus 3 schema-validated CALM `flows` (`flow-fdc3-outbound-instrument-and-chart-intent`, `flow-fdc3-inbound-ticket-launch-to-execution`, `flow-fdc3-view-orders-and-realtime-blotter`).
+- **Real Spec-Kit Governance → 22 Progressive CALM `controls`:** Parses `system-requirements.md` and `nonfunctional-delta.md` across States `001`–`014` into architecture-level and node-level CALM `1.3` `controls` (pre-publish trade validation, NATS account-scoped subject isolation, `C1`/`C2`/`C3` GHCR release provenance, auditable order-matcher logs, FDC3 public-symbol data minimization, Sail sidecar ingress isolation, and `GHSA-w5hq-g745-h8pq` dependency override).
 
 ### 5. Visual Player for Existing Hand-Curated Timelines (`--timeline <files...>`)
 
@@ -155,7 +158,7 @@ node dist/cli.js \
 
 ### 6. Interactive Demo Gallery (`docs/demos/`)
 
-- **Upstream `finos/traderx` + FINOS FDC3 (`docs/demos/finos-traderx/`):** Imported directly from [`finos/traderx`](https://github.com/finos/traderx) via `--from-traderx`—converts **13 progressive architectural states (`001`–`014`), 135 commit references, and 8 real ADRs** into CALM `1.3` snapshots, culminating in **FINOS FDC3** desktop agent intent interoperability (`014-fdc3-intent-interoperability`).
+- **Upstream `finos/traderx` + FINOS FDC3 (`docs/demos/finos-traderx/`):** Imported directly from [`finos/traderx`](https://github.com/finos/traderx) via `--from-traderx`—converts **13 progressive architectural states (`001`–`014`), 22 real Spec-Kit CALM `1.3` controls, 8 real ADRs, and 135 commit references**, culminating in **FINOS FDC3 2.2** `interfaces` and **3 FDC3 CALM `flows`** (`014-fdc3-intent-interoperability`).
 - **Multi-Repo Trading & FINRA Surveillance (`docs/demos/multi-repo/`):** Reproducible via `npm run demo:multi-repo`—synchronizes **3 independent Git repositories** (`traderx-platform`, `traderx-execution`, `finra-surveillance`) across 5 moments, demonstrating `details.detailed-architecture` boundary merging alongside strict peer isolation.
 - **Federated FINOS CALM Core + CALM Timelapse (`docs/demos/finos-federated/`):** Synchronizes `calm-3.json` + auto-discovered `calm-hub-detail.architecture.json` (`--resolve-details`) from `finos/architecture-as-code` with this repository's own `architecture.calm.json` (**19 commits → 8 moments**, 4 formatting commits filtered).
 - **Simulated 40-Commit Compliance Benchmark (`docs/demos/traderx/`):** Synthetic stress-test benchmark reproducible via `npm run demo:traderx` (`scripts/seed-traderx-demo.sh`)—**40 Git commits collapse to 9 moments** (5 formatting-only commits filtered, 5 co-changed ADRs, and 4 CALM `1.3` controls).
@@ -169,6 +172,14 @@ node dist/cli.js \
 - **Branch merge traversal:** Walks full commit history touching the file by default so feature-branch commits merged via pull requests retain their granular subjects; pass `--first-parent` to summarize merged branches at their mainline merge commit instead.
 - **Remote HTTP `detailed-architecture` URLs:** Local relative paths and co-supplied `--from-git` files are resolved offline; remote `https://` `detailed-architecture` URLs are intentionally not fetched to preserve the zero-network guarantee.
 - **Invalid historical JSON commits:** Commits where the CALM file failed `JSON.parse` are skipped safely and tallied in digest `stats` rather than halting extraction.
+
+## How AI Coding Tools Accelerated This Build
+
+This project used agentic AI coding tools both to **accelerate engineering velocity during the hackathon** and as a **bounded, deterministic orchestration pattern inside the tool itself**:
+
+- **Schema, Spectral & Spec-Kit Translation at Speed:** AI coding agents inspected upstream `@finos/calm-schema` (`1.2` / `1.3`), `@finos/calm-shared` Spectral rulesets (`rules-timeline.ts`, `rules-architecture.ts`, `rules-pattern.ts`), and `finos/traderx` Spec-Kit artifacts (`state-catalog.json`, `contract-delta.md`, `appd.v2.json`, `nonfunctional-delta.md`) in parallel—enabling full validator parity (`0` errors and `0` warnings from `@finos/calm-cli` across all 10 demo timelines and 13 TraderX snapshots in CI) within a single hackathon window.
+- **Automated Multi-Repo Fixtures & Visual Browser Verification:** Coding agents synthesized deterministic multi-repository Git test harnesses (`tests/*.test.ts`, 41 unit/e2e tests covering rename tracking, legacy `items` → `prefixItems` pattern migrations, `detailed-architecture` boundary merging, and FDC3 flow/control extraction) and delegated live headless-browser subagents to verify SVG node bounding boxes and responsive narrow-viewport (`720px`) layout without manual trial-and-error.
+- **Bounding AI Non-Determinism with Deterministic CALM Controls:** Rather than embedding opaque LLM API calls or credentials inside the CLI, `calm-timelapse` enforces `zero-network-execution` and `contiguous-cluster-coverage` (modeled in `architecture.calm.json`): `--emit-digest` writes a deterministic structural diff digest, an approved workspace agent (`skills/calm-timelapse/SKILL.md` + [AGENTS.md](./AGENTS.md)) proposes semantic phase clusters (`clusters.json`), and `validateClusterSpecs(0..N-1)` guarantees zero dropped commits and zero hallucinated snapshots.
 
 ## Development setup
 

@@ -224,16 +224,19 @@
         <div>
           <div class="meta-row">
             <span class="pill teal">Real Upstream finos/traderx · --from-traderx</span>
-            <span class="pill">13 Progressive States (001–014) · 135 Commit Refs</span>
-            <span class="pill">8 Real ADRs · FINOS FDC3 Interop</span>
+            <span class="pill">13 States (001–014) · 22 Spec-Kit Controls</span>
+            <span class="pill">3 FDC3 Flows · 7 FDC3/AppD Interfaces · 8 ADRs</span>
           </div>
-          <h3>FINOS TraderX Progressive Reference Architecture &amp; FDC3 Desktop Interop</h3>
+          <h3>FINOS TraderX Progressive Reference Architecture &amp; FDC3 2.2 Desktop Interop</h3>
           <p>
             Imported directly from upstream <code>finos/traderx</code> (<code>catalog/state-catalog.json</code>,
-            <code>specs/*/system/architecture.model.json</code>, and <code>docs/adr/*.md</code>) into schema-valid CALM 1.3:
-            traces TraderX from uncontainerized baseline services through gRPC internal transport, Angular SPA migration,
-            Docker Compose runtime boundaries, OpenTelemetry/Jaeger/Prometheus observability, Kubernetes, and
-            <strong>FINOS FDC3</strong> desktop agent intent interoperability on C3.
+            <code>specs/*/system/architecture.model.json</code>, <code>nonfunctional-delta.md</code>,
+            <code>contracts/contract-delta.md</code>, <code>appd.v2.json</code>, and <code>docs/adr/*.md</code>) into
+            schema-validated CALM 1.3: extracts <strong>22 real Spec-Kit governance controls</strong> across states
+            <code>001</code>–<code>014</code>, entrypoint and <strong>FINOS FDC3 2.2</strong> node interfaces
+            (<code>ViewOrders</code>, <code>TraderX.CreateTradeTicket</code>, <code>TraderX.CreateOrderTicket</code>,
+            <code>ViewChart</code>, <code>ViewQuote</code> on <code>fdc3.instrument</code> / <code>fdc3.account</code>),
+            and <strong>3 end-to-end FDC3 CALM flows</strong>.
           </p>
         </div>
         <div class="links">
