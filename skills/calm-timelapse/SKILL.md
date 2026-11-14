@@ -7,7 +7,7 @@ description: Curate executive FINOS CALM architectural moments from a determinis
 
 `calm-timelapse` follows the FINOS `calm-ai` (`calm init-ai`) pattern for regulated financial enterprises: **the CLI itself makes zero network or LLM calls**. Instead, `calm-timelapse` deterministically extracts structural CALM diffs from Git into a compact `<arch>.digest.json` file, and any organization-approved IDE AI assistant can group those commits into `<arch>.clusters.json`.
 
-Even when AI assistants are unavailable (e.g., in air-gapped CI/CD), `calm-timelapse --from-git <arch.json> --timelapse` works standalone using deterministic heuristics.
+Even when AI assistants are unavailable (e.g., in air-gapped CI/CD), `node dist/cli.js --from-git <arch.json> --timelapse` works standalone using deterministic heuristics.
 
 ---
 
@@ -15,11 +15,11 @@ Even when AI assistants are unavailable (e.g., in air-gapped CI/CD), `calm-timel
 
 ### Step 1 — Emit the Structural Commit Diff Digest (Deterministic)
 
-Run `calm-timelapse` on one or more Git-tracked CALM architecture files (across one or multiple repositories) with `--emit-digest`:
+After building locally once (`npm install && npm run build`), run `node dist/cli.js` on one or more Git-tracked CALM architecture files (across one or multiple repositories) with `--emit-digest`:
 
 ```bash
 # Single file (or pass --resolve-details to auto-discover same-repo detailed-architecture files)
-npx calm-timelapse \
+node dist/cli.js \
   --from-git architecture/system.calm.json \
   --emit-digest architecture/system.digest.json \
   -o architecture/system.timeline.json \
@@ -27,7 +27,7 @@ npx calm-timelapse \
   --validate
 
 # Multi-repo / multi-architecture synchronized timeline (optional Label=path syntax)
-npx calm-timelapse \
+node dist/cli.js \
   --from-git \
     "Platform=../repo-platform/architecture/platform.calm.json" \
     "Execution=../repo-execution/calm/execution-detail.calm.json" \
@@ -94,10 +94,10 @@ Read `<arch>.digest.json` and write `<arch>.clusters.json` as a JSON array of mo
 
 ### Step 3 — Apply `--clusters` & Validate Deterministically
 
-Feed `<arch>.clusters.json` back to `calm-timelapse`:
+Feed `<arch>.clusters.json` back to `node dist/cli.js`:
 
 ```bash
-npx calm-timelapse \
+node dist/cli.js \
   --from-git architecture/system.calm.json \
   --clusters architecture/system.clusters.json \
   -o architecture/system.timeline.json \
