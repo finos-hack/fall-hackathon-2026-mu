@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-export type ClusteringEngine = 'deterministic' | 'clusters-file';
+export type ClusteringEngine = 'deterministic' | 'clusters-file' | 'traderx-state-catalog';
 
 export type GitCommandRunner = (args: string[], cwd: string) => string;
 

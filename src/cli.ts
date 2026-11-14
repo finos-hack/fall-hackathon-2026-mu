@@ -6,6 +6,7 @@ import path from 'node:path';
 import { Command } from 'commander';
 import {
   generateTimelineFromGit,
+  generateTimelineFromTraderXRepo,
   parseSourceTargetSpec,
   renderTimelapseFromTimelineFile,
   validateCalmArchitectureSnapshot,
@@ -15,6 +16,7 @@ import type { GeneratedGitTimeline } from './types.js';
 
 interface CliOptions {
   fromGit?: string[];
+  fromTraderx?: string;
   timeline?: string[];
   output?: string;
   snapshotsDir?: string;
@@ -58,6 +60,10 @@ export function createProgram(): Command {
     .option(
       '--from-git <files...>',
       'One or more CALM JSON files across one or more Git repositories (supports optional label=path)',
+    )
+    .option(
+      '--from-traderx <repoDir>',
+      'Extract CALM 1.3 timeline and snapshots directly from an upstream finos/traderx repository clone',
     )
     .option(
       '--timeline <files...>',
@@ -111,15 +117,55 @@ export function createProgram(): Command {
 
   program.action(async (opts: CliOptions) => {
     const hasFromGit = Array.isArray(opts.fromGit) && opts.fromGit.length > 0;
+    const hasFromTraderx = typeof opts.fromTraderx === 'string' && opts.fromTraderx.trim().length > 0;
     const hasTimeline = Array.isArray(opts.timeline) && opts.timeline.length > 0;
+    const modeCount = Number(hasFromGit) + Number(hasFromTraderx) + Number(hasTimeline);
 
-    if (!hasFromGit && !hasTimeline) {
-      program.error('Specify either --from-git <files...> or --timeline <files...>.');
+    if (modeCount === 0) {
+      program.error(
+        'Specify either --from-git <files...> or --timeline <files...> (or --from-traderx <repoDir>).',
+      );
       return;
     }
 
-    if (hasFromGit && hasTimeline) {
-      program.error('Use either --from-git or --timeline, not both.');
+    if (modeCount > 1) {
+      program.error('Use only one of --from-git, --from-traderx, or --timeline.');
+      return;
+    }
+
+    if (hasFromTraderx && opts.fromTraderx) {
+      const outputPath = opts.output ?? path.resolve(process.cwd(), 'finos-traderx.timeline.json');
+      const timelapsePath = resolveTimelapseOutputPath(opts.timelapse, outputPath);
+      const result = generateTimelineFromTraderXRepo(opts.fromTraderx.trim(), {
+        outputPath,
+        snapshotsDir: opts.snapshotsDir,
+        timelapsePath,
+        defaultView: opts.feed ? 'feed' : undefined,
+        emitDigestPath: opts.emitDigest,
+        validate: opts.validate,
+        validateSnapshots: opts.validateSnapshots,
+        onDebug: opts.verbose ? (msg) => console.error(`[debug] ${msg}`) : undefined,
+      });
+
+      if ((opts.validate || opts.validateSnapshots) && result.validationErrors.length > 0) {
+        console.error('Timeline validation failed:');
+        for (const err of result.validationErrors) {
+          console.error(`  - ${err}`);
+        }
+        process.exitCode = 1;
+        return;
+      }
+
+      console.log(`Generated timeline: ${path.resolve(outputPath)}`);
+      console.log(
+        `Imported ${result.stats.momentsGenerated} FINOS TraderX state(s) (${result.stats.totalCommitsScanned} commit ref(s) scanned, ${result.stats.noiseCommitsFiltered} scaffold template(s) skipped) using ${result.stats.clusteringEngine}.`,
+      );
+      if (result.digestPath) {
+        console.log(`Emitted commit diff digest: ${result.digestPath}`);
+      }
+      if (result.timelapsePath) {
+        console.log(`Generated HTML timelapse: ${result.timelapsePath}`);
+      }
       return;
     }
 

@@ -130,6 +130,7 @@ node dist/cli.js \
 | CLI Flag | Description |
 |---|---|
 | `--from-git <files...>` | Extract and synchronize one or more Git-tracked CALM files (supports `Label=path`) |
+| `--from-traderx <repoDir>` | Import upstream [`finos/traderx`](https://github.com/finos/traderx) progressive state catalog (`001`–`014` + FINOS FDC3), ADRs, and Git commits into CALM `1.3` |
 | `--resolve-details` | Auto-discover and synchronize same-repo `details.detailed-architecture` child files |
 | `--max-commits <n>` / `--first-parent` | Optional commit cap (unlimited by default) and optional first-parent mainline walk |
 | `--timeline <files...>` | Validate or synchronize one or more existing `calm-timeline` JSON files |

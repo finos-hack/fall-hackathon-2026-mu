@@ -32,6 +32,7 @@ export * from './cluster.js';
 export * from './federation.js';
 export * from './timeline-emitter.js';
 export * from './timelapse-html.js';
+export * from './traderx-importer.js';
 
 export interface GenerateTimelineOptions {
   outputPath?: string;
