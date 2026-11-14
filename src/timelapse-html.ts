@@ -111,6 +111,163 @@ export interface TimelapsePayload {
   stats?: TimelapseStats;
 }
 
+export type BlastRadiusDirection = 'all' | 'dependents' | 'downstream';
+
+export interface BlastRadiusNodeHit {
+  id: string;
+  hop: number;
+  viaEdgeId: string;
+  viaRelType: string;
+}
+
+export interface BlastRadiusResult {
+  originId: string;
+  direction: BlastRadiusDirection;
+  originPresent: boolean;
+  impactedByNodeId: Record<string, BlastRadiusNodeHit>;
+  directNodeIds: string[];
+  transitiveNodeIds: string[];
+  impactedEdgeIds: string[];
+  impactedFlowIds: string[];
+  maxHop: number;
+  impactedCount: number;
+  totalActiveNodes: number;
+  impactRatio: number;
+}
+
+export function computeBlastRadius(
+  nodes: GraphNode[],
+  edges: GraphEdge[],
+  originId: string,
+  direction: BlastRadiusDirection = 'all',
+  flows: FlowInfo[] = [],
+): BlastRadiusResult {
+  const activeNodeSet = new Set(nodes.map((n) => n.id));
+  const totalActiveNodes = activeNodeSet.size;
+  if (!originId || !activeNodeSet.has(originId)) {
+    return {
+      originId,
+      direction,
+      originPresent: false,
+      impactedByNodeId: {},
+      directNodeIds: [],
+      transitiveNodeIds: [],
+      impactedEdgeIds: [],
+      impactedFlowIds: [],
+      maxHop: 0,
+      impactedCount: 0,
+      totalActiveNodes,
+      impactRatio: 0,
+    };
+  }
+
+  const adj = new Map<string, Array<{ target: string; edgeId: string; relType: string }>>();
+  const pushStep = (from: string, to: string, edgeId: string, relType: string): void => {
+    if (from === to || !activeNodeSet.has(from) || !activeNodeSet.has(to)) return;
+    let list = adj.get(from);
+    if (!list) {
+      list = [];
+      adj.set(from, list);
+    }
+    list.push({ target: to, edgeId, relType });
+  };
+
+  for (const edge of edges) {
+    const rel = edge.relType || 'connects';
+    if (direction === 'downstream') {
+      pushStep(edge.source, edge.target, edge.id, rel);
+    } else if (direction === 'dependents') {
+      if (rel === 'deployed-in') {
+        pushStep(edge.source, edge.target, edge.id, rel);
+      } else if (rel === 'composed-of') {
+        pushStep(edge.source, edge.target, edge.id, rel);
+        pushStep(edge.target, edge.source, edge.id, rel);
+      } else {
+        pushStep(edge.target, edge.source, edge.id, rel);
+      }
+    } else {
+      pushStep(edge.source, edge.target, edge.id, rel);
+      pushStep(edge.target, edge.source, edge.id, rel);
+    }
+  }
+
+  const dist = new Map<string, number>([[originId, 0]]);
+  const impactedByNodeId: Record<string, BlastRadiusNodeHit> = {};
+  const impactedEdgeSet = new Set<string>();
+  const queue: string[] = [originId];
+  let maxHop = 0;
+
+  while (queue.length > 0) {
+    const curr = queue.shift()!;
+    const currHop = dist.get(curr)!;
+    const steps = adj.get(curr) ?? [];
+    for (const step of steps) {
+      const existingHop = dist.get(step.target);
+      if (existingHop === undefined) {
+        const nextHop = currHop + 1;
+        dist.set(step.target, nextHop);
+        if (nextHop > maxHop) maxHop = nextHop;
+        impactedByNodeId[step.target] = {
+          id: step.target,
+          hop: nextHop,
+          viaEdgeId: step.edgeId,
+          viaRelType: step.relType,
+        };
+        impactedEdgeSet.add(step.edgeId);
+        queue.push(step.target);
+      } else if (existingHop === currHop + 1) {
+        impactedEdgeSet.add(step.edgeId);
+      }
+    }
+  }
+
+  const directNodeIds: string[] = [];
+  const transitiveNodeIds: string[] = [];
+  for (const hit of Object.values(impactedByNodeId)) {
+    if (hit.hop === 1) directNodeIds.push(hit.id);
+    else if (hit.hop >= 2) transitiveNodeIds.push(hit.id);
+  }
+  directNodeIds.sort((a, b) => a.localeCompare(b));
+  transitiveNodeIds.sort(
+    (a, b) => impactedByNodeId[a].hop - impactedByNodeId[b].hop || a.localeCompare(b),
+  );
+
+  const impactedFlowIds: string[] = [];
+  for (const fl of flows) {
+    const relIds = fl.relationshipIds ?? [];
+    const hit = relIds.some((relId) =>
+      edges.some(
+        (e) =>
+          (e.id === relId || e.id.startsWith(`${relId}::`)) &&
+          (e.source === originId ||
+            e.target === originId ||
+            impactedEdgeSet.has(e.id) ||
+            (dist.has(e.source) && dist.has(e.target))),
+      ),
+    );
+    if (hit) impactedFlowIds.push(fl.id);
+  }
+
+  const impactedCount = directNodeIds.length + transitiveNodeIds.length;
+  const peerDenominator = Math.max(1, totalActiveNodes - 1);
+  const impactRatio = totalActiveNodes > 1 ? impactedCount / peerDenominator : 0;
+
+  return {
+    originId,
+    direction,
+    originPresent: true,
+    impactedByNodeId,
+    directNodeIds,
+    transitiveNodeIds,
+    impactedEdgeIds: [...impactedEdgeSet],
+    impactedFlowIds,
+    maxHop,
+    impactedCount,
+    totalActiveNodes,
+    impactRatio,
+  };
+}
+
 function attachProvenanceToNodes(
   nodes: GraphNode[],
   provenance?: Record<string, FederatedNodeProvenance>,
@@ -1258,6 +1415,11 @@ export function buildTimelapsePayloadFromTimelineFile(
       ? rawMeta['clustering-engine']
       : 'manual-timeline';
 
+  const titlePrefix = 'Git Architecture Timeline — ';
+  const rawTitleStr = typeof rawMeta?.['title'] === 'string' ? rawMeta['title'].trim() : '';
+  const inferredFromTitle = rawTitleStr.startsWith(titlePrefix)
+    ? rawTitleStr.slice(titlePrefix.length).trim()
+    : '';
   const sourceBase =
     rawSources && rawSources.length > 1
       ? rawSources.map((s) => s.sourceLabel).join(' + ')
@@ -1265,7 +1427,7 @@ export function buildTimelapsePayloadFromTimelineFile(
         ? rawSources[0].sourceLabel
         : typeof rawMeta?.['source-file'] === 'string' && rawMeta['source-file'].trim()
           ? formatCalmSourceDisplay(rawMeta['source-file'].trim())
-          : path.basename(resolved);
+          : inferredFromTitle || path.basename(resolved);
   return {
     title: `CALM Architecture Timelapse — ${sourceBase}`,
     generatedAt: new Date().toISOString(),
@@ -1744,6 +1906,63 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
     }
     .gov-section { margin-top: 8px; }
     .gov-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+    .blast-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 600;
+      border-color: #334155;
+      color: #cbd5e1;
+      transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    }
+    .blast-toggle.active {
+      background: rgba(244, 63, 94, 0.18);
+      border-color: #f43f5e;
+      color: #fecdd3;
+    }
+    .blast-card-active {
+      border-color: rgba(244, 63, 94, 0.55) !important;
+      box-shadow: 0 0 0 1px rgba(244, 63, 94, 0.16);
+    }
+    .blast-meter {
+      height: 6px;
+      border-radius: 999px;
+      background: #0b1020;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin: 6px 0 8px;
+      display: flex;
+    }
+    .blast-meter-direct { background: #fb7185; height: 100%; }
+    .blast-meter-trans { background: #fb923c; height: 100%; }
+    .blast-chip-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 4px;
+    }
+    .blast-chip {
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: #0b1020;
+      border: 1px solid var(--border);
+      color: #e2e8f0;
+      cursor: pointer;
+    }
+    .blast-chip.direct {
+      border-color: rgba(251, 113, 133, 0.55);
+      background: rgba(244, 63, 94, 0.14);
+      color: #fecdd3;
+    }
+    .blast-chip.trans {
+      border-color: rgba(251, 146, 60, 0.5);
+      background: rgba(251, 146, 60, 0.12);
+      color: #fed7aa;
+    }
+    .blast-chip:hover {
+      filter: brightness(1.15);
+    }
     @media (max-width: 1180px) {
       main {
         grid-template-columns: minmax(0, 1fr) 310px;
@@ -2083,12 +2302,18 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
         </div>
         <div class="toolbar-sep" id="project-filter-sep" style="display:none;"></div>
         <div class="toolbar-group">
-          <label for="focus-select">Subsystem:</label>
-          <select id="focus-select" title="Focus on a node and its 1-hop subsystem">
-            <option value="">All Subsystems (Full View)</option>
+          <label for="focus-select">Node:</label>
+          <select id="focus-select" title="Select a node to inspect its Blast Radius or 1-hop neighborhood">
+            <option value="">Click node for Blast Radius…</option>
+          </select>
+          <button id="btn-blast-mode" type="button" class="blast-toggle active" aria-pressed="true" title="Toggle multi-hop Blast Radius impact analysis vs 1-hop neighbor inspect">⚡ Blast Radius</button>
+          <select id="blast-direction" title="Blast Radius propagation direction">
+            <option value="all" selected>All Impacted</option>
+            <option value="dependents">Dependents (Failure)</option>
+            <option value="downstream">Downstream (Flow)</option>
           </select>
           <label style="cursor:pointer;">
-            <input id="focus-isolate" type="checkbox" /> 1-hop only
+            <input id="focus-isolate" type="checkbox" /> Isolate
           </label>
           <button id="btn-reset-focus" type="button">Reset</button>
         </div>
@@ -2107,12 +2332,12 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
 
       <div class="canvas-wrap" id="canvas-wrap">
         <div class="canvas-overlay-top">
-          <div class="legend">
+          <div class="legend" id="canvas-legend">
             <span><i class="dot" style="background:var(--added)"></i>Added</span>
             <span><i class="dot" style="background:var(--modified)"></i>Modified</span>
             <span><i class="dot" style="background:var(--removed)"></i>Removed</span>
           </div>
-          <span class="canvas-hint">Click node to inspect · Wheel/Drag to zoom &amp; pan</span>
+          <span class="canvas-hint" id="canvas-hint">Click any node for Blast Radius · Wheel/Drag to zoom &amp; pan</span>
         </div>
         <svg id="graph" viewBox="0 0 ${payload.canvasWidth} ${payload.canvasHeight}" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
           <defs>
@@ -2127,6 +2352,12 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
             </marker>
             <marker id="arrow-removed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
               <path d="M 0 1 L 10 5 L 0 9 z" fill="#ef4444" />
+            </marker>
+            <marker id="arrow-blast-direct" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#fb7185" />
+            </marker>
+            <marker id="arrow-blast-transitive" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#fb923c" />
             </marker>
           </defs>
           <g id="viewport-layer">
@@ -2168,7 +2399,7 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
       </div>
 
       <div class="card" id="node-inspector" style="display:none;">
-        <h3>Subsystem Inspector</h3>
+        <h3 id="node-inspector-heading">⚡ Blast Radius &amp; Subsystem Impact</h3>
         <div id="node-inspector-body" style="font-size:13px;line-height:1.45;"></div>
       </div>
 
@@ -2273,9 +2504,14 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
       const projectFilterSep = document.getElementById('project-filter-sep');
       const projectSelect = document.getElementById('project-select');
       const focusSelect = document.getElementById('focus-select');
+      const btnBlastMode = document.getElementById('btn-blast-mode');
+      const blastDirectionSelect = document.getElementById('blast-direction');
       const focusIsolate = document.getElementById('focus-isolate');
       const btnResetFocus = document.getElementById('btn-reset-focus');
+      const canvasLegend = document.getElementById('canvas-legend');
+      const canvasHint = document.getElementById('canvas-hint');
       const nodeInspector = document.getElementById('node-inspector');
+      const nodeInspectorHeading = document.getElementById('node-inspector-heading');
       const nodeInspectorBody = document.getElementById('node-inspector-body');
       const governanceBody = document.getElementById('governance-body');
       const asOfDateInput = document.getElementById('as-of-date');
@@ -2333,6 +2569,8 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
       let currentIndex = 0;
       let timer = null;
       let focusedNodeId = '';
+      let blastModeEnabled = true;
+      let blastDirection = 'all';
       let selectedProjectId = '';
       let viewW = canvasWidth;
       let viewH = canvasHeight;
@@ -2377,6 +2615,123 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
         );
       }
 
+      function computeClientBlastRadius(frame, originId, direction) {
+        const nodes = (frame && frame.nodes) || [];
+        const edges = (frame && frame.edges) || [];
+        const flows = (frame && frame.flows) || [];
+        const activeSet = new Set(nodes.map((n) => n.id));
+        const totalActiveNodes = activeSet.size;
+        if (!originId || !activeSet.has(originId)) {
+          return {
+            originId,
+            direction,
+            originPresent: false,
+            impactedByNodeId: {},
+            directNodeIds: [],
+            transitiveNodeIds: [],
+            impactedEdgeIds: new Set(),
+            impactedFlows: [],
+            maxHop: 0,
+            impactedCount: 0,
+            totalActiveNodes,
+          };
+        }
+
+        const adj = new Map();
+        const pushStep = (from, to, edgeId, relType) => {
+          if (from === to || !activeSet.has(from) || !activeSet.has(to)) return;
+          if (!adj.has(from)) adj.set(from, []);
+          adj.get(from).push({ target: to, edgeId, relType });
+        };
+
+        for (const edge of edges) {
+          const rel = edge.relType || 'connects';
+          if (direction === 'downstream') {
+            pushStep(edge.source, edge.target, edge.id, rel);
+          } else if (direction === 'dependents') {
+            if (rel === 'deployed-in') {
+              pushStep(edge.source, edge.target, edge.id, rel);
+            } else if (rel === 'composed-of') {
+              pushStep(edge.source, edge.target, edge.id, rel);
+              pushStep(edge.target, edge.source, edge.id, rel);
+            } else {
+              pushStep(edge.target, edge.source, edge.id, rel);
+            }
+          } else {
+            pushStep(edge.source, edge.target, edge.id, rel);
+            pushStep(edge.target, edge.source, edge.id, rel);
+          }
+        }
+
+        const dist = new Map([[originId, 0]]);
+        const impactedByNodeId = {};
+        const impactedEdgeIds = new Set();
+        const queue = [originId];
+        let maxHop = 0;
+
+        while (queue.length > 0) {
+          const curr = queue.shift();
+          const currHop = dist.get(curr);
+          const steps = adj.get(curr) || [];
+          for (const step of steps) {
+            const existingHop = dist.get(step.target);
+            if (existingHop === undefined) {
+              const nextHop = currHop + 1;
+              dist.set(step.target, nextHop);
+              if (nextHop > maxHop) maxHop = nextHop;
+              impactedByNodeId[step.target] = {
+                id: step.target,
+                hop: nextHop,
+                viaEdgeId: step.edgeId,
+                viaRelType: step.relType,
+              };
+              impactedEdgeIds.add(step.edgeId);
+              queue.push(step.target);
+            } else if (existingHop === currHop + 1) {
+              impactedEdgeIds.add(step.edgeId);
+            }
+          }
+        }
+
+        const directNodeIds = [];
+        const transitiveNodeIds = [];
+        for (const hit of Object.values(impactedByNodeId)) {
+          if (hit.hop === 1) directNodeIds.push(hit.id);
+          else if (hit.hop >= 2) transitiveNodeIds.push(hit.id);
+        }
+        directNodeIds.sort((a, b) => a.localeCompare(b));
+        transitiveNodeIds.sort(
+          (a, b) => impactedByNodeId[a].hop - impactedByNodeId[b].hop || a.localeCompare(b),
+        );
+
+        const impactedFlows = flows.filter((fl) =>
+          (fl.relationshipIds || []).some((relId) =>
+            edges.some(
+              (e) =>
+                (e.id === relId || e.id.startsWith(relId + '::')) &&
+                (e.source === originId ||
+                  e.target === originId ||
+                  impactedEdgeIds.has(e.id) ||
+                  (dist.has(e.source) && dist.has(e.target))),
+            ),
+          ),
+        );
+
+        return {
+          originId,
+          direction,
+          originPresent: true,
+          impactedByNodeId,
+          directNodeIds,
+          transitiveNodeIds,
+          impactedEdgeIds,
+          impactedFlows,
+          maxHop,
+          impactedCount: directNodeIds.length + transitiveNodeIds.length,
+          totalActiveNodes,
+        };
+      }
+
       function computeActiveFrameBounds() {
         const frame = frames[currentIndex];
         const isolateMode = Boolean(focusIsolate && focusIsolate.checked);
@@ -2385,9 +2740,15 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
           const neighborhood = new Set();
           if (focusedNodeId) {
             neighborhood.add(focusedNodeId);
-            for (const edge of frame.edges || []) {
-              if (edge.source === focusedNodeId) neighborhood.add(edge.target);
-              if (edge.target === focusedNodeId) neighborhood.add(edge.source);
+            if (blastModeEnabled) {
+              const blast = computeClientBlastRadius(frame, focusedNodeId, blastDirection);
+              for (const id of blast.directNodeIds) neighborhood.add(id);
+              for (const id of blast.transitiveNodeIds) neighborhood.add(id);
+            } else {
+              for (const edge of frame.edges || []) {
+                if (edge.source === focusedNodeId) neighborhood.add(edge.target);
+                if (edge.target === focusedNodeId) neighborhood.add(edge.source);
+              }
             }
           }
           const candidateIds = new Set([
@@ -2787,17 +3148,46 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
         const neighborhood = new Set();
         const incomingEdges = [];
         const outgoingEdges = [];
+        const blastState =
+          focusedNodeId && blastModeEnabled
+            ? computeClientBlastRadius(frame, focusedNodeId, blastDirection)
+            : null;
+
         if (focusedNodeId) {
           neighborhood.add(focusedNodeId);
           for (const edge of frame.edges || []) {
             if (edge.source === focusedNodeId) {
-              neighborhood.add(edge.target);
+              if (!blastModeEnabled) neighborhood.add(edge.target);
               outgoingEdges.push(edge);
             }
             if (edge.target === focusedNodeId) {
-              neighborhood.add(edge.source);
+              if (!blastModeEnabled) neighborhood.add(edge.source);
               incomingEdges.push(edge);
             }
+          }
+          if (blastState) {
+            for (const id of blastState.directNodeIds) neighborhood.add(id);
+            for (const id of blastState.transitiveNodeIds) neighborhood.add(id);
+          }
+        }
+
+        if (canvasLegend && canvasHint) {
+          if (blastState && blastState.originPresent) {
+            canvasLegend.innerHTML =
+              '<span><i class="dot" style="background:#f43f5e"></i>Origin</span>' +
+              '<span><i class="dot" style="background:#fb7185"></i>Direct (1-hop)</span>' +
+              '<span><i class="dot" style="background:#fb923c"></i>Transitive (2+ hops)</span>';
+            canvasHint.textContent =
+              blastState.impactedCount +
+              ' other node(s) impacted · Click another node to pivot · Esc to clear';
+          } else {
+            canvasLegend.innerHTML =
+              '<span><i class="dot" style="background:var(--added)"></i>Added</span>' +
+              '<span><i class="dot" style="background:var(--modified)"></i>Modified</span>' +
+              '<span><i class="dot" style="background:var(--removed)"></i>Removed</span>';
+            canvasHint.textContent = blastModeEnabled
+              ? 'Click any node for Blast Radius · Wheel/Drag to zoom & pan'
+              : 'Click node to inspect 1-hop · Wheel/Drag to zoom & pan';
           }
         }
 
@@ -2806,21 +3196,202 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
           const inList = incomingEdges.map((e) => (positions[e.source]?.name || e.source) + ' (' + e.label + ')').join(', ') || 'none';
           const outList = outgoingEdges.map((e) => (positions[e.target]?.name || e.target) + ' (' + e.label + ')').join(', ') || 'none';
           nodeInspector.style.display = 'block';
+          nodeInspector.classList.toggle('blast-card-active', Boolean(blastState));
+          if (nodeInspectorHeading) {
+            nodeInspectorHeading.textContent = blastState
+              ? '⚡ Blast Radius & Subsystem Impact'
+              : 'Subsystem Inspector';
+          }
           nodeInspectorBody.innerHTML = '';
+
           const p1 = document.createElement('div');
+          p1.style.display = 'flex';
+          p1.style.justifyContent = 'space-between';
+          p1.style.alignItems = 'center';
+          p1.style.gap = '6px';
+          const p1Left = document.createElement('div');
           const strong = document.createElement('strong');
           strong.textContent = fNode.name + ' ';
           const code = document.createElement('code');
           code.textContent = fNode.id;
-          p1.appendChild(strong);
-          p1.appendChild(code);
+          p1Left.appendChild(strong);
+          p1Left.appendChild(code);
+          const clearBtn = document.createElement('button');
+          clearBtn.type = 'button';
+          clearBtn.style.padding = '2px 7px';
+          clearBtn.style.fontSize = '11px';
+          clearBtn.textContent = 'Clear';
+          clearBtn.addEventListener('click', () => setFocusNode(''));
+          p1.appendChild(p1Left);
+          p1.appendChild(clearBtn);
           nodeInspectorBody.appendChild(p1);
+
+          if (blastState) {
+            if (!blastState.originPresent) {
+              const absentDiv = document.createElement('div');
+              absentDiv.style.marginTop = '6px';
+              absentDiv.style.color = '#fde68a';
+              absentDiv.style.fontSize = '12px';
+              absentDiv.textContent =
+                'Node is not active in Moment ' +
+                (currentIndex + 1) +
+                ' (0 other nodes impacted at this point in Git history).';
+              nodeInspectorBody.appendChild(absentDiv);
+            } else {
+              const peerTotal = Math.max(0, blastState.totalActiveNodes - 1);
+              const pct = peerTotal > 0 ? Math.round((blastState.impactedCount / peerTotal) * 100) : 0;
+              let deltaNote = '';
+              if (currentIndex > 0) {
+                const prevBlast = computeClientBlastRadius(
+                  frames[currentIndex - 1],
+                  focusedNodeId,
+                  blastDirection,
+                );
+                if (prevBlast.originPresent) {
+                  const diffCount = blastState.impactedCount - prevBlast.impactedCount;
+                  deltaNote =
+                    diffCount > 0
+                      ? ' · +' + diffCount + ' vs prev moment'
+                      : diffCount < 0
+                        ? ' · ' + diffCount + ' vs prev moment'
+                        : ' · 0 Δ vs prev moment';
+                } else {
+                  deltaNote = ' · newly introduced';
+                }
+              }
+
+              const summaryBox = document.createElement('div');
+              summaryBox.style.marginTop = '7px';
+              summaryBox.style.padding = '7px 9px';
+              summaryBox.style.borderRadius = '8px';
+              summaryBox.style.background = 'rgba(244, 63, 94, 0.10)';
+              summaryBox.style.border = '1px solid rgba(251, 113, 133, 0.35)';
+
+              const headline = document.createElement('div');
+              headline.style.fontWeight = '700';
+              headline.style.color = '#fecdd3';
+              headline.textContent =
+                blastState.impactedCount +
+                ' of ' +
+                peerTotal +
+                ' other node' +
+                (peerTotal === 1 ? '' : 's') +
+                ' impacted (' +
+                pct +
+                '%)' +
+                deltaNote;
+              summaryBox.appendChild(headline);
+
+              const subline = document.createElement('div');
+              subline.style.fontSize = '11.5px';
+              subline.style.color = '#cbd5e1';
+              subline.style.marginTop = '2px';
+              subline.textContent =
+                blastState.directNodeIds.length +
+                ' direct (1-hop) · ' +
+                blastState.transitiveNodeIds.length +
+                ' transitive' +
+                (blastState.maxHop > 1 ? ' (up to ' + blastState.maxHop + ' hops)' : '');
+              summaryBox.appendChild(subline);
+
+              if (peerTotal > 0) {
+                const meter = document.createElement('div');
+                meter.className = 'blast-meter';
+                const dBar = document.createElement('div');
+                dBar.className = 'blast-meter-direct';
+                dBar.style.width = ((blastState.directNodeIds.length / peerTotal) * 100).toFixed(1) + '%';
+                const tBar = document.createElement('div');
+                tBar.className = 'blast-meter-trans';
+                tBar.style.width = ((blastState.transitiveNodeIds.length / peerTotal) * 100).toFixed(1) + '%';
+                meter.appendChild(dBar);
+                meter.appendChild(tBar);
+                summaryBox.appendChild(meter);
+              }
+              nodeInspectorBody.appendChild(summaryBox);
+
+              const appendChipSection = (label, ids, cssClass, showHop) => {
+                if (!ids || ids.length === 0) return;
+                const sec = document.createElement('div');
+                sec.className = 'gov-section';
+                const lbl = document.createElement('div');
+                lbl.className = 'gov-label';
+                lbl.textContent = label + ' (' + ids.length + ')';
+                sec.appendChild(lbl);
+                const wrap = document.createElement('div');
+                wrap.className = 'blast-chip-wrap';
+                const cap = 20;
+                ids.slice(0, cap).forEach((id) => {
+                  const chip = document.createElement('button');
+                  chip.type = 'button';
+                  chip.className = 'blast-chip ' + cssClass;
+                  const nm = positions[id] ? positions[id].name : id;
+                  const hopVal = blastState.impactedByNodeId[id]?.hop || 1;
+                  chip.textContent = nm + (showHop ? ' · ' + hopVal + 'h' : '');
+                  chip.title = 'Click to pivot Blast Radius origin to ' + nm + ' (' + id + ')';
+                  chip.addEventListener('click', () => setFocusNode(id));
+                  wrap.appendChild(chip);
+                });
+                if (ids.length > cap) {
+                  const more = document.createElement('span');
+                  more.style.fontSize = '11px';
+                  more.style.color = '#93a4c7';
+                  more.style.alignSelf = 'center';
+                  more.textContent = '+' + (ids.length - cap) + ' more';
+                  wrap.appendChild(more);
+                }
+                sec.appendChild(wrap);
+                nodeInspectorBody.appendChild(sec);
+              };
+
+              appendChipSection('Direct Impact · 1-Hop', blastState.directNodeIds, 'direct', false);
+              appendChipSection('Transitive Cascade · 2+ Hops', blastState.transitiveNodeIds, 'trans', true);
+
+              if (blastState.impactedFlows.length > 0) {
+                const flSec = document.createElement('div');
+                flSec.className = 'gov-section';
+                const flLbl = document.createElement('div');
+                flLbl.className = 'gov-label';
+                flLbl.textContent = 'Impacted CALM Flows (' + blastState.impactedFlows.length + ')';
+                flSec.appendChild(flLbl);
+                const flText = document.createElement('div');
+                flText.style.fontSize = '12px';
+                flText.style.color = '#fde68a';
+                flText.textContent = blastState.impactedFlows.map((f) => f.name).join(' · ');
+                flSec.appendChild(flText);
+                nodeInspectorBody.appendChild(flSec);
+              }
+
+              const impactedOwnerSet = new Set([
+                focusedNodeId,
+                ...blastState.directNodeIds,
+                ...blastState.transitiveNodeIds,
+                ...blastState.impactedEdgeIds,
+              ]);
+              const atRiskCtrls = (frame.controls || []).filter((c) => {
+                const colonIdx = String(c.id).indexOf(':');
+                return colonIdx > 0 && impactedOwnerSet.has(String(c.id).slice(0, colonIdx));
+              });
+              const nodeCtrlTotal = (frame.nodes || [])
+                .filter((n) => impactedOwnerSet.has(n.id))
+                .reduce((sum, n) => sum + (n.controlCount || 0), 0);
+              const riskCount = Math.max(atRiskCtrls.length, nodeCtrlTotal);
+              if (riskCount > 0) {
+                const ctrlDiv = document.createElement('div');
+                ctrlDiv.style.marginTop = '6px';
+                ctrlDiv.style.fontSize = '12px';
+                ctrlDiv.style.color = '#fca5a5';
+                ctrlDiv.textContent = 'At-Risk Governance Controls: ' + riskCount + ' control binding(s) on impacted subgraph';
+                nodeInspectorBody.appendChild(ctrlDiv);
+              }
+            }
+          }
+
           if (fNode.sourceLabel || positions[focusedNodeId].sourceLabel) {
             const labels = fNode.sourceLabels || positions[focusedNodeId].sourceLabels || [fNode.sourceLabel || positions[focusedNodeId].sourceLabel];
             const isMerged = Boolean(fNode.mergedViaDetailedArch || positions[focusedNodeId].mergedViaDetailedArch);
             const pSrc = document.createElement('div');
             pSrc.style.color = '#38bdf8';
-            pSrc.style.margin = '4px 0 2px';
+            pSrc.style.margin = '6px 0 2px';
             pSrc.textContent =
               'Source: ' +
               labels.join(' + ') +
@@ -2831,13 +3402,15 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
           p2.style.color = '#93a4c7';
           p2.style.margin = '4px 0';
           p2.textContent = 'Type: ' + fNode.nodeType + (fNode.description ? ' — ' + fNode.description : '');
-          const p3 = document.createElement('div');
-          p3.textContent = 'Upstream: ' + inList;
-          const p4 = document.createElement('div');
-          p4.textContent = 'Downstream: ' + outList;
           nodeInspectorBody.appendChild(p2);
-          nodeInspectorBody.appendChild(p3);
-          nodeInspectorBody.appendChild(p4);
+          if (!blastState) {
+            const p3 = document.createElement('div');
+            p3.textContent = 'Upstream: ' + inList;
+            const p4 = document.createElement('div');
+            p4.textContent = 'Downstream: ' + outList;
+            nodeInspectorBody.appendChild(p3);
+            nodeInspectorBody.appendChild(p4);
+          }
           if (Array.isArray(fNode.interfaces) && fNode.interfaces.length > 0) {
             const pIfaces = document.createElement('div');
             pIfaces.style.marginTop = '6px';
@@ -2851,6 +3424,7 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
           }
         } else {
           nodeInspector.style.display = 'none';
+          nodeInspector.classList.remove('blast-card-active');
         }
 
         renderGovernancePosture(currentIndex, frame);
@@ -2867,6 +3441,7 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
           fallbackBaseNodes: liveDiff ? liveDiff.baseNodes : null,
           focusedId: focusedNodeId,
           neighborhoodSet: neighborhood,
+          blastState,
           projectFilterId: selectedProjectId,
           isolate: isolateMode,
           markerPrefix: '',
@@ -3120,6 +3695,23 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
       focusSelect.addEventListener('change', (e) => {
         setFocusNode(e.target.value);
       });
+      if (btnBlastMode) {
+        btnBlastMode.addEventListener('click', () => {
+          blastModeEnabled = !blastModeEnabled;
+          btnBlastMode.classList.toggle('active', blastModeEnabled);
+          btnBlastMode.setAttribute('aria-pressed', String(blastModeEnabled));
+          if (blastDirectionSelect) {
+            blastDirectionSelect.style.display = blastModeEnabled ? 'inline-block' : 'none';
+          }
+          renderFrame(currentIndex);
+        });
+      }
+      if (blastDirectionSelect) {
+        blastDirectionSelect.addEventListener('change', (e) => {
+          blastDirection = e.target.value || 'all';
+          renderFrame(currentIndex);
+        });
+      }
       focusIsolate.addEventListener('change', () => {
         renderFrame(currentIndex);
       });
@@ -3150,6 +3742,7 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
           fallbackBaseNodes,
           focusedId,
           neighborhoodSet,
+          blastState,
           projectFilterId,
           isolate,
           markerPrefix,
@@ -3169,17 +3762,23 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
         const mkNorm = 'url(#' + markerPrefix + 'arrow-normal)';
         const mkAdd = 'url(#' + markerPrefix + 'arrow-added)';
         const mkMod = 'url(#' + markerPrefix + 'arrow-modified)';
+        const mkBlastDirect = 'url(#' + markerPrefix + 'arrow-blast-direct)';
+        const mkBlastTrans = 'url(#' + markerPrefix + 'arrow-blast-transitive)';
+        const hasActiveBlast = Boolean(blastState && blastState.originPresent);
 
         for (const edge of activeEdges) {
           const src = positions[edge.source];
           const dst = positions[edge.target];
           if (!src || !dst) continue;
 
-          const inFocus = !focusedId || edge.source === focusedId || edge.target === focusedId;
+          const isBlastEdge = Boolean(hasActiveBlast && blastState.impactedEdgeIds.has(edge.id));
+          const inFocus = hasActiveBlast
+            ? isBlastEdge
+            : (!focusedId || edge.source === focusedId || edge.target === focusedId);
           const srcInProj = nodeMatchesSpecificProject(src, projectFilterId);
           const dstInProj = nodeMatchesSpecificProject(dst, projectFilterId);
           const inProject = !projectFilterId || (srcInProj && dstInProj);
-          if (focusedId && isolate && !inFocus) continue;
+          if (focusedId && isolate && !(neighborhoodSet && neighborhoodSet.has(edge.source) && neighborhoodSet.has(edge.target))) continue;
           if (projectFilterId && isolate && !inProject) continue;
 
           const pairKey = edge.source < edge.target ? edge.source + '::' + edge.target : edge.target + '::' + edge.source;
@@ -3190,8 +3789,19 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
 
           const isAdded = addedEdges.has(edge.id);
           const isModified = modifiedEdges.has(edge.id);
-          const stroke = isAdded ? '#22c55e' : (isModified ? '#f59e0b' : '#64748b');
-          const marker = isAdded ? mkAdd : (isModified ? mkMod : mkNorm);
+          const srcHop = hasActiveBlast
+            ? (edge.source === focusedId ? 0 : blastState.impactedByNodeId[edge.source]?.hop)
+            : undefined;
+          const dstHop = hasActiveBlast
+            ? (edge.target === focusedId ? 0 : blastState.impactedByNodeId[edge.target]?.hop)
+            : undefined;
+          const maxEdgeHop = Math.max(srcHop ?? 0, dstHop ?? 0);
+          let stroke = isAdded ? '#22c55e' : (isModified ? '#f59e0b' : '#64748b');
+          let marker = isAdded ? mkAdd : (isModified ? mkMod : mkNorm);
+          if (isBlastEdge) {
+            stroke = maxEdgeHop <= 1 ? '#fb7185' : '#fb923c';
+            marker = maxEdgeHop <= 1 ? mkBlastDirect : mkBlastTrans;
+          }
 
           const dx = dst.x - src.x;
           const dy = dst.y - src.y;
@@ -3234,15 +3844,15 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
           const edgeActive = inFocus && (!projectFilterId || srcInProj || dstInProj);
           const g = createSvgEl('g', {
             class: 'edge-group',
-            opacity: edgeActive ? (inProject ? 1 : 0.45) : 0.12,
+            opacity: edgeActive ? (inProject ? 1 : 0.45) : (hasActiveBlast ? 0.09 : 0.12),
           });
           g.appendChild(createSvgEl('path', {
             d: 'M ' + x1 + ' ' + y1 + ' C ' + cx1 + ' ' + cy1 + ', ' + cx2 + ' ' + cy2 + ', ' + x2 + ' ' + y2,
             fill: 'none',
             stroke,
-            'stroke-width': isAdded || isModified || (focusedId && inFocus) ? 2.5 : 1.75,
+            'stroke-width': isBlastEdge || isAdded || isModified || (focusedId && inFocus) ? 2.6 : 1.75,
             'marker-end': marker,
-            opacity: isAdded || isModified ? 1 : 0.78,
+            opacity: isBlastEdge || isAdded || isModified ? 1 : 0.78,
           }));
 
           const showLabel = Boolean(edge.label) && (
@@ -3313,6 +3923,7 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
           const visibleActive = inFocus && inProject;
 
           const isFocusedTarget = focusedId === node.id;
+          const blastHit = hasActiveBlast ? blastState.impactedByNodeId[node.id] : null;
           const isAdded = addedNodes.has(node.id);
           const isModified = modifiedNodes.has(node.id);
           const isRemoved = removedNodes.has(node.id);
@@ -3322,11 +3933,24 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
           if (isAdded) { stroke = '#22c55e'; fill = '#0f291e'; }
           else if (isModified) { stroke = '#f59e0b'; fill = '#2b200c'; }
           else if (isRemoved) { stroke = '#ef4444'; fill = '#2c1215'; }
-          if (isFocusedTarget) { stroke = '#38bdf8'; }
+
+          if (hasActiveBlast) {
+            if (isFocusedTarget) {
+              stroke = '#f43f5e';
+              fill = '#311022';
+            } else if (blastHit) {
+              stroke = blastHit.hop === 1 ? '#fb7185' : '#fb923c';
+              fill = blastHit.hop === 1 ? '#2c1425' : '#2b1b0e';
+            }
+          } else if (isFocusedTarget) {
+            stroke = '#38bdf8';
+          }
 
           const g = createSvgEl('g', {
             class: 'node-group',
-            opacity: isRemoved ? (visibleActive ? 0.45 : 0.12) : (visibleActive ? 1 : 0.16),
+            opacity: isRemoved
+              ? (visibleActive ? 0.45 : 0.12)
+              : (visibleActive ? 1 : (hasActiveBlast ? 0.14 : 0.16)),
           });
           if (onNodeClick) {
             g.addEventListener('click', (ev) => {
@@ -3337,6 +3961,19 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
 
           const w = 176;
           const h = 64;
+          if (hasActiveBlast && isFocusedTarget) {
+            g.appendChild(createSvgEl('rect', {
+              x: pos.x - w / 2 - 5,
+              y: pos.y - h / 2 - 5,
+              width: w + 10,
+              height: h + 10,
+              rx: 13,
+              fill: 'none',
+              stroke: '#f43f5e',
+              'stroke-width': 1.8,
+              'stroke-opacity': 0.55,
+            }));
+          }
           g.appendChild(createSvgEl('rect', {
             x: pos.x - w / 2,
             y: pos.y - h / 2,
@@ -3345,9 +3982,43 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
             rx: 10,
             fill,
             stroke,
-            'stroke-width': isAdded || isModified || isRemoved ? 2.4 : 1.5,
+            'stroke-width':
+              (hasActiveBlast && (isFocusedTarget || blastHit)) || isAdded || isModified || isRemoved
+                ? (isFocusedTarget ? 2.8 : 2.4)
+                : 1.5,
             'stroke-dasharray': isRemoved ? '5 4' : 'none',
           }));
+
+          if (hasActiveBlast && (isFocusedTarget || blastHit)) {
+            const hopLabel = isFocusedTarget ? '⚡ ORIGIN' : blastHit.hop + '-HOP';
+            const hopColor = isFocusedTarget
+              ? '#f43f5e'
+              : (blastHit.hop === 1 ? '#fb7185' : '#fb923c');
+            const hopW = isFocusedTarget ? 58 : 42;
+            const hopH = 14;
+            const hopX = pos.x + w / 2 - hopW - 5;
+            const hopY = pos.y + h / 2 - hopH / 2;
+            g.appendChild(createSvgEl('rect', {
+              x: hopX,
+              y: hopY,
+              width: hopW,
+              height: hopH,
+              rx: 7,
+              fill: '#0b1020',
+              stroke: hopColor,
+              'stroke-width': 1.1,
+            }));
+            const hopText = createSvgEl('text', {
+              x: hopX + hopW / 2,
+              y: hopY + 10,
+              fill: hopColor,
+              'font-size': 9,
+              'font-weight': 700,
+              'text-anchor': 'middle',
+            });
+            hopText.textContent = hopLabel;
+            g.appendChild(hopText);
+          }
 
           const effSourceId = node.sourceId || pos.sourceId;
           const effSourceLabel = node.sourceLabel || pos.sourceLabel;
@@ -3874,6 +4545,10 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
 
       window.addEventListener('keydown', (e) => {
         if (currentViewMode === 'feed') return;
+        if (e.key === 'Escape' && focusedNodeId) {
+          setFocusNode('');
+          return;
+        }
         const tag = document.activeElement && document.activeElement.tagName;
         if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
         if (e.code === 'Space') {

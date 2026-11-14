@@ -233,7 +233,7 @@ node dist/cli.js \
 | Capability | Details |
 |---|---|
 | **Dual Views: Stage & Architecture Feed** | Toggle between **Timelapse Stage** (single-viewport scrubber) and **Architecture Feed** (`--feed` or `#feed`), which presents moments in **reverse chronological order** (`Latest First`, `N → 1`) as scrollable posts pairing an auto-cropped architecture diagram, narrative summary, change/ADR chips, `⬇ Save SVG`, and `Inspect in Stage →` |
-| **Project & Subsystem Filtering** | Filter multi-repo graphs and feed posts by repository (`Project`), keyword search, or node (`Subsystem`), with optional `1-hop only` blast-radius isolation |
+| **Multi-Hop Blast Radius & Project Filtering** | Click any node to simulate multi-hop **Blast Radius** impact (`All Impacted`, `Dependents / Failure Cascade`, or `Downstream Flow`) with `1-HOP` / `2-HOP+` badges, impacted CALM `flows`, at-risk `controls`, temporal blast-radius delta across moments, `Isolate` zoom, or repository (`Project`) filtering |
 | **As-Of Date & Baseline Diff** | Jump to the authoritative architecture effective on any `YYYY-MM-DD` date or diff any baseline moment against the current frame |
 | **Governance, Flows & SHA-256 Integrity** | Inspect active CALM `1.3` `controls` requirements, `flows`, cumulative co-changed ADRs, `detailed-architecture` merge provenance, and tamper-evident `snapshot-sha256` digests per moment |
 | **Offline Single-File HTML** | Self-contained SVG player with zoom/pan, keyboard transport (`Space`, `←`/`→`), and zero external CDN, font, or script requests |
