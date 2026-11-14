@@ -4,16 +4,38 @@ export type ClusteringEngine = 'deterministic' | 'clusters-file';
 
 export type GitCommandRunner = (args: string[], cwd: string) => string;
 
+export interface FederatedSourceDescriptor {
+    sourceId: string;
+    sourceLabel: string;
+    repoName: string;
+    fileName: string;
+    relPath: string;
+}
+
+export interface FederatedNodeProvenance {
+    primarySourceId: string;
+    primarySourceLabel: string;
+    sourceIds: string[];
+    sourceLabels: string[];
+    mergedViaDetailedArch: boolean;
+    resolvedFromParentId?: string;
+}
+
 export interface GitCommitSnapshot {
     sha: string;
     shortSha: string;
     date: string;
+    timestampIso?: string;
     author: string;
     subject: string;
     body: string;
     historicalPath: string;
     coChangedAdrs: string[];
     document: Record<string, unknown>;
+    sourceId?: string;
+    sourceLabel?: string;
+    repoName?: string;
+    nodeProvenance?: Record<string, FederatedNodeProvenance>;
 }
 
 export interface DeltaChangeItem {
@@ -74,11 +96,15 @@ export interface CommitDigestEntry {
     summaryLine: string;
     changes: string[];
     coChangedAdrs: string[];
+    sourceId?: string;
+    sourceLabel?: string;
+    repoName?: string;
 }
 
 export interface CommitHistoryDigest {
     schemaVersion: '1.0';
     sourceFile: string;
+    sources?: FederatedSourceDescriptor[];
     latestCommitDate: string;
     stats: {
         totalCommitsScanned: number;
@@ -102,6 +128,7 @@ export interface MomentCluster {
     commits: StructuralCommitDelta[];
     mergedChangeItems: DeltaChangeItem[];
     snapshotDocument: Record<string, unknown>;
+    nodeProvenance?: Record<string, FederatedNodeProvenance>;
 }
 
 export interface GeneratedGitMoment {
@@ -121,7 +148,7 @@ export interface GeneratedGitTimeline {
     $schema: string;
     'current-moment'?: string;
     moments: GeneratedGitMoment[];
-    metadata?: Record<string, string>;
+    metadata?: Record<string, unknown>;
 }
 
 export interface GitTimelineStats {
@@ -131,6 +158,8 @@ export interface GitTimelineStats {
     structuralCommitsRetained: number;
     momentsGenerated: number;
     clusteringEngine: ClusteringEngine;
+    sourcesTracked?: number;
+    repositoriesTracked?: number;
 }
 
 export interface GitTimelineResult {

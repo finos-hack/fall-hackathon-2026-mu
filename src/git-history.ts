@@ -27,11 +27,11 @@ export interface ExtractGitHistoryOptions {
 export function extractGitHistory(
     targetFilePath: string,
     options: ExtractGitHistoryOptions = {},
-): { commits: GitCommitSnapshot[]; totalCommitsScanned: number; repoRoot: string } {
+): { commits: GitCommitSnapshot[]; totalCommitsScanned: number; repoRoot: string; relPath: string } {
     const runGit = options.gitRunner ?? defaultGitRunner;
     const rawAbsTarget = path.resolve(targetFilePath);
     const absTarget = existsSync(rawAbsTarget) ? realpathSync(rawAbsTarget) : rawAbsTarget;
-    const targetDir = existsSync(absTarget) ? path.dirname(absTarget) : process.cwd();
+    const targetDir = existsSync(absTarget) ? path.dirname(absTarget) : path.dirname(rawAbsTarget);
 
     const rawRepoRoot = runGit(['rev-parse', '--show-toplevel'], targetDir).trim();
     const repoRoot = existsSync(rawRepoRoot) ? realpathSync(rawRepoRoot) : rawRepoRoot;
@@ -44,7 +44,7 @@ export function extractGitHistory(
         '-M30%',
         '-n',
         String(maxCommits),
-        '--format=%x1e%H%x1f%h%x1f%cs%x1f%an%x1f%s%x1f%b%x1d',
+        '--format=%x1e%H%x1f%h%x1f%cs%x1f%an%x1f%s%x1f%b%x1f%cI%x1d',
         '--name-only',
         '--',
         relTarget,
@@ -61,6 +61,7 @@ export function extractGitHistory(
         sha: string;
         shortSha: string;
         date: string;
+        timestampIso?: string;
         author: string;
         subject: string;
         body: string;
@@ -72,7 +73,7 @@ export function extractGitHistory(
         const [headerPart, filesPart = ''] = record.split('\x1d');
         const fields = headerPart.split('\x1f');
         if (fields.length < 5) continue;
-        const [sha, shortSha, date, author, subject, body = ''] = fields;
+        const [sha, shortSha, date, author, subject, body = '', timestampIso = ''] = fields;
         const fileLines = filesPart
             .split(/\r?\n/)
             .map((line) => line.trim())
@@ -82,6 +83,7 @@ export function extractGitHistory(
             sha: sha.trim(),
             shortSha: shortSha.trim(),
             date: date.trim(),
+            timestampIso: timestampIso.trim() || undefined,
             author: author.trim(),
             subject: subject.trim(),
             body: body.trim(),
@@ -137,6 +139,7 @@ export function extractGitHistory(
                 sha: entry.sha,
                 shortSha: entry.shortSha,
                 date: entry.date,
+                ...(entry.timestampIso ? { timestampIso: entry.timestampIso } : {}),
                 author: entry.author,
                 subject: entry.subject,
                 body: entry.body,
@@ -149,7 +152,7 @@ export function extractGitHistory(
         }
     }
 
-    return { commits: snapshots, totalCommitsScanned, repoRoot };
+    return { commits: snapshots, totalCommitsScanned, repoRoot, relPath: relTarget };
 }
 
 export function filterStructuralCommits(

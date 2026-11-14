@@ -216,6 +216,10 @@ describe('timelapse-html', () => {
     expect(html).toContain('id="focus-select"');
     expect(html).toContain('id="focus-isolate"');
     expect(html).toContain('id="node-inspector"');
+
+    const scriptBlocks = [...html.matchAll(/<script(?![^>]*type="application\/json")[^>]*>([\s\S]*?)<\/script>/g)];
+    expect(scriptBlocks).toHaveLength(1);
+    expect(() => new Function(scriptBlocks[0][1])).not.toThrow();
   });
 
   it('builds payload from a saved calm-timeline JSON file and writes HTML', () => {

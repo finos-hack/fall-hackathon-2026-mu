@@ -15,16 +15,33 @@ Even when AI assistants are unavailable (e.g., in air-gapped CI/CD), `calm-timel
 
 ### Step 1 — Emit the Structural Commit Diff Digest (Deterministic)
 
-Run `calm-timelapse` on a Git-tracked CALM architecture file with `--emit-digest`:
+Run `calm-timelapse` on one or more Git-tracked CALM architecture files (across one or multiple repositories) with `--emit-digest`:
 
 ```bash
+# Single file (or pass --resolve-details to auto-discover same-repo detailed-architecture files)
 npx calm-timelapse \
   --from-git architecture/system.calm.json \
   --emit-digest architecture/system.digest.json \
   -o architecture/system.timeline.json \
   --timelapse architecture/system.timelapse.html \
   --validate
+
+# Multi-repo / multi-architecture synchronized timeline (optional Label=path syntax)
+npx calm-timelapse \
+  --from-git \
+    "Platform=../repo-platform/architecture/platform.calm.json" \
+    "Execution=../repo-execution/calm/execution-detail.calm.json" \
+    "Surveillance=../repo-surveillance/calm/surveillance.calm.json" \
+  --emit-digest timeline/federated.digest.json \
+  -o timeline/federated.timeline.json \
+  --snapshots-dir timeline/snapshots \
+  --timelapse timeline/federated.timelapse.html \
+  --validate
 ```
+
+**Multi-Architecture Node Isolation & Resolution Rule:**
+- Unlinked peer architectures **never** merge nodes even when two files declare the same `unique-id` (e.g., `postgres-db`); each node is scoped per source (`<sourceId>--<unique-id>`).
+- Nodes merge **only** when a parent node explicitly references a child architecture via `node.details["detailed-architecture"]`, in which case shared boundary nodes merge canonically and internal child nodes attach to the parent via a CALM `composed-of` relationship.
 
 This immediately produces a working deterministic timeline + HTML player **and** writes `system.digest.json` containing:
 - `stats`: total commits scanned, noise commits filtered, and `structuralCommitsRetained` (`N`).
