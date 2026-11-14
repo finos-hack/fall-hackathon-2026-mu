@@ -609,16 +609,12 @@ describe('timelapse-html', () => {
       { id: 'ctrl-1', description: 'Control 1', requirementCount: 1 },
     ]);
 
-    payload.defaultView = 'feed';
-    const feedHtml = renderTimelapseHtml(payload);
-    expect(feedHtml).toContain('id="btn-mode-feed"');
-    expect(feedHtml).toContain('id="feed-view"');
-    expect(feedHtml).toContain('id="feed-stream"');
-    expect(feedHtml).toContain('"defaultView":"feed"');
-    expect(feedHtml).toContain('id="btn-feed-latest" type="button" class="feed-pill-btn active"');
-    expect(feedHtml).toContain('let feedNewestFirst = true;');
+    const stageHtml = renderTimelapseHtml(payload);
+    expect(stageHtml).toContain('id="stage-view"');
+    expect(stageHtml).not.toContain('id="feed-view"');
+    expect(stageHtml).not.toContain('Snapshot SHA-256');
 
-    const scriptMatch = feedHtml.match(/<script>([\s\S]*?)<\/script>/);
+    const scriptMatch = stageHtml.match(/<script>([\s\S]*?)<\/script>/);
     expect(scriptMatch).not.toBeNull();
     expect(() => new Function(scriptMatch![1])).not.toThrow();
   });
