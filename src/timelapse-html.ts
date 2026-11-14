@@ -79,6 +79,7 @@ export interface TimelapsePayload {
   generatedAt: string;
   sourceFile: string;
   sources?: FederatedSourceDescriptor[];
+  defaultView?: 'stage' | 'feed';
   engine: string;
   canvasWidth: number;
   canvasHeight: number;
@@ -682,6 +683,7 @@ export function buildTimelapsePayloadFromClusters(
     title?: string;
     sourceFile: string;
     sources?: FederatedSourceDescriptor[];
+    defaultView?: 'stage' | 'feed';
     engine: string;
     stats?: TimelapseStats;
   },
@@ -775,6 +777,7 @@ export function buildTimelapsePayloadFromClusters(
     generatedAt: new Date().toISOString(),
     sourceFile: sourceBase,
     ...(isMultiSource ? { sources: options.sources } : {}),
+    ...(options.defaultView ? { defaultView: options.defaultView } : {}),
     engine: options.engine,
     canvasWidth: layout.canvasWidth,
     canvasHeight: layout.canvasHeight,
@@ -914,7 +917,12 @@ export function buildTimelapsePayloadFromTimelineFile(
       ? rawMeta['clustering-engine']
       : 'manual-timeline';
 
-  const sourceBase = path.basename(resolved);
+  const sourceBase =
+    rawSources && rawSources.length > 1
+      ? rawSources.map((s) => s.sourceLabel).join(' + ')
+      : typeof rawMeta?.['source-file'] === 'string' && rawMeta['source-file'].trim()
+        ? path.basename(rawMeta['source-file'].trim())
+        : path.basename(resolved);
   return {
     title: `CALM Architecture Timelapse — ${sourceBase}`,
     generatedAt: new Date().toISOString(),
@@ -1423,21 +1431,281 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
         border-top: 1px solid var(--border);
       }
     }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      flex-wrap: wrap;
+    }
+    .mode-switch {
+      display: inline-flex;
+      background: #0b1020;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 2px;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+    .mode-btn {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 11px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+    .mode-btn:hover {
+      color: var(--text);
+    }
+    .mode-btn.active {
+      background: var(--accent);
+      color: #06202b;
+    }
+    #feed-view {
+      flex: 1 1 0%;
+      min-height: 0;
+      overflow-y: auto;
+      display: none;
+      flex-direction: column;
+      background: radial-gradient(circle at 50% 0%, #131e3a 0%, var(--bg) 55%);
+    }
+    .feed-toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 15;
+      background: rgba(17, 25, 46, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 9px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 12.5px;
+    }
+    .feed-toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .feed-pill-btn {
+      background: var(--panel-alt);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 4px 11px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .feed-pill-btn.active {
+      background: rgba(56, 189, 248, 0.18);
+      color: #bae6fd;
+      border-color: #0284c7;
+    }
+    #feed-search {
+      background: #0b1020;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 12.5px;
+      min-width: 220px;
+    }
+    .feed-stream {
+      width: 100%;
+      max-width: 940px;
+      margin: 0 auto;
+      padding: 24px 20px 64px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .feed-post {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+    }
+    .feed-post-meta {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .feed-author-block {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+    .feed-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.24), rgba(167, 139, 250, 0.22));
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      color: #e0f2fe;
+      font-weight: 700;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .feed-meta-title {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+    .feed-meta-sub {
+      font-size: 11.5px;
+      color: var(--muted);
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .feed-source-pill {
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 1px 8px;
+      border-radius: 999px;
+      background: #0b1020;
+      border: 1px solid #38bdf8;
+      color: #bae6fd;
+    }
+    .feed-actions {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .feed-action-btn {
+      background: var(--panel-alt);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .feed-action-btn.primary {
+      background: rgba(56, 189, 248, 0.16);
+      border-color: #0284c7;
+      color: #bae6fd;
+    }
+    .feed-post-title {
+      margin: 0;
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: #f8fafc;
+    }
+    .feed-post-summary {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.58;
+      color: #cbd5e1;
+    }
+    .feed-figure {
+      margin: 2px 0 0;
+      background: radial-gradient(circle at top left, #15213e 0%, #0b1020 75%);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .feed-svg-wrap {
+      width: 100%;
+      height: 300px;
+      position: relative;
+      cursor: pointer;
+    }
+    .feed-svg-wrap svg {
+      position: static;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .feed-figure-caption {
+      padding: 8px 14px;
+      background: rgba(11, 16, 32, 0.85);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 11.5px;
+      color: var(--muted);
+    }
+    .feed-delta-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-weight: 600;
+    }
+    .feed-highlights {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding-top: 2px;
+    }
+    .feed-chip {
+      font-size: 11.5px;
+      padding: 3px 9px;
+      border-radius: 7px;
+      background: var(--panel-alt);
+      border: 1px solid var(--border);
+      color: #cbd5e1;
+    }
+    .feed-chip.add { border-color: rgba(34, 197, 94, 0.45); color: #86efac; background: rgba(34, 197, 94, 0.1); }
+    .feed-chip.mod { border-color: rgba(245, 158, 11, 0.45); color: #fde68a; background: rgba(245, 158, 11, 0.1); }
+    .feed-chip.del { border-color: rgba(239, 68, 68, 0.45); color: #fca5a5; background: rgba(239, 68, 68, 0.1); }
+    .feed-chip.adr { border-color: rgba(56, 189, 248, 0.45); color: #bae6fd; background: rgba(56, 189, 248, 0.12); }
+    .feed-empty {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--muted);
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+    }
   </style>
 </head>
 <body>
   <header>
-    <h1>${safeTitle}</h1>
+    <div class="header-left">
+      <h1>${safeTitle}</h1>
+      <div class="mode-switch" role="tablist" aria-label="View mode">
+        <button id="btn-mode-stage" type="button" class="mode-btn active" role="tab" aria-selected="true">▶ Timelapse Stage</button>
+        <button id="btn-mode-feed" type="button" class="mode-btn" role="tab" aria-selected="false">☰ Architecture Feed</button>
+      </div>
+    </div>
     <div class="meta-badges">
       <span class="badge" id="badge-moments">0 moments</span>
       <span class="badge" id="badge-sources" style="display:none;"></span>
       <span class="badge badge-funnel" id="badge-funnel"${funnelText ? '' : ' style="display:none;"'}>${escapeHtml(funnelText)}</span>
       <span class="badge" id="badge-engine">engine: ${escapeHtml(payload.engine)}</span>
-      <span class="badge">Keys: Space Play/Pause · ←/→ Step</span>
+      <span class="badge" id="badge-keys">Keys: Space Play/Pause · ←/→ Step</span>
     </div>
   </header>
 
-  <main>
+  <main id="stage-view">
     <section class="stage">
       <div class="stage-toolbar">
         <div class="toolbar-group" id="project-filter-group" style="display:none;">
@@ -1559,6 +1827,27 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
     </aside>
   </main>
 
+  <section id="feed-view" aria-label="Architecture Evolution Feed">
+    <div class="feed-toolbar">
+      <div class="feed-toolbar-group">
+        <strong id="feed-count" style="color:#f1f5f9;">0 posts</strong>
+        <span style="color:var(--border);">|</span>
+        <button id="btn-feed-latest" type="button" class="feed-pill-btn active">Latest First (N → 1)</button>
+        <button id="btn-feed-story" type="button" class="feed-pill-btn">Story Order (1 → N)</button>
+      </div>
+      <div class="feed-toolbar-group">
+        <label id="feed-project-wrap" style="display:none;color:var(--muted);align-items:center;gap:6px;">
+          Project:
+          <select id="feed-project-select" title="Filter feed posts by project">
+            <option value="">All Projects</option>
+          </select>
+        </label>
+        <input id="feed-search" type="search" placeholder="Filter posts by node, ADR, control, commit..." />
+      </div>
+    </div>
+    <div class="feed-stream" id="feed-stream"></div>
+  </section>
+
   <script id="timelapse-data" type="application/json">${serializedPayload}</script>
   <script>
     (function () {
@@ -1590,6 +1879,19 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
       const badgeMoments = document.getElementById('badge-moments');
       const badgeSources = document.getElementById('badge-sources');
       const badgeFunnel = document.getElementById('badge-funnel');
+      const badgeKeys = document.getElementById('badge-keys');
+
+      const stageView = document.getElementById('stage-view');
+      const feedView = document.getElementById('feed-view');
+      const btnModeStage = document.getElementById('btn-mode-stage');
+      const btnModeFeed = document.getElementById('btn-mode-feed');
+      const feedCount = document.getElementById('feed-count');
+      const btnFeedStory = document.getElementById('btn-feed-story');
+      const btnFeedLatest = document.getElementById('btn-feed-latest');
+      const feedProjectWrap = document.getElementById('feed-project-wrap');
+      const feedProjectSelect = document.getElementById('feed-project-select');
+      const feedSearch = document.getElementById('feed-search');
+      const feedStream = document.getElementById('feed-stream');
 
       const btnZoomIn = document.getElementById('btn-zoom-in');
       const btnZoomOut = document.getElementById('btn-zoom-out');
@@ -1634,6 +1936,15 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
             opt.value = src.sourceId;
             opt.textContent = src.sourceLabel;
             projectSelect.appendChild(opt);
+          });
+        }
+        if (feedProjectWrap) feedProjectWrap.style.display = 'inline-flex';
+        if (feedProjectSelect) {
+          sources.forEach((src) => {
+            const opt = document.createElement('option');
+            opt.value = src.sourceId;
+            opt.textContent = src.sourceLabel;
+            feedProjectSelect.appendChild(opt);
           });
         }
       }
@@ -2022,252 +2333,25 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
 
         renderGovernancePosture(currentIndex, frame);
 
-        const nodeHalfW = 88;
-        const nodeHalfH = 32;
-        const activeEdges = frame.edges || [];
-        const totalEdgeCount = activeEdges.length;
-        const pairCounts = new Map();
-        for (const e of activeEdges) {
-          const key = e.source < e.target ? e.source + '::' + e.target : e.target + '::' + e.source;
-          pairCounts.set(key, (pairCounts.get(key) || 0) + 1);
-        }
-        const pairSeen = new Map();
-
-        for (const edge of activeEdges) {
-          const src = positions[edge.source];
-          const dst = positions[edge.target];
-          if (!src || !dst) continue;
-
-          const inFocus = !focusedNodeId || edge.source === focusedNodeId || edge.target === focusedNodeId;
-          const srcInProj = nodeMatchesProject(src);
-          const dstInProj = nodeMatchesProject(dst);
-          const inProject = !selectedProjectId || (srcInProj && dstInProj);
-          if (focusedNodeId && isolateMode && !inFocus) continue;
-          if (selectedProjectId && isolateMode && !inProject) continue;
-
-          const pairKey = edge.source < edge.target ? edge.source + '::' + edge.target : edge.target + '::' + edge.source;
-          const pairTotal = pairCounts.get(pairKey) || 1;
-          const pairIdx = pairSeen.get(pairKey) || 0;
-          pairSeen.set(pairKey, pairIdx + 1);
-          const curveOffset = pairTotal > 1 ? (pairIdx - (pairTotal - 1) / 2) * 34 : 0;
-
-          const isAdded = addedEdges.has(edge.id);
-          const isModified = modifiedEdges.has(edge.id);
-          const stroke = isAdded ? '#22c55e' : (isModified ? '#f59e0b' : '#64748b');
-          const marker = isAdded ? 'url(#arrow-added)' : (isModified ? 'url(#arrow-modified)' : 'url(#arrow-normal)');
-
-          const dx = dst.x - src.x;
-          const dy = dst.y - src.y;
-          let x1, y1, x2, y2, cx1, cy1, cx2, cy2;
-
-          if (dx > 20) {
-            x1 = src.x + nodeHalfW;
-            y1 = src.y;
-            x2 = dst.x - nodeHalfW;
-            y2 = dst.y;
-            const span = Math.max(48, (x2 - x1) * 0.48);
-            cx1 = x1 + span;
-            cy1 = y1 + curveOffset;
-            cx2 = x2 - span;
-            cy2 = y2 + curveOffset;
-          } else if (dx < -20) {
-            x1 = src.x - nodeHalfW;
-            y1 = src.y;
-            x2 = dst.x + nodeHalfW;
-            y2 = dst.y;
-            const arch = (Math.abs(dy) < 25 ? -72 : 0) + curveOffset;
-            const span = Math.max(54, Math.abs(x1 - x2) * 0.42);
-            cx1 = x1 - span;
-            cy1 = y1 + arch;
-            cx2 = x2 + span;
-            cy2 = y2 + arch;
-          } else {
-            const signY = dy >= 0 ? 1 : -1;
-            x1 = src.x;
-            y1 = src.y + signY * nodeHalfH;
-            x2 = dst.x;
-            y2 = dst.y - signY * nodeHalfH;
-            const bulge = 58 + curveOffset;
-            cx1 = x1 + bulge;
-            cy1 = y1 + signY * 18;
-            cx2 = x2 + bulge;
-            cy2 = y2 - signY * 18;
-          }
-
-          const edgeActive = inFocus && (!selectedProjectId || srcInProj || dstInProj);
-          const g = createSvgEl('g', {
-            class: 'edge-group',
-            opacity: edgeActive ? (inProject ? 1 : 0.45) : 0.12,
-          });
-          g.appendChild(createSvgEl('path', {
-            d: 'M ' + x1 + ' ' + y1 + ' C ' + cx1 + ' ' + cy1 + ', ' + cx2 + ' ' + cy2 + ', ' + x2 + ' ' + y2,
-            fill: 'none',
-            stroke,
-            'stroke-width': isAdded || isModified || (focusedNodeId && inFocus) ? 2.5 : 1.75,
-            'marker-end': marker,
-            opacity: isAdded || isModified ? 1 : 0.78,
-          }));
-
-          const showLabel = Boolean(edge.label) && (
-            totalEdgeCount <= 12 ||
-            Boolean(focusedNodeId && inFocus) ||
-            isAdded ||
-            isModified
-          );
-          if (showLabel) {
-            const mx = 0.125 * x1 + 0.375 * cx1 + 0.375 * cx2 + 0.125 * x2;
-            const my = 0.125 * y1 + 0.375 * cy1 + 0.375 * cy2 + 0.125 * y2;
-            const labelStr = edge.label.length > 18 ? edge.label.slice(0, 17) + '…' : edge.label;
-            const pillW = Math.max(32, Math.round(labelStr.length * 6.4 + 14));
-            const pillH = 18;
-
-            g.appendChild(createSvgEl('rect', {
-              x: mx - pillW / 2,
-              y: my - pillH / 2,
-              width: pillW,
-              height: pillH,
-              rx: 9,
-              fill: '#0b1020',
-              'fill-opacity': 0.92,
-              stroke: isAdded ? '#22c55e' : (isModified ? '#f59e0b' : '#334155'),
-              'stroke-width': 1,
-            }));
-
-            const label = createSvgEl('text', {
-              x: mx,
-              y: my + 3.5,
-              fill: isAdded ? '#86efac' : (isModified ? '#fde68a' : '#cbd5e1'),
-              'font-size': 10.5,
-              'text-anchor': 'middle',
-            });
-            label.textContent = labelStr;
-            g.appendChild(label);
-          }
-          svgEdges.appendChild(g);
-        }
-
-        const renderNodes = [...(frame.nodes || [])];
-        for (const remId of removedNodes) {
-          const fallbackNode = liveDiff?.baseNodes?.get(remId);
-          if (positions[remId]) {
-            renderNodes.push({
-              id: remId,
-              name: fallbackNode?.name || positions[remId].name,
-              nodeType: fallbackNode?.nodeType || positions[remId].nodeType,
-              controlCount: fallbackNode?.controlCount || positions[remId].controlCount,
-              sourceId: fallbackNode?.sourceId || positions[remId].sourceId,
-              sourceLabel: fallbackNode?.sourceLabel || positions[remId].sourceLabel,
-              sourceIds: fallbackNode?.sourceIds || positions[remId].sourceIds,
-              sourceLabels: fallbackNode?.sourceLabels || positions[remId].sourceLabels,
-              mergedViaDetailedArch:
-                fallbackNode?.mergedViaDetailedArch || positions[remId].mergedViaDetailedArch,
-            });
-          }
-        }
-
-        for (const node of renderNodes) {
-          const pos = positions[node.id];
-          if (!pos) continue;
-
-          const inFocus = !focusedNodeId || neighborhood.has(node.id);
-          const inProject = nodeMatchesProject(node.sourceId || node.sourceIds ? node : pos);
-          if (focusedNodeId && isolateMode && !inFocus) continue;
-          if (selectedProjectId && isolateMode && !inProject) continue;
-          const visibleActive = inFocus && inProject;
-
-          const isFocusedTarget = focusedNodeId === node.id;
-          const isAdded = addedNodes.has(node.id);
-          const isModified = modifiedNodes.has(node.id);
-          const isRemoved = removedNodes.has(node.id);
-
-          let stroke = '#3b82f6';
-          let fill = '#13203d';
-          if (isAdded) { stroke = '#22c55e'; fill = '#0f291e'; }
-          else if (isModified) { stroke = '#f59e0b'; fill = '#2b200c'; }
-          else if (isRemoved) { stroke = '#ef4444'; fill = '#2c1215'; }
-          if (isFocusedTarget) { stroke = '#38bdf8'; }
-
-          const g = createSvgEl('g', {
-            class: 'node-group',
-            opacity: isRemoved ? (visibleActive ? 0.45 : 0.12) : (visibleActive ? 1 : 0.16),
-          });
-          g.addEventListener('click', (ev) => {
-            ev.stopPropagation();
-            setFocusNode(focusedNodeId === node.id ? '' : node.id);
-          });
-
-          const w = 176;
-          const h = 64;
-          g.appendChild(createSvgEl('rect', {
-            x: pos.x - w / 2,
-            y: pos.y - h / 2,
-            width: w,
-            height: h,
-            rx: 10,
-            fill,
-            stroke,
-            'stroke-width': isAdded || isModified || isRemoved ? 2.4 : 1.5,
-            'stroke-dasharray': isRemoved ? '5 4' : 'none',
-          }));
-
-          const effSourceId = node.sourceId || pos.sourceId;
-          const effSourceLabel = node.sourceLabel || pos.sourceLabel;
-          const effSourceLabels = node.sourceLabels || pos.sourceLabels;
-          const effMerged = Boolean(node.mergedViaDetailedArch || pos.mergedViaDetailedArch);
-          if (isMultiSource && effSourceLabel) {
-            const rawBadge = effMerged && Array.isArray(effSourceLabels) && effSourceLabels.length > 1
-              ? '⇄ ' + effSourceLabels.join('+')
-              : effSourceLabel;
-            const badgeStr = rawBadge.length > 22 ? rawBadge.slice(0, 21) + '…' : rawBadge;
-            const badgeW = Math.min(w - 12, Math.max(44, Math.round(badgeStr.length * 5.8 + 14)));
-            const badgeH = 15;
-            const badgeColor = sourceColorMap.get(effSourceId) || '#38bdf8';
-            g.appendChild(createSvgEl('rect', {
-              x: pos.x - badgeW / 2,
-              y: pos.y - h / 2 - 8,
-              width: badgeW,
-              height: badgeH,
-              rx: 7.5,
-              fill: '#0b1020',
-              stroke: badgeColor,
-              'stroke-width': 1.1,
-            }));
-            const badgeText = createSvgEl('text', {
-              x: pos.x,
-              y: pos.y - h / 2 + 2.5,
-              fill: badgeColor,
-              'font-size': 9.5,
-              'font-weight': 600,
-              'text-anchor': 'middle',
-            });
-            badgeText.textContent = badgeStr;
-            g.appendChild(badgeText);
-          }
-
-          const titleText = createSvgEl('text', {
-            x: pos.x,
-            y: pos.y - 5,
-            fill: '#f1f5f9',
-            'font-size': 12.5,
-            'font-weight': 600,
-            'text-anchor': 'middle',
-          });
-          titleText.textContent = node.name.length > 22 ? node.name.slice(0, 21) + '…' : node.name;
-          g.appendChild(titleText);
-
-          const ctrlSuffix = node.controlCount ? ' · ' + node.controlCount + ' ctrl' : '';
-          const typeText = createSvgEl('text', {
-            x: pos.x,
-            y: pos.y + 15,
-            fill: '#93a4c7',
-            'font-size': 10.5,
-            'text-anchor': 'middle',
-          });
-          typeText.textContent = node.nodeType + ctrlSuffix + (isRemoved ? ' (removed)' : '');
-          g.appendChild(typeText);
-
-          svgNodes.appendChild(g);
-        }
+        drawGraphScene({
+          edgesContainer: svgEdges,
+          nodesContainer: svgNodes,
+          frame,
+          addedNodes,
+          modifiedNodes,
+          removedNodes,
+          addedEdges,
+          modifiedEdges,
+          fallbackBaseNodes: liveDiff ? liveDiff.baseNodes : null,
+          focusedId: focusedNodeId,
+          neighborhoodSet: neighborhood,
+          projectFilterId: selectedProjectId,
+          isolate: isolateMode,
+          markerPrefix: '',
+          onNodeClick: (clickedId) => {
+            setFocusNode(focusedNodeId === clickedId ? '' : clickedId);
+          },
+        });
 
         changeList.innerHTML = '';
         if (liveDiff && compareBase) {
@@ -2515,7 +2599,734 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
         if (projectSelect) projectSelect.value = '';
         setFocusNode('');
       });
+      function nodeMatchesSpecificProject(nodeOrPos, projId) {
+        if (!projId) return true;
+        if (!nodeOrPos) return false;
+        if (Array.isArray(nodeOrPos.sourceIds) && nodeOrPos.sourceIds.includes(projId)) {
+          return true;
+        }
+        return nodeOrPos.sourceId === projId;
+      }
+
+      function drawGraphScene(opts) {
+        const {
+          edgesContainer,
+          nodesContainer,
+          frame,
+          addedNodes,
+          modifiedNodes,
+          removedNodes,
+          addedEdges,
+          modifiedEdges,
+          fallbackBaseNodes,
+          focusedId,
+          neighborhoodSet,
+          projectFilterId,
+          isolate,
+          markerPrefix,
+          onNodeClick,
+        } = opts;
+
+        const nodeHalfW = 88;
+        const nodeHalfH = 32;
+        const activeEdges = frame.edges || [];
+        const totalEdgeCount = activeEdges.length;
+        const pairCounts = new Map();
+        for (const e of activeEdges) {
+          const key = e.source < e.target ? e.source + '::' + e.target : e.target + '::' + e.source;
+          pairCounts.set(key, (pairCounts.get(key) || 0) + 1);
+        }
+        const pairSeen = new Map();
+        const mkNorm = 'url(#' + markerPrefix + 'arrow-normal)';
+        const mkAdd = 'url(#' + markerPrefix + 'arrow-added)';
+        const mkMod = 'url(#' + markerPrefix + 'arrow-modified)';
+
+        for (const edge of activeEdges) {
+          const src = positions[edge.source];
+          const dst = positions[edge.target];
+          if (!src || !dst) continue;
+
+          const inFocus = !focusedId || edge.source === focusedId || edge.target === focusedId;
+          const srcInProj = nodeMatchesSpecificProject(src, projectFilterId);
+          const dstInProj = nodeMatchesSpecificProject(dst, projectFilterId);
+          const inProject = !projectFilterId || (srcInProj && dstInProj);
+          if (focusedId && isolate && !inFocus) continue;
+          if (projectFilterId && isolate && !inProject) continue;
+
+          const pairKey = edge.source < edge.target ? edge.source + '::' + edge.target : edge.target + '::' + edge.source;
+          const pairTotal = pairCounts.get(pairKey) || 1;
+          const pairIdx = pairSeen.get(pairKey) || 0;
+          pairSeen.set(pairKey, pairIdx + 1);
+          const curveOffset = pairTotal > 1 ? (pairIdx - (pairTotal - 1) / 2) * 34 : 0;
+
+          const isAdded = addedEdges.has(edge.id);
+          const isModified = modifiedEdges.has(edge.id);
+          const stroke = isAdded ? '#22c55e' : (isModified ? '#f59e0b' : '#64748b');
+          const marker = isAdded ? mkAdd : (isModified ? mkMod : mkNorm);
+
+          const dx = dst.x - src.x;
+          const dy = dst.y - src.y;
+          let x1, y1, x2, y2, cx1, cy1, cx2, cy2;
+
+          if (dx > 20) {
+            x1 = src.x + nodeHalfW;
+            y1 = src.y;
+            x2 = dst.x - nodeHalfW;
+            y2 = dst.y;
+            const span = Math.max(48, (x2 - x1) * 0.48);
+            cx1 = x1 + span;
+            cy1 = y1 + curveOffset;
+            cx2 = x2 - span;
+            cy2 = y2 + curveOffset;
+          } else if (dx < -20) {
+            x1 = src.x - nodeHalfW;
+            y1 = src.y;
+            x2 = dst.x + nodeHalfW;
+            y2 = dst.y;
+            const arch = (Math.abs(dy) < 25 ? -72 : 0) + curveOffset;
+            const span = Math.max(54, Math.abs(x1 - x2) * 0.42);
+            cx1 = x1 - span;
+            cy1 = y1 + arch;
+            cx2 = x2 + span;
+            cy2 = y2 + arch;
+          } else {
+            const signY = dy >= 0 ? 1 : -1;
+            x1 = src.x;
+            y1 = src.y + signY * nodeHalfH;
+            x2 = dst.x;
+            y2 = dst.y - signY * nodeHalfH;
+            const bulge = 58 + curveOffset;
+            cx1 = x1 + bulge;
+            cy1 = y1 + signY * 18;
+            cx2 = x2 + bulge;
+            cy2 = y2 - signY * 18;
+          }
+
+          const edgeActive = inFocus && (!projectFilterId || srcInProj || dstInProj);
+          const g = createSvgEl('g', {
+            class: 'edge-group',
+            opacity: edgeActive ? (inProject ? 1 : 0.45) : 0.12,
+          });
+          g.appendChild(createSvgEl('path', {
+            d: 'M ' + x1 + ' ' + y1 + ' C ' + cx1 + ' ' + cy1 + ', ' + cx2 + ' ' + cy2 + ', ' + x2 + ' ' + y2,
+            fill: 'none',
+            stroke,
+            'stroke-width': isAdded || isModified || (focusedId && inFocus) ? 2.5 : 1.75,
+            'marker-end': marker,
+            opacity: isAdded || isModified ? 1 : 0.78,
+          }));
+
+          const showLabel = Boolean(edge.label) && (
+            totalEdgeCount <= 12 ||
+            Boolean(focusedId && inFocus) ||
+            isAdded ||
+            isModified
+          );
+          if (showLabel) {
+            const mx = 0.125 * x1 + 0.375 * cx1 + 0.375 * cx2 + 0.125 * x2;
+            const my = 0.125 * y1 + 0.375 * cy1 + 0.375 * cy2 + 0.125 * y2;
+            const labelStr = edge.label.length > 18 ? edge.label.slice(0, 17) + '…' : edge.label;
+            const pillW = Math.max(32, Math.round(labelStr.length * 6.4 + 14));
+            const pillH = 18;
+
+            g.appendChild(createSvgEl('rect', {
+              x: mx - pillW / 2,
+              y: my - pillH / 2,
+              width: pillW,
+              height: pillH,
+              rx: 9,
+              fill: '#0b1020',
+              'fill-opacity': 0.92,
+              stroke: isAdded ? '#22c55e' : (isModified ? '#f59e0b' : '#334155'),
+              'stroke-width': 1,
+            }));
+
+            const label = createSvgEl('text', {
+              x: mx,
+              y: my + 3.5,
+              fill: isAdded ? '#86efac' : (isModified ? '#fde68a' : '#cbd5e1'),
+              'font-size': 10.5,
+              'text-anchor': 'middle',
+            });
+            label.textContent = labelStr;
+            g.appendChild(label);
+          }
+          edgesContainer.appendChild(g);
+        }
+
+        const renderNodes = [...(frame.nodes || [])];
+        for (const remId of removedNodes) {
+          const fallbackNode = fallbackBaseNodes ? fallbackBaseNodes.get(remId) : null;
+          if (positions[remId]) {
+            renderNodes.push({
+              id: remId,
+              name: fallbackNode?.name || positions[remId].name,
+              nodeType: fallbackNode?.nodeType || positions[remId].nodeType,
+              controlCount: fallbackNode?.controlCount || positions[remId].controlCount,
+              sourceId: fallbackNode?.sourceId || positions[remId].sourceId,
+              sourceLabel: fallbackNode?.sourceLabel || positions[remId].sourceLabel,
+              sourceIds: fallbackNode?.sourceIds || positions[remId].sourceIds,
+              sourceLabels: fallbackNode?.sourceLabels || positions[remId].sourceLabels,
+              mergedViaDetailedArch:
+                fallbackNode?.mergedViaDetailedArch || positions[remId].mergedViaDetailedArch,
+            });
+          }
+        }
+
+        for (const node of renderNodes) {
+          const pos = positions[node.id];
+          if (!pos) continue;
+
+          const inFocus = !focusedId || (neighborhoodSet && neighborhoodSet.has(node.id));
+          const inProject = nodeMatchesSpecificProject(node.sourceId || node.sourceIds ? node : pos, projectFilterId);
+          if (focusedId && isolate && !inFocus) continue;
+          if (projectFilterId && isolate && !inProject) continue;
+          const visibleActive = inFocus && inProject;
+
+          const isFocusedTarget = focusedId === node.id;
+          const isAdded = addedNodes.has(node.id);
+          const isModified = modifiedNodes.has(node.id);
+          const isRemoved = removedNodes.has(node.id);
+
+          let stroke = '#3b82f6';
+          let fill = '#13203d';
+          if (isAdded) { stroke = '#22c55e'; fill = '#0f291e'; }
+          else if (isModified) { stroke = '#f59e0b'; fill = '#2b200c'; }
+          else if (isRemoved) { stroke = '#ef4444'; fill = '#2c1215'; }
+          if (isFocusedTarget) { stroke = '#38bdf8'; }
+
+          const g = createSvgEl('g', {
+            class: 'node-group',
+            opacity: isRemoved ? (visibleActive ? 0.45 : 0.12) : (visibleActive ? 1 : 0.16),
+          });
+          if (onNodeClick) {
+            g.addEventListener('click', (ev) => {
+              ev.stopPropagation();
+              onNodeClick(node.id);
+            });
+          }
+
+          const w = 176;
+          const h = 64;
+          g.appendChild(createSvgEl('rect', {
+            x: pos.x - w / 2,
+            y: pos.y - h / 2,
+            width: w,
+            height: h,
+            rx: 10,
+            fill,
+            stroke,
+            'stroke-width': isAdded || isModified || isRemoved ? 2.4 : 1.5,
+            'stroke-dasharray': isRemoved ? '5 4' : 'none',
+          }));
+
+          const effSourceId = node.sourceId || pos.sourceId;
+          const effSourceLabel = node.sourceLabel || pos.sourceLabel;
+          const effSourceLabels = node.sourceLabels || pos.sourceLabels;
+          const effMerged = Boolean(node.mergedViaDetailedArch || pos.mergedViaDetailedArch);
+          if (isMultiSource && effSourceLabel) {
+            const rawBadge = effMerged && Array.isArray(effSourceLabels) && effSourceLabels.length > 1
+              ? '⇄ ' + effSourceLabels.join('+')
+              : effSourceLabel;
+            const badgeStr = rawBadge.length > 22 ? rawBadge.slice(0, 21) + '…' : rawBadge;
+            const badgeW = Math.min(w - 12, Math.max(44, Math.round(badgeStr.length * 5.8 + 14)));
+            const badgeH = 15;
+            const badgeColor = sourceColorMap.get(effSourceId) || '#38bdf8';
+            g.appendChild(createSvgEl('rect', {
+              x: pos.x - badgeW / 2,
+              y: pos.y - h / 2 - 8,
+              width: badgeW,
+              height: badgeH,
+              rx: 7.5,
+              fill: '#0b1020',
+              stroke: badgeColor,
+              'stroke-width': 1.1,
+            }));
+            const badgeText = createSvgEl('text', {
+              x: pos.x,
+              y: pos.y - h / 2 + 2.5,
+              fill: badgeColor,
+              'font-size': 9.5,
+              'font-weight': 600,
+              'text-anchor': 'middle',
+            });
+            badgeText.textContent = badgeStr;
+            g.appendChild(badgeText);
+          }
+
+          const titleText = createSvgEl('text', {
+            x: pos.x,
+            y: pos.y - 5,
+            fill: '#f1f5f9',
+            'font-size': 12.5,
+            'font-weight': 600,
+            'text-anchor': 'middle',
+          });
+          titleText.textContent = node.name.length > 22 ? node.name.slice(0, 21) + '…' : node.name;
+          g.appendChild(titleText);
+
+          const ctrlSuffix = node.controlCount ? ' · ' + node.controlCount + ' ctrl' : '';
+          const typeText = createSvgEl('text', {
+            x: pos.x,
+            y: pos.y + 15,
+            fill: '#93a4c7',
+            'font-size': 10.5,
+            'text-anchor': 'middle',
+          });
+          typeText.textContent = node.nodeType + ctrlSuffix + (isRemoved ? ' (removed)' : '');
+          g.appendChild(typeText);
+
+          nodesContainer.appendChild(g);
+        }
+      }
+
+      let currentViewMode = 'stage';
+      let feedNewestFirst = true;
+      let feedProjectFilter = '';
+      let feedQuery = '';
+
+      function createFeedPostSvg(frame, frameIdx, projFilter) {
+        const activeIds = [
+          ...(frame.nodes || []).map((n) => n.id),
+          ...(frame.removedNodeIds || []),
+        ];
+        let minX = Infinity;
+        let minY = Infinity;
+        let maxX = -Infinity;
+        let maxY = -Infinity;
+        for (const id of activeIds) {
+          const p = positions[id];
+          if (!p) continue;
+          if (p.x < minX) minX = p.x;
+          if (p.y < minY) minY = p.y;
+          if (p.x > maxX) maxX = p.x;
+          if (p.y > maxY) maxY = p.y;
+        }
+        if (!Number.isFinite(minX)) {
+          minX = 0; minY = 0; maxX = canvasWidth; maxY = canvasHeight;
+        }
+        const padX = 135;
+        const padY = 72;
+        const rawW = (maxX - minX) + padX * 2;
+        const rawH = (maxY - minY) + padY * 2;
+        const vbW = Math.max(580, rawW);
+        const vbH = Math.max(240, rawH);
+        const cx = (minX + maxX) / 2;
+        const cy = (minY + maxY) / 2;
+        const vbX = Math.round(cx - vbW / 2);
+        const vbY = Math.round(cy - vbH / 2);
+
+        const markerPrefix = 'feed-' + frameIdx + '-';
+        const svg = createSvgEl('svg', {
+          viewBox: vbX + ' ' + vbY + ' ' + Math.round(vbW) + ' ' + Math.round(vbH),
+          preserveAspectRatio: 'xMidYMid meet',
+          xmlns: 'http://www.w3.org/2000/svg',
+        });
+
+        const defs = createSvgEl('defs', {});
+        const markerSpecs = [
+          ['arrow-normal', '#64748b'],
+          ['arrow-added', '#22c55e'],
+          ['arrow-modified', '#f59e0b'],
+        ];
+        for (const [mName, color] of markerSpecs) {
+          const m = createSvgEl('marker', {
+            id: markerPrefix + mName,
+            viewBox: '0 0 10 10',
+            refX: 9,
+            refY: 5,
+            markerWidth: 7,
+            markerHeight: 7,
+            orient: 'auto-start-reverse',
+          });
+          m.appendChild(createSvgEl('path', { d: 'M 0 1 L 10 5 L 0 9 z', fill: color }));
+          defs.appendChild(m);
+        }
+        svg.appendChild(defs);
+
+        const edgesG = createSvgEl('g', {});
+        const nodesG = createSvgEl('g', {});
+        svg.appendChild(edgesG);
+        svg.appendChild(nodesG);
+
+        const prevFrame = frameIdx > 0 ? frames[frameIdx - 1] : null;
+        const fallbackBaseNodes = prevFrame
+          ? new Map((prevFrame.nodes || []).map((n) => [n.id, n]))
+          : null;
+
+        drawGraphScene({
+          edgesContainer: edgesG,
+          nodesContainer: nodesG,
+          frame,
+          addedNodes: new Set(frame.addedNodeIds || []),
+          modifiedNodes: new Set(frame.modifiedNodeIds || []),
+          removedNodes: new Set(frame.removedNodeIds || []),
+          addedEdges: new Set(frame.addedEdgeIds || []),
+          modifiedEdges: new Set(frame.modifiedEdgeIds || []),
+          fallbackBaseNodes,
+          focusedId: '',
+          neighborhoodSet: null,
+          projectFilterId: projFilter,
+          isolate: false,
+          markerPrefix,
+          onNodeClick: (clickedNodeId) => {
+            setViewMode('stage');
+            renderFrame(frameIdx);
+            setFocusNode(clickedNodeId);
+          },
+        });
+
+        return { svg, vbX, vbY, vbW: Math.round(vbW), vbH: Math.round(vbH) };
+      }
+
+      function downloadPostSvg(svgEl, vbX, vbY, vbW, vbH, filename) {
+        const clone = svgEl.cloneNode(true);
+        clone.setAttribute('width', String(vbW));
+        clone.setAttribute('height', String(vbH));
+        clone.setAttribute('style', 'font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;');
+        const bgRect = createSvgEl('rect', {
+          x: vbX,
+          y: vbY,
+          width: vbW,
+          height: vbH,
+          fill: '#0b1020',
+        });
+        clone.insertBefore(bgRect, clone.firstChild);
+        const xml = '<?xml version="1.0" encoding="UTF-8"?>\\n' + new XMLSerializer().serializeToString(clone);
+        const blob = new Blob([xml], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+
+      function frameTouchesProject(frame, projId) {
+        if (!projId) return true;
+        const srcObj = sources.find((s) => s.sourceId === projId);
+        const labelNeedle = srcObj ? '[' + srcObj.sourceLabel + ']' : '';
+        if (labelNeedle) {
+          if ((frame.commitMessages || []).some((m) => String(m).includes(labelNeedle))) return true;
+          if ((frame.changes || []).some((c) => String(c.text || '').includes(labelNeedle))) return true;
+        }
+        const changedIds = [
+          ...(frame.addedNodeIds || []),
+          ...(frame.modifiedNodeIds || []),
+          ...(frame.removedNodeIds || []),
+        ];
+        for (const id of changedIds) {
+          const p = positions[id];
+          if (nodeMatchesSpecificProject(p, projId)) return true;
+        }
+        return false;
+      }
+
+      function collectMomentSourceLabels(frame) {
+        if (!isMultiSource) return [];
+        const touched = [];
+        for (const src of sources) {
+          if (frameTouchesProject(frame, src.sourceId)) {
+            touched.push(src);
+          }
+        }
+        return touched;
+      }
+
+      function renderFeed() {
+        if (!feedStream) return;
+        feedStream.innerHTML = '';
+
+        const indices = frames.map((_, idx) => idx);
+        indices.sort((a, b) => {
+          const da = String(frames[a].validFrom || '');
+          const db = String(frames[b].validFrom || '');
+          if (da && db && da !== db) {
+            return feedNewestFirst ? db.localeCompare(da) : da.localeCompare(db);
+          }
+          return feedNewestFirst ? b - a : a - b;
+        });
+
+        const needle = feedQuery.trim().toLowerCase();
+        const matched = indices.filter((idx) => {
+          const f = frames[idx];
+          if (!frameTouchesProject(f, feedProjectFilter)) return false;
+          if (!needle) return true;
+          const hay = [
+            f.name,
+            f.description,
+            f.validFrom,
+            ...(f.commits || []),
+            ...(f.commitMessages || []),
+            ...(f.adrs || []),
+            ...(f.changes || []).map((c) => c.text),
+            ...(f.nodes || []).map((n) => n.name + ' ' + n.id),
+            ...(f.controls || []).map((c) => c.id + ' ' + c.description),
+          ]
+            .join(' ')
+            .toLowerCase();
+          return hay.includes(needle);
+        });
+
+        if (feedCount) {
+          feedCount.textContent =
+            matched.length + ' architectural post' + (matched.length === 1 ? '' : 's');
+        }
+
+        if (matched.length === 0) {
+          const empty = document.createElement('div');
+          empty.className = 'feed-empty';
+          empty.textContent = 'No architectural moments match the current project or search filter.';
+          feedStream.appendChild(empty);
+          return;
+        }
+
+        for (const idx of matched) {
+          const f = frames[idx];
+          const article = document.createElement('article');
+          article.className = 'feed-post';
+          article.setAttribute('data-moment-index', String(idx));
+
+          const metaRow = document.createElement('div');
+          metaRow.className = 'feed-post-meta';
+
+          const authorBlock = document.createElement('div');
+          authorBlock.className = 'feed-author-block';
+
+          const avatar = document.createElement('div');
+          avatar.className = 'feed-avatar';
+          avatar.textContent = 'M' + (idx + 1);
+          authorBlock.appendChild(avatar);
+
+          const metaTextWrap = document.createElement('div');
+          const metaTitle = document.createElement('div');
+          metaTitle.className = 'feed-meta-title';
+          const dateLabel = f.validFrom ? String(f.validFrom).slice(0, 10) : 'Manual Moment';
+          metaTitle.appendChild(
+            document.createTextNode('Moment ' + (idx + 1) + ' of ' + frames.length + ' · ' + dateLabel),
+          );
+
+          for (const src of collectMomentSourceLabels(f)) {
+            const sp = document.createElement('span');
+            sp.className = 'feed-source-pill';
+            const c = sourceColorMap.get(src.sourceId) || '#38bdf8';
+            sp.style.borderColor = c;
+            sp.style.color = c;
+            sp.textContent = src.sourceLabel;
+            metaTitle.appendChild(sp);
+          }
+
+          const metaSub = document.createElement('div');
+          metaSub.className = 'feed-meta-sub';
+          const commitInfo = (f.commits && f.commits.length > 0)
+            ? f.commitCount + ' commit' + (f.commitCount === 1 ? '' : 's') + ' (' + f.commits[0] + (f.commits.length > 1 ? '..' + f.commits[f.commits.length - 1] : '') + ')'
+            : 'Curated snapshot';
+          metaSub.textContent =
+            commitInfo +
+            ((f.adrs && f.adrs.length) ? ' · ' + f.adrs.length + ' ADR(s)' : '') +
+            ((f.controls && f.controls.length) ? ' · ' + f.controls.length + ' active control(s)' : '');
+
+          metaTextWrap.appendChild(metaTitle);
+          metaTextWrap.appendChild(metaSub);
+          authorBlock.appendChild(metaTextWrap);
+          metaRow.appendChild(authorBlock);
+
+          const actions = document.createElement('div');
+          actions.className = 'feed-actions';
+
+          const { svg, vbX, vbY, vbW, vbH } = createFeedPostSvg(f, idx, feedProjectFilter);
+
+          const btnSaveSvg = document.createElement('button');
+          btnSaveSvg.type = 'button';
+          btnSaveSvg.className = 'feed-action-btn';
+          btnSaveSvg.textContent = '⬇ Save SVG';
+          btnSaveSvg.title = 'Download standalone SVG snapshot for this post';
+          btnSaveSvg.addEventListener('click', () => {
+            const slug = String(f.id || ('moment-' + (idx + 1))).replace(/[^a-zA-Z0-9_-]+/g, '-');
+            downloadPostSvg(svg, vbX, vbY, vbW, vbH, slug + '.svg');
+          });
+
+          const btnOpenStage = document.createElement('button');
+          btnOpenStage.type = 'button';
+          btnOpenStage.className = 'feed-action-btn primary';
+          btnOpenStage.textContent = 'Inspect in Stage →';
+          btnOpenStage.addEventListener('click', () => {
+            setViewMode('stage');
+            renderFrame(idx);
+          });
+
+          actions.appendChild(btnSaveSvg);
+          actions.appendChild(btnOpenStage);
+          metaRow.appendChild(actions);
+          article.appendChild(metaRow);
+
+          const h3 = document.createElement('h3');
+          h3.className = 'feed-post-title';
+          h3.textContent = f.name;
+          article.appendChild(h3);
+
+          const summaryP = document.createElement('p');
+          summaryP.className = 'feed-post-summary';
+          summaryP.textContent = f.description || f.summary || '';
+          article.appendChild(summaryP);
+
+          const figure = document.createElement('div');
+          figure.className = 'feed-figure';
+          const svgWrap = document.createElement('div');
+          svgWrap.className = 'feed-svg-wrap';
+          svgWrap.title = 'Click diagram or any node to inspect in interactive Timelapse Stage';
+          svgWrap.appendChild(svg);
+          svgWrap.addEventListener('click', () => {
+            setViewMode('stage');
+            renderFrame(idx);
+          });
+          figure.appendChild(svgWrap);
+
+          const caption = document.createElement('div');
+          caption.className = 'feed-figure-caption';
+          const deltaPills = document.createElement('div');
+          deltaPills.className = 'feed-delta-pills';
+          const addCnt = (f.addedNodeIds || []).length + (f.addedEdgeIds || []).length;
+          const modCnt = (f.modifiedNodeIds || []).length + (f.modifiedEdgeIds || []).length;
+          const delCnt = (f.removedNodeIds || []).length + (f.removedEdgeIds || []).length;
+
+          const sAdd = document.createElement('span');
+          sAdd.style.color = '#86efac';
+          sAdd.textContent = '+' + addCnt + ' added';
+          deltaPills.appendChild(sAdd);
+
+          if (modCnt > 0) {
+            const sMod = document.createElement('span');
+            sMod.style.color = '#fde68a';
+            sMod.textContent = '~' + modCnt + ' modified';
+            deltaPills.appendChild(sMod);
+          }
+          if (delCnt > 0) {
+            const sDel = document.createElement('span');
+            sDel.style.color = '#fca5a5';
+            sDel.textContent = '-' + delCnt + ' removed';
+            deltaPills.appendChild(sDel);
+          }
+
+          const stateTotals = document.createElement('span');
+          stateTotals.textContent =
+            (f.nodes || []).length +
+            ' nodes · ' +
+            (f.edges || []).length +
+            ' relationships' +
+            ((f.controls && f.controls.length) ? ' · ' + f.controls.length + ' controls' : '');
+
+          caption.appendChild(deltaPills);
+          caption.appendChild(stateTotals);
+          figure.appendChild(caption);
+          article.appendChild(figure);
+
+          const highlights = document.createElement('div');
+          highlights.className = 'feed-highlights';
+          const allChanges = f.changes || [];
+          const maxInline = 6;
+          const renderChips = (limit) => {
+            highlights.innerHTML = '';
+            const shown = allChanges.slice(0, limit);
+            for (const ch of shown) {
+              const chip = document.createElement('span');
+              chip.className = 'feed-chip ' + (ch.kind || 'mod');
+              const prefix = ch.kind === 'add' ? '+ ' : (ch.kind === 'del' ? '- ' : '~ ');
+              chip.textContent = prefix + ch.text;
+              highlights.appendChild(chip);
+            }
+            if (allChanges.length > limit) {
+              const moreBtn = document.createElement('button');
+              moreBtn.type = 'button';
+              moreBtn.className = 'feed-action-btn';
+              moreBtn.style.fontSize = '11px';
+              moreBtn.style.padding = '3px 9px';
+              moreBtn.textContent = '+' + (allChanges.length - limit) + ' more changes';
+              moreBtn.addEventListener('click', () => renderChips(allChanges.length));
+              highlights.appendChild(moreBtn);
+            }
+            for (const adr of f.adrs || []) {
+              const adrChip = document.createElement('span');
+              adrChip.className = 'feed-chip adr';
+              adrChip.textContent = 'ADR: ' + adr;
+              highlights.appendChild(adrChip);
+            }
+          };
+          if (allChanges.length > 0 || (f.adrs && f.adrs.length > 0)) {
+            renderChips(maxInline);
+            article.appendChild(highlights);
+          }
+
+          feedStream.appendChild(article);
+        }
+      }
+
+      function setViewMode(mode, updateHash = true) {
+        currentViewMode = mode === 'feed' ? 'feed' : 'stage';
+        const isFeed = currentViewMode === 'feed';
+        if (isFeed) stopPlayback();
+
+        if (stageView) stageView.style.display = isFeed ? 'none' : 'grid';
+        if (feedView) feedView.style.display = isFeed ? 'flex' : 'none';
+        if (badgeKeys) badgeKeys.style.display = isFeed ? 'none' : 'inline-block';
+
+        if (btnModeStage) {
+          btnModeStage.classList.toggle('active', !isFeed);
+          btnModeStage.setAttribute('aria-selected', String(!isFeed));
+        }
+        if (btnModeFeed) {
+          btnModeFeed.classList.toggle('active', isFeed);
+          btnModeFeed.setAttribute('aria-selected', String(isFeed));
+        }
+
+        if (isFeed) {
+          renderFeed();
+        }
+        if (updateHash && window.history && window.history.replaceState) {
+          const base = window.location.pathname + window.location.search;
+          window.history.replaceState(null, '', isFeed ? base + '#feed' : base);
+        }
+      }
+
+      if (btnModeStage) {
+        btnModeStage.addEventListener('click', () => setViewMode('stage'));
+      }
+      if (btnModeFeed) {
+        btnModeFeed.addEventListener('click', () => setViewMode('feed'));
+      }
+      if (btnFeedStory) {
+        btnFeedStory.addEventListener('click', () => {
+          feedNewestFirst = false;
+          btnFeedStory.classList.add('active');
+          if (btnFeedLatest) btnFeedLatest.classList.remove('active');
+          renderFeed();
+        });
+      }
+      if (btnFeedLatest) {
+        btnFeedLatest.addEventListener('click', () => {
+          feedNewestFirst = true;
+          btnFeedLatest.classList.add('active');
+          if (btnFeedStory) btnFeedStory.classList.remove('active');
+          renderFeed();
+        });
+      }
+      if (feedProjectSelect) {
+        feedProjectSelect.addEventListener('change', (e) => {
+          feedProjectFilter = e.target.value || '';
+          renderFeed();
+        });
+      }
+      if (feedSearch) {
+        feedSearch.addEventListener('input', (e) => {
+          feedQuery = e.target.value || '';
+          renderFeed();
+        });
+      }
+
       window.addEventListener('keydown', (e) => {
+        if (currentViewMode === 'feed') return;
         const tag = document.activeElement && document.activeElement.tagName;
         if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
         if (e.code === 'Space') {
@@ -2532,6 +3343,13 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
       });
 
       renderFrame(0);
+      const urlWantsFeed =
+        window.location.hash === '#feed' ||
+        new URLSearchParams(window.location.search).get('view') === 'feed' ||
+        payload.defaultView === 'feed';
+      if (urlWantsFeed) {
+        setViewMode('feed', false);
+      }
     })();
   </script>
 </body>

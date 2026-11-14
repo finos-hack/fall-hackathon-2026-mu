@@ -290,12 +290,15 @@ describe('calm-timelapse CLI e2e', () => {
     const outHtml2 = path.join(repoDir, 'out', 're-rendered.html');
     const res2 = spawnSync(
       process.execPath,
-      [cliPath, '--timeline', outTimeline, '--validate', '--timelapse', outHtml2],
+      [cliPath, '--timeline', outTimeline, '--validate', '--timelapse', outHtml2, '--feed'],
       { encoding: 'utf8' },
     );
     expect(res2.status).toBe(0);
     expect(res2.stdout).toContain('Timeline valid:');
     expect(fs.existsSync(outHtml2)).toBe(true);
+    const html2 = fs.readFileSync(outHtml2, 'utf8');
+    expect(html2).toContain('"defaultView":"feed"');
+    expect(html2).toContain('id="feed-view"');
 
     const resInvalidSnap = spawnSync(
       process.execPath,

@@ -37,6 +37,7 @@ export interface GenerateTimelineOptions {
   outputPath?: string;
   snapshotsDir?: string;
   timelapsePath?: string;
+  defaultView?: 'stage' | 'feed';
   emitDigestPath?: string;
   clustersPath?: string;
   clusterSpecs?: unknown;
@@ -210,6 +211,7 @@ export async function generateTimelineFromGit(
     const payload = buildTimelapsePayloadFromClusters(clusters, {
       sourceFile: primaryFilePath,
       sources,
+      defaultView: options.defaultView,
       engine,
       stats: {
         totalCommitsScanned,
@@ -250,6 +252,7 @@ export async function generateTimelineFromGit(
 export function renderTimelapseFromTimelineFile(
   timelineFileOrFiles: string | string[],
   outputHtmlPath: string,
+  options?: { defaultView?: 'stage' | 'feed' },
 ): string {
   const files = (Array.isArray(timelineFileOrFiles) ? timelineFileOrFiles : [timelineFileOrFiles])
     .map((f) => f.trim())
@@ -261,5 +264,8 @@ export function renderTimelapseFromTimelineFile(
     files.length > 1
       ? buildTimelapsePayloadFromTimelineFiles(files)
       : buildTimelapsePayloadFromTimelineFile(files[0]);
+  if (options?.defaultView) {
+    payload.defaultView = options.defaultView;
+  }
   return writeTimelapseHtml(outputHtmlPath, payload);
 }
