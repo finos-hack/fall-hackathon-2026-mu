@@ -1,0 +1,110 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm-timeline.json",
+  "moments": [
+    {
+      "unique-id": "moment-01-structural-diff-engine",
+      "node-type": "moment",
+      "name": "Structural CALM Diff Engine Foundation",
+      "description": "Establishes canonical JSON normalization and structural CALM diffing to filter pure formatting and key-reordering noise from genuine topology changes.",
+      "valid-from": "2026-11-13",
+      "details": {
+        "detailed-architecture": "snapshots/01-a47bcb9-moment-01-structural-diff-engine.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "a47bcb9"
+        ],
+        "commit-messages": [
+          "feat(diff): scaffold TypeScript workspace and structural CALM diff engine"
+        ],
+        "commit-count": 1
+      }
+    },
+    {
+      "unique-id": "moment-02-git-timeline-emitter",
+      "node-type": "moment",
+      "name": "Git History Extractor & CALM Timeline Emitter",
+      "description": "Adds local git log --follow blob traversal, contiguous 0..N-1 cluster validation, diff digest export, and schema-valid calm-timeline 1.3 snapshot emission.",
+      "valid-from": "2026-11-13",
+      "details": {
+        "detailed-architecture": "snapshots/02-08b4549-moment-02-git-timeline-emitter.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "08b4549"
+        ],
+        "commit-messages": [
+          "feat(timeline): add Git history walker, cluster validator, and CALM timeline emitter"
+        ],
+        "commit-count": 1
+      }
+    },
+    {
+      "unique-id": "moment-03-timelapse-stage-and-cli",
+      "node-type": "moment",
+      "name": "Interactive SVG Timelapse Stage, CLI & Governance Controls",
+      "description": "Introduces the zero-network CLI entrypoint, offline single-viewport SVG Timelapse Stage renderer, IDE assistant skill, and CALM 1.3 zero-network controls.",
+      "valid-from": "2026-11-13",
+      "details": {
+        "detailed-architecture": "snapshots/03-85654fd-moment-03-timelapse-stage-and-cli.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "85654fd"
+        ],
+        "commit-messages": [
+          "feat(timelapse): add interactive SVG stage player, CLI, and IDE skill"
+        ],
+        "commit-count": 1
+      }
+    },
+    {
+      "unique-id": "moment-04-multi-repo-federation",
+      "node-type": "moment",
+      "name": "Multi-Repo Federation & detailed-architecture Composition",
+      "description": "Synchronizes commits across multiple Git repositories with strict peer namespace isolation while merging shared boundary nodes linked through details.detailed-architecture.",
+      "valid-from": "2026-11-13",
+      "details": {
+        "detailed-architecture": "snapshots/04-0e983b8-moment-04-multi-repo-federation.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "0e983b8"
+        ],
+        "commit-messages": [
+          "feat(federation): synchronize multi-repo timelines and resolve detailed-architecture"
+        ],
+        "commit-count": 1
+      }
+    },
+    {
+      "unique-id": "moment-05-architecture-feed-mode",
+      "node-type": "moment",
+      "name": "Reverse-Chronological Architecture Feed Mode",
+      "description": "Adds the scrollable reverse-chronological Architecture Feed (--feed / #feed), rendering each major architectural change as a story card with an auto-cropped SVG diagram and narrative summary.",
+      "valid-from": "2026-11-13",
+      "details": {
+        "detailed-architecture": "snapshots/05-0f4a060-moment-05-architecture-feed-mode.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "0f4a060"
+        ],
+        "commit-messages": [
+          "feat(player): add reverse-chronological Architecture Feed mode (--feed / #feed)"
+        ],
+        "commit-count": 1
+      }
+    }
+  ],
+  "metadata": {
+    "title": "Git Architecture Timeline — architecture.calm.json",
+    "description": "Automatically synthesized from Git commit history of architecture.calm.json",
+    "generator": "calm-timelapse",
+    "clustering-engine": "clusters-file",
+    "total-commits-scanned": "5",
+    "noise-commits-filtered": "0",
+    "structural-commits-retained": "5"
+  },
+  "current-moment": "moment-05-architecture-feed-mode"
+}

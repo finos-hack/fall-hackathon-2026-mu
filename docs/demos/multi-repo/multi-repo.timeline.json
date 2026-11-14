@@ -1,0 +1,642 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm-timeline.json",
+  "moments": [
+    {
+      "unique-id": "moment-01-platform-edge-bootstrap",
+      "node-type": "moment",
+      "name": "TraderX Platform Ingress & Execution Boundary",
+      "description": "The TraderX Platform repository establishes the initial north-south Institutional Desk ingress through Edge Gateway into the high-level Execution Core subsystem over HTTPS (ADR-0001).",
+      "valid-from": "2026-01-12",
+      "details": {
+        "detailed-architecture": "snapshots/01-4095156-moment-01-platform-edge-bootstrap.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "4095156"
+        ],
+        "commit-messages": [
+          "[TraderX Platform] feat(platform): bootstrap edge gateway and execution core subsystem"
+        ],
+        "commit-count": 1,
+        "node-provenance": {
+          "traderx-platform--institutional-client": {
+            "primarySourceId": "traderx-platform",
+            "primarySourceLabel": "TraderX Platform",
+            "sourceIds": [
+              "traderx-platform"
+            ],
+            "sourceLabels": [
+              "TraderX Platform"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "traderx-platform--edge-gateway": {
+            "primarySourceId": "traderx-platform",
+            "primarySourceLabel": "TraderX Platform",
+            "sourceIds": [
+              "traderx-platform"
+            ],
+            "sourceLabels": [
+              "TraderX Platform"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "traderx-platform--execution-core": {
+            "primarySourceId": "traderx-platform",
+            "primarySourceLabel": "TraderX Platform",
+            "sourceIds": [
+              "traderx-platform"
+            ],
+            "sourceLabels": [
+              "TraderX Platform"
+            ],
+            "mergedViaDetailedArch": false
+          }
+        }
+      },
+      "adrs": [
+        "[TraderX Platform] docs/adr/0001-platform-boundary.md"
+      ]
+    },
+    {
+      "unique-id": "moment-02-isolated-finra-surveillance",
+      "node-type": "moment",
+      "name": "Independent FINRA CAT Surveillance Launch",
+      "description": "The independent FINRA Surveillance repository launches CAT Drop-Copy Ingestor and its own PostgreSQL warehouse (postgres-trades-db). Because Surveillance is an unlinked peer repository, its nodes remain strictly isolated in their own namespace.",
+      "valid-from": "2026-02-03",
+      "details": {
+        "detailed-architecture": "snapshots/02-b373268-moment-02-isolated-finra-surveillance.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "b373268"
+        ],
+        "commit-messages": [
+          "[FINRA Surveillance] feat(surveillance): launch independent FINRA CAT drop-copy ingestor and compliance DB"
+        ],
+        "commit-count": 1,
+        "node-provenance": {
+          "traderx-platform--institutional-client": {
+            "primarySourceId": "traderx-platform",
+            "primarySourceLabel": "TraderX Platform",
+            "sourceIds": [
+              "traderx-platform"
+            ],
+            "sourceLabels": [
+              "TraderX Platform"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "traderx-platform--edge-gateway": {
+            "primarySourceId": "traderx-platform",
+            "primarySourceLabel": "TraderX Platform",
+            "sourceIds": [
+              "traderx-platform"
+            ],
+            "sourceLabels": [
+              "TraderX Platform"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "traderx-platform--execution-core": {
+            "primarySourceId": "traderx-platform",
+            "primarySourceLabel": "TraderX Platform",
+            "sourceIds": [
+              "traderx-platform"
+            ],
+            "sourceLabels": [
+              "TraderX Platform"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finra-surveillance--cat-ingestor": {
+            "primarySourceId": "finra-surveillance",
+            "primarySourceLabel": "FINRA Surveillance",
+            "sourceIds": [
+              "finra-surveillance"
+            ],
+            "sourceLabels": [
+              "FINRA Surveillance"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finra-surveillance--postgres-trades-db": {
+            "primarySourceId": "finra-surveillance",
+            "primarySourceLabel": "FINRA Surveillance",
+            "sourceIds": [
+              "finra-surveillance"
+            ],
+            "sourceLabels": [
+              "FINRA Surveillance"
+            ],
+            "mergedViaDetailedArch": false
+          }
+        }
+      },
+      "adrs": [
+        "[FINRA Surveillance] docs/adr/0001-regulatory-isolation.md"
+      ]
+    },
+    {
+      "unique-id": "moment-03-federated-execution-composition",
+      "node-type": "moment",
+      "name": "Federated Execution Sub-Architecture & Shared Kafka",
+      "description": "TraderX Platform links Execution Core to the TraderX Execution repository via details.detailed-architecture. Shared boundary node kafka-event-bus merges canonically across both repos while Execution's postgres-trades-db stays strictly separate from Surveillance's postgres-trades-db.",
+      "valid-from": "2026-02-24",
+      "details": {
+        "detailed-architecture": "snapshots/03-786cc9d-moment-03-federated-execution-composition.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "addf93b",
+          "786cc9d"
+        ],
+        "commit-messages": [
+          "[TraderX Execution] feat(execution): publish execution-detail sub-architecture with SOR, matcher, and Kafka fills",
+          "[TraderX Platform] feat(platform): link execution-core via detailed-architecture and attach T+1 settlement adapter"
+        ],
+        "commit-count": 2,
+        "node-provenance": {
+          "traderx-platform--institutional-client": {
+            "primarySourceId": "traderx-platform",
+            "primarySourceLabel": "TraderX Platform",
+            "sourceIds": [
+              "traderx-platform"
+            ],
+            "sourceLabels": [
+              "TraderX Platform"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "traderx-platform--edge-gateway": {
+            "primarySourceId": "traderx-platform",
+            "primarySourceLabel": "TraderX Platform",
+            "sourceIds": [
+              "traderx-platform"
+            ],
+            "sourceLabels": [
+              "TraderX Platform"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "traderx-platform--execution-core": {
+            "primarySourceId": "traderx-platform",
+            "primarySourceLabel": "TraderX Platform",
+            "sourceIds": [
+              "traderx-platform"
+            ],
+            "sourceLabels": [
+              "TraderX Platform"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "traderx-platform--kafka-event-bus": {
+            "primarySourceId": "traderx-platform",
+            "primarySourceLabel": "TraderX Platform",
+            "sourceIds": [
+              "traderx-platform",
+              "traderx-execution"
+            ],
+            "sourceLabels": [
+              "TraderX Platform",
+              "TraderX Execution"
+            ],
+            "mergedViaDetailedArch": true
+          },
+          "traderx-platform--settlement-adapter": {
+            "primarySourceId": "traderx-platform",
+            "primarySourceLabel": "TraderX Platform",
+            "sourceIds": [
+              "traderx-platform"
+            ],
+            "sourceLabels": [
+              "TraderX Platform"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "traderx-execution--sor-router": {
+            "primarySourceId": "traderx-execution",
+            "primarySourceLabel": "TraderX Execution",
+            "sourceIds": [
+              "traderx-execution"
+            ],
+            "sourceLabels": [
+              "TraderX Execution"
+            ],
+            "mergedViaDetailedArch": false,
+            "resolvedFromParentId": "traderx-platform--execution-core"
+          },
+          "traderx-execution--matching-engine": {
+            "primarySourceId": "traderx-execution",
+            "primarySourceLabel": "TraderX Execution",
+            "sourceIds": [
+              "traderx-execution"
+            ],
+            "sourceLabels": [
+              "TraderX Execution"
+            ],
+            "mergedViaDetailedArch": false,
+            "resolvedFromParentId": "traderx-platform--execution-core"
+          },
+          "traderx-execution--postgres-trades-db": {
+            "primarySourceId": "traderx-execution",
+            "primarySourceLabel": "TraderX Execution",
+            "sourceIds": [
+              "traderx-execution"
+            ],
+            "sourceLabels": [
+              "TraderX Execution"
+            ],
+            "mergedViaDetailedArch": false,
+            "resolvedFromParentId": "traderx-platform--execution-core"
+          },
+          "finra-surveillance--cat-ingestor": {
+            "primarySourceId": "finra-surveillance",
+            "primarySourceLabel": "FINRA Surveillance",
+            "sourceIds": [
+              "finra-surveillance"
+            ],
+            "sourceLabels": [
+              "FINRA Surveillance"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finra-surveillance--postgres-trades-db": {
+            "primarySourceId": "finra-surveillance",
+            "primarySourceLabel": "FINRA Surveillance",
+            "sourceIds": [
+              "finra-surveillance"
+            ],
+            "sourceLabels": [
+              "FINRA Surveillance"
+            ],
+            "mergedViaDetailedArch": false
+          }
+        }
+      },
+      "adrs": [
+        "[TraderX Execution] docs/adr/0002-execution-subarch.md",
+        "[TraderX Platform] docs/adr/0002-federated-execution-link.md"
+      ]
+    },
+    {
+      "unique-id": "moment-04-execution-pretrade-risk-mtls",
+      "node-type": "moment",
+      "name": "SEC 15c3-5 Pre-Trade Risk & Zero-Trust mTLS",
+      "description": "Inside the TraderX Execution repository, Smart Order Router introduces synchronous SEC 15c3-5 Pre-Trade Risk checks and upgrades internal matching links from plain TCP to mutual TLS (ADR-0003).",
+      "valid-from": "2026-03-18",
+      "details": {
+        "detailed-architecture": "snapshots/04-6272de7-moment-04-execution-pretrade-risk-mtls.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "6272de7"
+        ],
+        "commit-messages": [
+          "[TraderX Execution] feat(execution): enforce SEC 15c3-5 pre-trade risk gate and mTLS internal transport"
+        ],
+        "commit-count": 1,
+        "node-provenance": {
+          "traderx-platform--institutional-client": {
+            "primarySourceId": "traderx-platform",
+            "primarySourceLabel": "TraderX Platform",
+            "sourceIds": [
+              "traderx-platform"
+            ],
+            "sourceLabels": [
+              "TraderX Platform"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "traderx-platform--edge-gateway": {
+            "primarySourceId": "traderx-platform",
+            "primarySourceLabel": "TraderX Platform",
+            "sourceIds": [
+              "traderx-platform"
+            ],
+            "sourceLabels": [
+              "TraderX Platform"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "traderx-platform--execution-core": {
+            "primarySourceId": "traderx-platform",
+            "primarySourceLabel": "TraderX Platform",
+            "sourceIds": [
+              "traderx-platform"
+            ],
+            "sourceLabels": [
+              "TraderX Platform"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "traderx-platform--kafka-event-bus": {
+            "primarySourceId": "traderx-platform",
+            "primarySourceLabel": "TraderX Platform",
+            "sourceIds": [
+              "traderx-platform",
+              "traderx-execution"
+            ],
+            "sourceLabels": [
+              "TraderX Platform",
+              "TraderX Execution"
+            ],
+            "mergedViaDetailedArch": true
+          },
+          "traderx-platform--settlement-adapter": {
+            "primarySourceId": "traderx-platform",
+            "primarySourceLabel": "TraderX Platform",
+            "sourceIds": [
+              "traderx-platform"
+            ],
+            "sourceLabels": [
+              "TraderX Platform"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "traderx-execution--sor-router": {
+            "primarySourceId": "traderx-execution",
+            "primarySourceLabel": "TraderX Execution",
+            "sourceIds": [
+              "traderx-execution"
+            ],
+            "sourceLabels": [
+              "TraderX Execution"
+            ],
+            "mergedViaDetailedArch": false,
+            "resolvedFromParentId": "traderx-platform--execution-core"
+          },
+          "traderx-execution--matching-engine": {
+            "primarySourceId": "traderx-execution",
+            "primarySourceLabel": "TraderX Execution",
+            "sourceIds": [
+              "traderx-execution"
+            ],
+            "sourceLabels": [
+              "TraderX Execution"
+            ],
+            "mergedViaDetailedArch": false,
+            "resolvedFromParentId": "traderx-platform--execution-core"
+          },
+          "traderx-execution--postgres-trades-db": {
+            "primarySourceId": "traderx-execution",
+            "primarySourceLabel": "TraderX Execution",
+            "sourceIds": [
+              "traderx-execution"
+            ],
+            "sourceLabels": [
+              "TraderX Execution"
+            ],
+            "mergedViaDetailedArch": false,
+            "resolvedFromParentId": "traderx-platform--execution-core"
+          },
+          "traderx-execution--pretrade-risk": {
+            "primarySourceId": "traderx-execution",
+            "primarySourceLabel": "TraderX Execution",
+            "sourceIds": [
+              "traderx-execution"
+            ],
+            "sourceLabels": [
+              "TraderX Execution"
+            ],
+            "mergedViaDetailedArch": false,
+            "resolvedFromParentId": "traderx-platform--execution-core"
+          },
+          "finra-surveillance--cat-ingestor": {
+            "primarySourceId": "finra-surveillance",
+            "primarySourceLabel": "FINRA Surveillance",
+            "sourceIds": [
+              "finra-surveillance"
+            ],
+            "sourceLabels": [
+              "FINRA Surveillance"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finra-surveillance--postgres-trades-db": {
+            "primarySourceId": "finra-surveillance",
+            "primarySourceLabel": "FINRA Surveillance",
+            "sourceIds": [
+              "finra-surveillance"
+            ],
+            "sourceLabels": [
+              "FINRA Surveillance"
+            ],
+            "mergedViaDetailedArch": false
+          }
+        }
+      },
+      "adrs": [
+        "[TraderX Execution] docs/adr/0003-sec-15c3-5-mtls.md"
+      ]
+    },
+    {
+      "unique-id": "moment-05-surveillance-spoofing-worm-vault",
+      "node-type": "moment",
+      "name": "FINRA Spoofing Analytics & SEC 17a-4 WORM Vault",
+      "description": "The FINRA Surveillance repository deploys Spoofing & Layering Detector and a 7-year immutable SEC 17a-4 WORM Archive (ADR-0002), completing cross-program compliance visibility on a single synchronized timeline.",
+      "valid-from": "2026-04-09",
+      "details": {
+        "detailed-architecture": "snapshots/05-e2204e8-moment-05-surveillance-spoofing-worm-vault.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "e2204e8"
+        ],
+        "commit-messages": [
+          "[FINRA Surveillance] feat(surveillance): deploy spoofing detector and SEC 17a-4 WORM archive"
+        ],
+        "commit-count": 1,
+        "node-provenance": {
+          "traderx-platform--institutional-client": {
+            "primarySourceId": "traderx-platform",
+            "primarySourceLabel": "TraderX Platform",
+            "sourceIds": [
+              "traderx-platform"
+            ],
+            "sourceLabels": [
+              "TraderX Platform"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "traderx-platform--edge-gateway": {
+            "primarySourceId": "traderx-platform",
+            "primarySourceLabel": "TraderX Platform",
+            "sourceIds": [
+              "traderx-platform"
+            ],
+            "sourceLabels": [
+              "TraderX Platform"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "traderx-platform--execution-core": {
+            "primarySourceId": "traderx-platform",
+            "primarySourceLabel": "TraderX Platform",
+            "sourceIds": [
+              "traderx-platform"
+            ],
+            "sourceLabels": [
+              "TraderX Platform"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "traderx-platform--kafka-event-bus": {
+            "primarySourceId": "traderx-platform",
+            "primarySourceLabel": "TraderX Platform",
+            "sourceIds": [
+              "traderx-platform",
+              "traderx-execution"
+            ],
+            "sourceLabels": [
+              "TraderX Platform",
+              "TraderX Execution"
+            ],
+            "mergedViaDetailedArch": true
+          },
+          "traderx-platform--settlement-adapter": {
+            "primarySourceId": "traderx-platform",
+            "primarySourceLabel": "TraderX Platform",
+            "sourceIds": [
+              "traderx-platform"
+            ],
+            "sourceLabels": [
+              "TraderX Platform"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "traderx-execution--sor-router": {
+            "primarySourceId": "traderx-execution",
+            "primarySourceLabel": "TraderX Execution",
+            "sourceIds": [
+              "traderx-execution"
+            ],
+            "sourceLabels": [
+              "TraderX Execution"
+            ],
+            "mergedViaDetailedArch": false,
+            "resolvedFromParentId": "traderx-platform--execution-core"
+          },
+          "traderx-execution--matching-engine": {
+            "primarySourceId": "traderx-execution",
+            "primarySourceLabel": "TraderX Execution",
+            "sourceIds": [
+              "traderx-execution"
+            ],
+            "sourceLabels": [
+              "TraderX Execution"
+            ],
+            "mergedViaDetailedArch": false,
+            "resolvedFromParentId": "traderx-platform--execution-core"
+          },
+          "traderx-execution--postgres-trades-db": {
+            "primarySourceId": "traderx-execution",
+            "primarySourceLabel": "TraderX Execution",
+            "sourceIds": [
+              "traderx-execution"
+            ],
+            "sourceLabels": [
+              "TraderX Execution"
+            ],
+            "mergedViaDetailedArch": false,
+            "resolvedFromParentId": "traderx-platform--execution-core"
+          },
+          "traderx-execution--pretrade-risk": {
+            "primarySourceId": "traderx-execution",
+            "primarySourceLabel": "TraderX Execution",
+            "sourceIds": [
+              "traderx-execution"
+            ],
+            "sourceLabels": [
+              "TraderX Execution"
+            ],
+            "mergedViaDetailedArch": false,
+            "resolvedFromParentId": "traderx-platform--execution-core"
+          },
+          "finra-surveillance--cat-ingestor": {
+            "primarySourceId": "finra-surveillance",
+            "primarySourceLabel": "FINRA Surveillance",
+            "sourceIds": [
+              "finra-surveillance"
+            ],
+            "sourceLabels": [
+              "FINRA Surveillance"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finra-surveillance--postgres-trades-db": {
+            "primarySourceId": "finra-surveillance",
+            "primarySourceLabel": "FINRA Surveillance",
+            "sourceIds": [
+              "finra-surveillance"
+            ],
+            "sourceLabels": [
+              "FINRA Surveillance"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finra-surveillance--finra-alert-engine": {
+            "primarySourceId": "finra-surveillance",
+            "primarySourceLabel": "FINRA Surveillance",
+            "sourceIds": [
+              "finra-surveillance"
+            ],
+            "sourceLabels": [
+              "FINRA Surveillance"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finra-surveillance--worm-audit-vault": {
+            "primarySourceId": "finra-surveillance",
+            "primarySourceLabel": "FINRA Surveillance",
+            "sourceIds": [
+              "finra-surveillance"
+            ],
+            "sourceLabels": [
+              "FINRA Surveillance"
+            ],
+            "mergedViaDetailedArch": false
+          }
+        }
+      },
+      "adrs": [
+        "[FINRA Surveillance] docs/adr/0002-worm-surveillance-retention.md"
+      ]
+    }
+  ],
+  "metadata": {
+    "title": "Git Architecture Timeline — TraderX Platform + TraderX Execution + FINRA Surveillance",
+    "description": "Automatically synthesized from Git commit history of TraderX Platform + TraderX Execution + FINRA Surveillance",
+    "generator": "calm-timelapse",
+    "sources": [
+      {
+        "sourceId": "traderx-platform",
+        "sourceLabel": "TraderX Platform",
+        "repoName": "traderx-platform",
+        "fileName": "platform.calm.json",
+        "relPath": "architecture/platform.calm.json"
+      },
+      {
+        "sourceId": "traderx-execution",
+        "sourceLabel": "TraderX Execution",
+        "repoName": "traderx-execution",
+        "fileName": "execution-detail.calm.json",
+        "relPath": "calm/execution-detail.calm.json"
+      },
+      {
+        "sourceId": "finra-surveillance",
+        "sourceLabel": "FINRA Surveillance",
+        "repoName": "finra-surveillance",
+        "fileName": "surveillance.calm.json",
+        "relPath": "calm/surveillance.calm.json"
+      }
+    ],
+    "clustering-engine": "clusters-file",
+    "total-commits-scanned": "8",
+    "noise-commits-filtered": "2",
+    "structural-commits-retained": "6",
+    "sources-tracked": "3",
+    "repositories-tracked": "3"
+  },
+  "current-moment": "moment-05-surveillance-spoofing-worm-vault"
+}

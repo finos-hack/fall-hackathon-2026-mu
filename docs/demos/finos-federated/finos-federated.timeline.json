@@ -1,0 +1,1230 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm-timeline.json",
+  "moments": [
+    {
+      "unique-id": "2025-12-23-initial-architecture-finos-calm-core",
+      "node-type": "moment",
+      "name": "Initial Architecture: [FINOS CALM Core + finos/calm-hub-detail] docs(calm): Define CALM in CALM (+1 co-committed file(s))",
+      "description": "Establishes the initial architecture baseline with CALM User (finos-calm-core--calm-user), CALM CLI (finos-calm-core--calm-cli), VSCode Extension (finos-calm-core--calm-vscode), CALM Hub API (finos-calm-core--calm-hub), and 4 more, connected via finos-calm-core--user-interacts-with-ui, finos-calm-core--user-interacts-with-cli, finos-calm-core--user-interacts-with-vscode, finos-calm-core--cli-to-hub, and 4 more (2 commits: f1486acb..784858e7).",
+      "valid-from": "2025-12-23",
+      "details": {
+        "detailed-architecture": "snapshots/01-784858e7-2025-12-23-initial-architecture-finos-calm-core.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "f1486acb",
+          "784858e7"
+        ],
+        "commit-messages": [
+          "[FINOS CALM Core + finos/calm-hub-detail] docs(calm): Define CALM in CALM (+1 co-committed file(s))",
+          "[FINOS CALM Core + finos/calm-hub-detail] docs(calm): remove unwanted hallucinations (+1 co-committed file(s))"
+        ],
+        "commit-count": 2,
+        "node-provenance": {
+          "finos-calm-core--calm-user": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-cli": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-vscode": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-hub": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-hub-ui": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--mongodb": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-hub-system": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--vscode": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "2026-03-31-finos-calm-core-chore-hide-ants-from",
+      "node-type": "moment",
+      "name": "[FINOS CALM Core] chore: hide --ants from docify help and clean up ant farm template",
+      "description": "This phase updates architecture governance and runtime definitions (2 commits: 77749fa4..78a48ab8). Covers flows [FINOS CALM Core] Publish Architecture, [FINOS CALM Core] Browse Architectures, and [FINOS CALM Core] Validate Architecture in IDE.",
+      "valid-from": "2026-03-31",
+      "details": {
+        "detailed-architecture": "snapshots/02-78a48ab8-2026-03-31-finos-calm-core-chore-hide-ants-from.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "77749fa4",
+          "78a48ab8"
+        ],
+        "commit-messages": [
+          "[FINOS CALM Core] chore: hide --ants from docify help and clean up ant farm template",
+          "[FINOS CALM Core] fix(calm-hub): make mongo initialization log consistent (#2286)"
+        ],
+        "commit-count": 2,
+        "node-provenance": {
+          "finos-calm-core--calm-user": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-cli": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-vscode": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-hub": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-hub-ui": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--mongodb": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-hub-system": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--vscode": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "2026-07-25-finos-calm-core-finos-calm-hub-detail",
+      "node-type": "moment",
+      "name": "[FINOS CALM Core + finos/calm-hub-detail] docs: add third timeline moment for CalmStudio and CALM Server (#2882) (+1 co-committed file(s))",
+      "description": "This phase introduces CalmStudio (finos-calm-core--calm-studio), CALM Server (finos-calm-core--calm-server), REST Resources Layer (finos-calm-hub-detail--calm-hub-resources), Services Layer (finos-calm-hub-detail--calm-hub-services), and 2 more (1 commit: d95a3bbe). Connectivity shifts through new links finos-calm-core--user-interacts-with-studio, finos-calm-core--user-interacts-with-calm-server, finos-calm-hub-detail--resources-to-services, finos-calm-hub-detail--services-to-storage, and 3 more and updated links finos-calm-core--cli-to-hub, finos-calm-core--hub-to-db, and finos-calm-core--hub-ui-to-hub. Covers flows [FINOS CALM Core] Edit Architecture in CalmStudio and [FINOS CALM Core] Validate Architecture via CALM Server.",
+      "valid-from": "2026-07-25",
+      "details": {
+        "detailed-architecture": "snapshots/03-d95a3bbe-2026-07-25-finos-calm-core-finos-calm-hub-detail.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "d95a3bbe"
+        ],
+        "commit-messages": [
+          "[FINOS CALM Core + finos/calm-hub-detail] docs: add third timeline moment for CalmStudio and CALM Server (#2882) (+1 co-committed file(s))"
+        ],
+        "commit-count": 1,
+        "node-provenance": {
+          "finos-calm-core--calm-user": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-cli": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-vscode": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-studio": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-server": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-hub": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-hub-ui": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--mongodb": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core",
+              "finos-calm-hub-detail"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core",
+              "finos/calm-hub-detail"
+            ],
+            "mergedViaDetailedArch": true
+          },
+          "finos-calm-core--calm-hub-system": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--vscode": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-hub-detail--calm-hub-resources": {
+            "primarySourceId": "finos-calm-hub-detail",
+            "primarySourceLabel": "finos/calm-hub-detail",
+            "sourceIds": [
+              "finos-calm-hub-detail"
+            ],
+            "sourceLabels": [
+              "finos/calm-hub-detail"
+            ],
+            "mergedViaDetailedArch": false,
+            "resolvedFromParentId": "finos-calm-core--calm-hub"
+          },
+          "finos-calm-hub-detail--calm-hub-services": {
+            "primarySourceId": "finos-calm-hub-detail",
+            "primarySourceLabel": "finos/calm-hub-detail",
+            "sourceIds": [
+              "finos-calm-hub-detail"
+            ],
+            "sourceLabels": [
+              "finos/calm-hub-detail"
+            ],
+            "mergedViaDetailedArch": false,
+            "resolvedFromParentId": "finos-calm-core--calm-hub"
+          },
+          "finos-calm-hub-detail--calm-hub-storage": {
+            "primarySourceId": "finos-calm-hub-detail",
+            "primarySourceLabel": "finos/calm-hub-detail",
+            "sourceIds": [
+              "finos-calm-hub-detail"
+            ],
+            "sourceLabels": [
+              "finos/calm-hub-detail"
+            ],
+            "mergedViaDetailedArch": false,
+            "resolvedFromParentId": "finos-calm-core--calm-hub"
+          },
+          "finos-calm-hub-detail--nitritedb": {
+            "primarySourceId": "finos-calm-hub-detail",
+            "primarySourceLabel": "finos/calm-hub-detail",
+            "sourceIds": [
+              "finos-calm-hub-detail"
+            ],
+            "sourceLabels": [
+              "finos/calm-hub-detail"
+            ],
+            "mergedViaDetailedArch": false,
+            "resolvedFromParentId": "finos-calm-core--calm-hub"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "2026-11-13-calm-timelapse-feat-diff-scaffold-typ",
+      "node-type": "moment",
+      "name": "[CALM Timelapse] feat(diff): scaffold TypeScript project and add structural CALM diff engine",
+      "description": "This phase introduces Git Repository (calm-timelapse--git-repo), Git History Extractor (calm-timelapse--git-history-extractor), and Structural Diff Engine (calm-timelapse--structural-diff-engine) (1 commit: 669cfa1). Connectivity shifts through new links calm-timelapse--rel-git-to-extractor and calm-timelapse--rel-extractor-to-diff.",
+      "valid-from": "2026-11-13",
+      "details": {
+        "detailed-architecture": "snapshots/04-669cfa1-2026-11-13-calm-timelapse-feat-diff-scaffold-typ.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "669cfa1"
+        ],
+        "commit-messages": [
+          "[CALM Timelapse] feat(diff): scaffold TypeScript project and add structural CALM diff engine"
+        ],
+        "commit-count": 1,
+        "node-provenance": {
+          "finos-calm-core--calm-user": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-cli": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-vscode": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-studio": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-server": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-hub": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-hub-ui": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--mongodb": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core",
+              "finos-calm-hub-detail"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core",
+              "finos/calm-hub-detail"
+            ],
+            "mergedViaDetailedArch": true
+          },
+          "finos-calm-core--calm-hub-system": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--vscode": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "calm-timelapse--git-repo": {
+            "primarySourceId": "calm-timelapse",
+            "primarySourceLabel": "CALM Timelapse",
+            "sourceIds": [
+              "calm-timelapse"
+            ],
+            "sourceLabels": [
+              "CALM Timelapse"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "calm-timelapse--git-history-extractor": {
+            "primarySourceId": "calm-timelapse",
+            "primarySourceLabel": "CALM Timelapse",
+            "sourceIds": [
+              "calm-timelapse"
+            ],
+            "sourceLabels": [
+              "CALM Timelapse"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "calm-timelapse--structural-diff-engine": {
+            "primarySourceId": "calm-timelapse",
+            "primarySourceLabel": "CALM Timelapse",
+            "sourceIds": [
+              "calm-timelapse"
+            ],
+            "sourceLabels": [
+              "CALM Timelapse"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-hub-detail--calm-hub-resources": {
+            "primarySourceId": "finos-calm-hub-detail",
+            "primarySourceLabel": "finos/calm-hub-detail",
+            "sourceIds": [
+              "finos-calm-hub-detail"
+            ],
+            "sourceLabels": [
+              "finos/calm-hub-detail"
+            ],
+            "mergedViaDetailedArch": false,
+            "resolvedFromParentId": "finos-calm-core--calm-hub"
+          },
+          "finos-calm-hub-detail--calm-hub-services": {
+            "primarySourceId": "finos-calm-hub-detail",
+            "primarySourceLabel": "finos/calm-hub-detail",
+            "sourceIds": [
+              "finos-calm-hub-detail"
+            ],
+            "sourceLabels": [
+              "finos/calm-hub-detail"
+            ],
+            "mergedViaDetailedArch": false,
+            "resolvedFromParentId": "finos-calm-core--calm-hub"
+          },
+          "finos-calm-hub-detail--calm-hub-storage": {
+            "primarySourceId": "finos-calm-hub-detail",
+            "primarySourceLabel": "finos/calm-hub-detail",
+            "sourceIds": [
+              "finos-calm-hub-detail"
+            ],
+            "sourceLabels": [
+              "finos/calm-hub-detail"
+            ],
+            "mergedViaDetailedArch": false,
+            "resolvedFromParentId": "finos-calm-core--calm-hub"
+          },
+          "finos-calm-hub-detail--nitritedb": {
+            "primarySourceId": "finos-calm-hub-detail",
+            "primarySourceLabel": "finos/calm-hub-detail",
+            "sourceIds": [
+              "finos-calm-hub-detail"
+            ],
+            "sourceLabels": [
+              "finos/calm-hub-detail"
+            ],
+            "mergedViaDetailedArch": false,
+            "resolvedFromParentId": "finos-calm-core--calm-hub"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "2026-11-13-calm-timelapse-feat-timeline-add-git",
+      "node-type": "moment",
+      "name": "[CALM Timelapse] feat(timeline): add git history walker, cluster validator, and CALM timeline emitter",
+      "description": "This phase introduces Commit Diff Digest Exporter (calm-timelapse--digest-exporter), Deterministic & Spec Clusterer (calm-timelapse--moment-clusterer), CALM Timeline Emitter (calm-timelapse--timeline-emitter), HTML Timelapse Renderer (calm-timelapse--timelapse-renderer), and 2 more (2 commits: 915ba00..bfd0199). Connectivity shifts through new links calm-timelapse--rel-diff-to-digest, calm-timelapse--rel-diff-to-cluster, calm-timelapse--rel-assistant-curates-clusters, calm-timelapse--rel-cluster-to-emitter, and 2 more. Applies controls calm-timelapse--zero-network-execution and calm-timelapse--contiguous-cluster-coverage.",
+      "valid-from": "2026-11-13",
+      "details": {
+        "detailed-architecture": "snapshots/05-bfd0199-2026-11-13-calm-timelapse-feat-timeline-add-git.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "915ba00",
+          "bfd0199"
+        ],
+        "commit-messages": [
+          "[CALM Timelapse] feat(timeline): add git history walker, cluster validator, and CALM timeline emitter",
+          "[CALM Timelapse] feat(timelapse): add interactive SVG player, CLI, and calm-ai skill"
+        ],
+        "commit-count": 2,
+        "node-provenance": {
+          "finos-calm-core--calm-user": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-cli": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-vscode": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-studio": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-server": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-hub": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-hub-ui": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--mongodb": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core",
+              "finos-calm-hub-detail"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core",
+              "finos/calm-hub-detail"
+            ],
+            "mergedViaDetailedArch": true
+          },
+          "finos-calm-core--calm-hub-system": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--vscode": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "calm-timelapse--git-repo": {
+            "primarySourceId": "calm-timelapse",
+            "primarySourceLabel": "CALM Timelapse",
+            "sourceIds": [
+              "calm-timelapse"
+            ],
+            "sourceLabels": [
+              "CALM Timelapse"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "calm-timelapse--git-history-extractor": {
+            "primarySourceId": "calm-timelapse",
+            "primarySourceLabel": "CALM Timelapse",
+            "sourceIds": [
+              "calm-timelapse"
+            ],
+            "sourceLabels": [
+              "CALM Timelapse"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "calm-timelapse--structural-diff-engine": {
+            "primarySourceId": "calm-timelapse",
+            "primarySourceLabel": "CALM Timelapse",
+            "sourceIds": [
+              "calm-timelapse"
+            ],
+            "sourceLabels": [
+              "CALM Timelapse"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "calm-timelapse--digest-exporter": {
+            "primarySourceId": "calm-timelapse",
+            "primarySourceLabel": "CALM Timelapse",
+            "sourceIds": [
+              "calm-timelapse"
+            ],
+            "sourceLabels": [
+              "CALM Timelapse"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "calm-timelapse--moment-clusterer": {
+            "primarySourceId": "calm-timelapse",
+            "primarySourceLabel": "CALM Timelapse",
+            "sourceIds": [
+              "calm-timelapse"
+            ],
+            "sourceLabels": [
+              "CALM Timelapse"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "calm-timelapse--timeline-emitter": {
+            "primarySourceId": "calm-timelapse",
+            "primarySourceLabel": "CALM Timelapse",
+            "sourceIds": [
+              "calm-timelapse"
+            ],
+            "sourceLabels": [
+              "CALM Timelapse"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "calm-timelapse--timelapse-renderer": {
+            "primarySourceId": "calm-timelapse",
+            "primarySourceLabel": "CALM Timelapse",
+            "sourceIds": [
+              "calm-timelapse"
+            ],
+            "sourceLabels": [
+              "CALM Timelapse"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "calm-timelapse--ide-ai-assistant": {
+            "primarySourceId": "calm-timelapse",
+            "primarySourceLabel": "CALM Timelapse",
+            "sourceIds": [
+              "calm-timelapse"
+            ],
+            "sourceLabels": [
+              "CALM Timelapse"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "calm-timelapse--architect-user": {
+            "primarySourceId": "calm-timelapse",
+            "primarySourceLabel": "CALM Timelapse",
+            "sourceIds": [
+              "calm-timelapse"
+            ],
+            "sourceLabels": [
+              "CALM Timelapse"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-hub-detail--calm-hub-resources": {
+            "primarySourceId": "finos-calm-hub-detail",
+            "primarySourceLabel": "finos/calm-hub-detail",
+            "sourceIds": [
+              "finos-calm-hub-detail"
+            ],
+            "sourceLabels": [
+              "finos/calm-hub-detail"
+            ],
+            "mergedViaDetailedArch": false,
+            "resolvedFromParentId": "finos-calm-core--calm-hub"
+          },
+          "finos-calm-hub-detail--calm-hub-services": {
+            "primarySourceId": "finos-calm-hub-detail",
+            "primarySourceLabel": "finos/calm-hub-detail",
+            "sourceIds": [
+              "finos-calm-hub-detail"
+            ],
+            "sourceLabels": [
+              "finos/calm-hub-detail"
+            ],
+            "mergedViaDetailedArch": false,
+            "resolvedFromParentId": "finos-calm-core--calm-hub"
+          },
+          "finos-calm-hub-detail--calm-hub-storage": {
+            "primarySourceId": "finos-calm-hub-detail",
+            "primarySourceLabel": "finos/calm-hub-detail",
+            "sourceIds": [
+              "finos-calm-hub-detail"
+            ],
+            "sourceLabels": [
+              "finos/calm-hub-detail"
+            ],
+            "mergedViaDetailedArch": false,
+            "resolvedFromParentId": "finos-calm-core--calm-hub"
+          },
+          "finos-calm-hub-detail--nitritedb": {
+            "primarySourceId": "finos-calm-hub-detail",
+            "primarySourceLabel": "finos/calm-hub-detail",
+            "sourceIds": [
+              "finos-calm-hub-detail"
+            ],
+            "sourceLabels": [
+              "finos/calm-hub-detail"
+            ],
+            "mergedViaDetailedArch": false,
+            "resolvedFromParentId": "finos-calm-core--calm-hub"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "2026-11-13-calm-timelapse-feat-federation-synchr",
+      "node-type": "moment",
+      "name": "[CALM Timelapse] feat(federation): synchronize multi-repo CALM timelines and resolve detailed-architecture",
+      "description": "This phase introduces Multi-Repo Federation Engine (calm-timelapse--federation-engine) and updates Git History Extractor (calm-timelapse--git-history-extractor) (1 commit: d89fe61). Connectivity shifts through new links calm-timelapse--rel-extractor-to-federation and calm-timelapse--rel-federation-to-diff and retired links calm-timelapse--rel-extractor-to-diff. Applies controls calm-timelapse--strict-peer-namespace-isolation.",
+      "valid-from": "2026-11-13",
+      "details": {
+        "detailed-architecture": "snapshots/06-d89fe61-2026-11-13-calm-timelapse-feat-federation-synchr.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "d89fe61"
+        ],
+        "commit-messages": [
+          "[CALM Timelapse] feat(federation): synchronize multi-repo CALM timelines and resolve detailed-architecture"
+        ],
+        "commit-count": 1,
+        "node-provenance": {
+          "finos-calm-core--calm-user": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-cli": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-vscode": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-studio": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-server": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-hub": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--calm-hub-ui": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--mongodb": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core",
+              "finos-calm-hub-detail"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core",
+              "finos/calm-hub-detail"
+            ],
+            "mergedViaDetailedArch": true
+          },
+          "finos-calm-core--calm-hub-system": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-core--vscode": {
+            "primarySourceId": "finos-calm-core",
+            "primarySourceLabel": "FINOS CALM Core",
+            "sourceIds": [
+              "finos-calm-core"
+            ],
+            "sourceLabels": [
+              "FINOS CALM Core"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "calm-timelapse--git-repo": {
+            "primarySourceId": "calm-timelapse",
+            "primarySourceLabel": "CALM Timelapse",
+            "sourceIds": [
+              "calm-timelapse"
+            ],
+            "sourceLabels": [
+              "CALM Timelapse"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "calm-timelapse--git-history-extractor": {
+            "primarySourceId": "calm-timelapse",
+            "primarySourceLabel": "CALM Timelapse",
+            "sourceIds": [
+              "calm-timelapse"
+            ],
+            "sourceLabels": [
+              "CALM Timelapse"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "calm-timelapse--federation-engine": {
+            "primarySourceId": "calm-timelapse",
+            "primarySourceLabel": "CALM Timelapse",
+            "sourceIds": [
+              "calm-timelapse"
+            ],
+            "sourceLabels": [
+              "CALM Timelapse"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "calm-timelapse--structural-diff-engine": {
+            "primarySourceId": "calm-timelapse",
+            "primarySourceLabel": "CALM Timelapse",
+            "sourceIds": [
+              "calm-timelapse"
+            ],
+            "sourceLabels": [
+              "CALM Timelapse"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "calm-timelapse--digest-exporter": {
+            "primarySourceId": "calm-timelapse",
+            "primarySourceLabel": "CALM Timelapse",
+            "sourceIds": [
+              "calm-timelapse"
+            ],
+            "sourceLabels": [
+              "CALM Timelapse"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "calm-timelapse--moment-clusterer": {
+            "primarySourceId": "calm-timelapse",
+            "primarySourceLabel": "CALM Timelapse",
+            "sourceIds": [
+              "calm-timelapse"
+            ],
+            "sourceLabels": [
+              "CALM Timelapse"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "calm-timelapse--timeline-emitter": {
+            "primarySourceId": "calm-timelapse",
+            "primarySourceLabel": "CALM Timelapse",
+            "sourceIds": [
+              "calm-timelapse"
+            ],
+            "sourceLabels": [
+              "CALM Timelapse"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "calm-timelapse--timelapse-renderer": {
+            "primarySourceId": "calm-timelapse",
+            "primarySourceLabel": "CALM Timelapse",
+            "sourceIds": [
+              "calm-timelapse"
+            ],
+            "sourceLabels": [
+              "CALM Timelapse"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "calm-timelapse--ide-ai-assistant": {
+            "primarySourceId": "calm-timelapse",
+            "primarySourceLabel": "CALM Timelapse",
+            "sourceIds": [
+              "calm-timelapse"
+            ],
+            "sourceLabels": [
+              "CALM Timelapse"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "calm-timelapse--architect-user": {
+            "primarySourceId": "calm-timelapse",
+            "primarySourceLabel": "CALM Timelapse",
+            "sourceIds": [
+              "calm-timelapse"
+            ],
+            "sourceLabels": [
+              "CALM Timelapse"
+            ],
+            "mergedViaDetailedArch": false
+          },
+          "finos-calm-hub-detail--calm-hub-resources": {
+            "primarySourceId": "finos-calm-hub-detail",
+            "primarySourceLabel": "finos/calm-hub-detail",
+            "sourceIds": [
+              "finos-calm-hub-detail"
+            ],
+            "sourceLabels": [
+              "finos/calm-hub-detail"
+            ],
+            "mergedViaDetailedArch": false,
+            "resolvedFromParentId": "finos-calm-core--calm-hub"
+          },
+          "finos-calm-hub-detail--calm-hub-services": {
+            "primarySourceId": "finos-calm-hub-detail",
+            "primarySourceLabel": "finos/calm-hub-detail",
+            "sourceIds": [
+              "finos-calm-hub-detail"
+            ],
+            "sourceLabels": [
+              "finos/calm-hub-detail"
+            ],
+            "mergedViaDetailedArch": false,
+            "resolvedFromParentId": "finos-calm-core--calm-hub"
+          },
+          "finos-calm-hub-detail--calm-hub-storage": {
+            "primarySourceId": "finos-calm-hub-detail",
+            "primarySourceLabel": "finos/calm-hub-detail",
+            "sourceIds": [
+              "finos-calm-hub-detail"
+            ],
+            "sourceLabels": [
+              "finos/calm-hub-detail"
+            ],
+            "mergedViaDetailedArch": false,
+            "resolvedFromParentId": "finos-calm-core--calm-hub"
+          },
+          "finos-calm-hub-detail--nitritedb": {
+            "primarySourceId": "finos-calm-hub-detail",
+            "primarySourceLabel": "finos/calm-hub-detail",
+            "sourceIds": [
+              "finos-calm-hub-detail"
+            ],
+            "sourceLabels": [
+              "finos/calm-hub-detail"
+            ],
+            "mergedViaDetailedArch": false,
+            "resolvedFromParentId": "finos-calm-core--calm-hub"
+          }
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "title": "Git Architecture Timeline — FINOS CALM Core + CALM Timelapse + finos/calm-hub-detail",
+    "description": "Automatically synthesized from Git commit history of FINOS CALM Core + CALM Timelapse + finos/calm-hub-detail",
+    "generator": "calm-timelapse",
+    "sources": [
+      {
+        "sourceId": "finos-calm-core",
+        "sourceLabel": "FINOS CALM Core",
+        "repoName": "finos",
+        "fileName": "calm-3.json",
+        "relPath": "calm/architecture/calm-3.json"
+      },
+      {
+        "sourceId": "calm-timelapse",
+        "sourceLabel": "CALM Timelapse",
+        "repoName": "fall-hackathon-2026-mu",
+        "fileName": "architecture.calm.json",
+        "relPath": "architecture.calm.json"
+      },
+      {
+        "sourceId": "finos-calm-hub-detail",
+        "sourceLabel": "finos/calm-hub-detail",
+        "repoName": "finos",
+        "fileName": "calm-hub-detail.architecture.json",
+        "relPath": "calm/architecture/calm-hub-detail.architecture.json"
+      }
+    ],
+    "clustering-engine": "deterministic",
+    "total-commits-scanned": "17",
+    "noise-commits-filtered": "4",
+    "structural-commits-retained": "9",
+    "sources-tracked": "3",
+    "repositories-tracked": "2"
+  },
+  "current-moment": "2026-11-13-calm-timelapse-feat-federation-synchr"
+}

@@ -1,0 +1,287 @@
+{
+  "schemaVersion": "1.0",
+  "sourceFile": "FINOS CALM Core + CALM Timelapse + finos/calm-hub-detail",
+  "sources": [
+    {
+      "sourceId": "finos-calm-core",
+      "sourceLabel": "FINOS CALM Core",
+      "repoName": "finos",
+      "fileName": "calm-3.json",
+      "relPath": "calm/architecture/calm-3.json"
+    },
+    {
+      "sourceId": "calm-timelapse",
+      "sourceLabel": "CALM Timelapse",
+      "repoName": "fall-hackathon-2026-mu",
+      "fileName": "architecture.calm.json",
+      "relPath": "architecture.calm.json"
+    },
+    {
+      "sourceId": "finos-calm-hub-detail",
+      "sourceLabel": "finos/calm-hub-detail",
+      "repoName": "finos",
+      "fileName": "calm-hub-detail.architecture.json",
+      "relPath": "calm/architecture/calm-hub-detail.architecture.json"
+    }
+  ],
+  "latestCommitDate": "2026-11-13",
+  "stats": {
+    "totalCommitsScanned": 17,
+    "validSnapshotsParsed": 16,
+    "noiseCommitsFiltered": 4,
+    "structuralCommitsRetained": 9
+  },
+  "instructions": [
+    "Group the 9 structural commits below (indices 0..8) into cohesive architectural moments (phases).",
+    "Every commit index from 0 to 8 MUST be covered contiguously with zero gaps or overlaps: first startIndex=0, each next startIndex = previous endIndex + 1, final endIndex=8.",
+    "Group multi-commit sprints, node-addition + relationship-wiring sequences, protocol hardening, and coupled control/ADR rollouts into unified phases while keeping pivotal milestones distinct.",
+    "Write an executive `name` (3-7 words; no leading step numbers and no conventional-commit prefixes such as \"feat:\" or \"chore:\").",
+    "Write a 2-3 sentence narrative `description` explaining WHAT changed architecturally, HOW connectivity or security boundaries shifted, and WHY, citing concrete node IDs, protocols, controls, or ADRs. Do not output mechanical count strings such as \"+1 node(s)\".",
+    "Save the resulting JSON array to a `<name>.clusters.json` file and pass `--clusters <name>.clusters.json` back to `calm-timelapse`."
+  ],
+  "expectedClusterSchema": {
+    "type": "array",
+    "items": {
+      "type": "object",
+      "required": [
+        "startIndex",
+        "endIndex",
+        "uniqueId",
+        "name",
+        "description"
+      ],
+      "properties": {
+        "startIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 8
+        },
+        "endIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 8
+        },
+        "uniqueId": {
+          "type": "string",
+          "description": "kebab-case moment identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "Executive phase title (3-7 words)"
+        },
+        "description": {
+          "type": "string",
+          "description": "2-3 sentence architectural narrative"
+        }
+      }
+    }
+  },
+  "commits": [
+    {
+      "index": 0,
+      "sha": "f1486acb99a6545f65b17729edd830cdd7f4178b",
+      "shortSha": "f1486acb",
+      "date": "2025-12-23",
+      "author": "Mark Scott",
+      "subject": "[FINOS CALM Core + finos/calm-hub-detail] docs(calm): Define CALM in CALM (+1 co-committed file(s))",
+      "summaryLine": "[FINOS CALM Core + finos/calm-hub-detail] Initial baseline with 8 node(s), 8 relationship(s)",
+      "changes": [
+        "[FINOS CALM Core + finos/calm-hub-detail] Added node CALM User (finos-calm-core--calm-user)",
+        "[FINOS CALM Core + finos/calm-hub-detail] Added node CALM CLI (finos-calm-core--calm-cli)",
+        "[FINOS CALM Core + finos/calm-hub-detail] Added node VSCode Extension (finos-calm-core--calm-vscode)",
+        "[FINOS CALM Core + finos/calm-hub-detail] Added node CALM Hub API (finos-calm-core--calm-hub)",
+        "[FINOS CALM Core + finos/calm-hub-detail] Added node CALM Hub UI (finos-calm-core--calm-hub-ui)",
+        "[FINOS CALM Core + finos/calm-hub-detail] Added node MongoDB (finos-calm-core--mongodb)",
+        "[FINOS CALM Core + finos/calm-hub-detail] Added node CALM Hub System (finos-calm-core--calm-hub-system)",
+        "[FINOS CALM Core + finos/calm-hub-detail] Added node Visual Studio Code (finos-calm-core--vscode)",
+        "[FINOS CALM Core + finos/calm-hub-detail] Added relationship finos-calm-core--user-interacts-with-ui",
+        "[FINOS CALM Core + finos/calm-hub-detail] Added relationship finos-calm-core--user-interacts-with-cli",
+        "[FINOS CALM Core + finos/calm-hub-detail] Added relationship finos-calm-core--user-interacts-with-vscode",
+        "[FINOS CALM Core + finos/calm-hub-detail] Added relationship finos-calm-core--cli-to-hub",
+        "[FINOS CALM Core + finos/calm-hub-detail] Added relationship finos-calm-core--hub-to-db",
+        "[FINOS CALM Core + finos/calm-hub-detail] Added relationship finos-calm-core--hub-ui-to-hub",
+        "[FINOS CALM Core + finos/calm-hub-detail] Added relationship finos-calm-core--hub-system-composition",
+        "[FINOS CALM Core + finos/calm-hub-detail] Added relationship finos-calm-core--vscode-composition"
+      ],
+      "coChangedAdrs": [],
+      "sourceId": "finos-calm-hub-detail",
+      "sourceLabel": "FINOS CALM Core + finos/calm-hub-detail",
+      "repoName": "finos"
+    },
+    {
+      "index": 1,
+      "sha": "784858e7cc7b486e30e089c1e86992268cee7758",
+      "shortSha": "784858e7",
+      "date": "2025-12-23",
+      "author": "Mark Scott",
+      "subject": "[FINOS CALM Core + finos/calm-hub-detail] docs(calm): remove unwanted hallucinations (+1 co-committed file(s))",
+      "summaryLine": "[FINOS CALM Core + finos/calm-hub-detail] ~4 node(s), ~3 rel(s)",
+      "changes": [
+        "[FINOS CALM Core + finos/calm-hub-detail] Modified node CALM CLI (finos-calm-core--calm-cli) [interfaces]",
+        "[FINOS CALM Core + finos/calm-hub-detail] Modified node VSCode Extension (finos-calm-core--calm-vscode) [interfaces]",
+        "[FINOS CALM Core + finos/calm-hub-detail] Modified node CALM Hub API (finos-calm-core--calm-hub) [interfaces]",
+        "[FINOS CALM Core + finos/calm-hub-detail] Modified node CALM Hub UI (finos-calm-core--calm-hub-ui) [interfaces]",
+        "[FINOS CALM Core + finos/calm-hub-detail] Modified relationship finos-calm-core--cli-to-hub",
+        "[FINOS CALM Core + finos/calm-hub-detail] Modified relationship finos-calm-core--hub-to-db",
+        "[FINOS CALM Core + finos/calm-hub-detail] Modified relationship finos-calm-core--hub-ui-to-hub"
+      ],
+      "coChangedAdrs": [],
+      "sourceId": "finos-calm-hub-detail",
+      "sourceLabel": "FINOS CALM Core + finos/calm-hub-detail",
+      "repoName": "finos"
+    },
+    {
+      "index": 2,
+      "sha": "77749fa4477a592e24cce5855f6752a5ea775a82",
+      "shortSha": "77749fa4",
+      "date": "2026-03-30",
+      "author": "Thels",
+      "subject": "[FINOS CALM Core] chore: hide --ants from docify help and clean up ant farm template",
+      "summaryLine": "[FINOS CALM Core] flows(+3/~0/-0)",
+      "changes": [
+        "[FINOS CALM Core] Added flow [FINOS CALM Core] Publish Architecture",
+        "[FINOS CALM Core] Added flow [FINOS CALM Core] Browse Architectures",
+        "[FINOS CALM Core] Added flow [FINOS CALM Core] Validate Architecture in IDE"
+      ],
+      "coChangedAdrs": [],
+      "sourceId": "finos-calm-core",
+      "sourceLabel": "FINOS CALM Core",
+      "repoName": "finos"
+    },
+    {
+      "index": 3,
+      "sha": "78a48ab8a831fda26004977f4755c8a95251beb0",
+      "shortSha": "78a48ab8",
+      "date": "2026-03-31",
+      "author": "Mark Scott",
+      "subject": "[FINOS CALM Core] fix(calm-hub): make mongo initialization log consistent (#2286)",
+      "summaryLine": "[FINOS CALM Core] flows(+0/~1/-0)",
+      "changes": [
+        "[FINOS CALM Core] Modified flow [FINOS CALM Core] Browse Architectures"
+      ],
+      "coChangedAdrs": [],
+      "sourceId": "finos-calm-core",
+      "sourceLabel": "FINOS CALM Core",
+      "repoName": "finos"
+    },
+    {
+      "index": 4,
+      "sha": "d95a3bbe6ff777d89d63481ca96a508e9575f7d8",
+      "shortSha": "d95a3bbe",
+      "date": "2026-07-25",
+      "author": "Mark Scott",
+      "subject": "[FINOS CALM Core + finos/calm-hub-detail] docs: add third timeline moment for CalmStudio and CALM Server (#2882) (+1 co-committed file(s))",
+      "summaryLine": "[FINOS CALM Core + finos/calm-hub-detail] +6 node(s), +7 rel(s), ~3 rel(s), flows(+2/~0/-0)",
+      "changes": [
+        "[FINOS CALM Core + finos/calm-hub-detail] Added node CalmStudio (finos-calm-core--calm-studio)",
+        "[FINOS CALM Core + finos/calm-hub-detail] Added node CALM Server (finos-calm-core--calm-server)",
+        "[FINOS CALM Core + finos/calm-hub-detail] Added node REST Resources Layer (finos-calm-hub-detail--calm-hub-resources)",
+        "[FINOS CALM Core + finos/calm-hub-detail] Added node Services Layer (finos-calm-hub-detail--calm-hub-services)",
+        "[FINOS CALM Core + finos/calm-hub-detail] Added node Storage Layer (finos-calm-hub-detail--calm-hub-storage)",
+        "[FINOS CALM Core + finos/calm-hub-detail] Added node NitriteDB (finos-calm-hub-detail--nitritedb)",
+        "[FINOS CALM Core + finos/calm-hub-detail] Added relationship finos-calm-core--user-interacts-with-studio",
+        "[FINOS CALM Core + finos/calm-hub-detail] Added relationship finos-calm-core--user-interacts-with-calm-server",
+        "[FINOS CALM Core + finos/calm-hub-detail] Added relationship finos-calm-hub-detail--resources-to-services",
+        "[FINOS CALM Core + finos/calm-hub-detail] Added relationship finos-calm-hub-detail--services-to-storage",
+        "[FINOS CALM Core + finos/calm-hub-detail] Added relationship finos-calm-hub-detail--storage-to-mongo",
+        "[FINOS CALM Core + finos/calm-hub-detail] Added relationship finos-calm-hub-detail--storage-to-nitrite",
+        "[FINOS CALM Core + finos/calm-hub-detail] Added relationship finos-calm-hub-detail--resolved-detailed-architecture",
+        "[FINOS CALM Core + finos/calm-hub-detail] Modified relationship finos-calm-core--cli-to-hub",
+        "[FINOS CALM Core + finos/calm-hub-detail] Modified relationship finos-calm-core--hub-to-db",
+        "[FINOS CALM Core + finos/calm-hub-detail] Modified relationship finos-calm-core--hub-ui-to-hub",
+        "[FINOS CALM Core + finos/calm-hub-detail] Added flow [FINOS CALM Core] Edit Architecture in CalmStudio",
+        "[FINOS CALM Core + finos/calm-hub-detail] Added flow [FINOS CALM Core] Validate Architecture via CALM Server"
+      ],
+      "coChangedAdrs": [],
+      "sourceId": "finos-calm-hub-detail",
+      "sourceLabel": "FINOS CALM Core + finos/calm-hub-detail",
+      "repoName": "finos"
+    },
+    {
+      "index": 5,
+      "sha": "669cfa1f19b995f5a8f9f26a7f9d4a2060c80b00",
+      "shortSha": "669cfa1",
+      "date": "2026-11-13",
+      "author": "Akshar Prabhu Desai",
+      "subject": "[CALM Timelapse] feat(diff): scaffold TypeScript project and add structural CALM diff engine",
+      "summaryLine": "[CALM Timelapse] +3 node(s), +2 rel(s)",
+      "changes": [
+        "[CALM Timelapse] Added node Git Repository (calm-timelapse--git-repo)",
+        "[CALM Timelapse] Added node Git History Extractor (calm-timelapse--git-history-extractor)",
+        "[CALM Timelapse] Added node Structural Diff Engine (calm-timelapse--structural-diff-engine)",
+        "[CALM Timelapse] Added relationship calm-timelapse--rel-git-to-extractor",
+        "[CALM Timelapse] Added relationship calm-timelapse--rel-extractor-to-diff"
+      ],
+      "coChangedAdrs": [],
+      "sourceId": "calm-timelapse",
+      "sourceLabel": "CALM Timelapse",
+      "repoName": "fall-hackathon-2026-mu"
+    },
+    {
+      "index": 6,
+      "sha": "915ba00a2bfe9541a4d4ec8084b66f94736dd9f8",
+      "shortSha": "915ba00",
+      "date": "2026-11-13",
+      "author": "Akshar Prabhu Desai",
+      "subject": "[CALM Timelapse] feat(timeline): add git history walker, cluster validator, and CALM timeline emitter",
+      "summaryLine": "[CALM Timelapse] +4 node(s), +4 rel(s), controls(+1/~0/-0)",
+      "changes": [
+        "[CALM Timelapse] Added node Commit Diff Digest Exporter (calm-timelapse--digest-exporter)",
+        "[CALM Timelapse] Added node Deterministic & Spec Clusterer (calm-timelapse--moment-clusterer)",
+        "[CALM Timelapse] Added node CALM Timeline Emitter (calm-timelapse--timeline-emitter)",
+        "[CALM Timelapse] Added node IDE AI Assistant (Optional) (calm-timelapse--ide-ai-assistant)",
+        "[CALM Timelapse] Added relationship calm-timelapse--rel-diff-to-digest",
+        "[CALM Timelapse] Added relationship calm-timelapse--rel-diff-to-cluster",
+        "[CALM Timelapse] Added relationship calm-timelapse--rel-assistant-curates-clusters",
+        "[CALM Timelapse] Added relationship calm-timelapse--rel-cluster-to-emitter",
+        "[CALM Timelapse] Added architecture control calm-timelapse--contiguous-cluster-coverage"
+      ],
+      "coChangedAdrs": [],
+      "sourceId": "calm-timelapse",
+      "sourceLabel": "CALM Timelapse",
+      "repoName": "fall-hackathon-2026-mu"
+    },
+    {
+      "index": 7,
+      "sha": "bfd01991cae2879ca7bcd169f7da8effc918d4e1",
+      "shortSha": "bfd0199",
+      "date": "2026-11-13",
+      "author": "Akshar Prabhu Desai",
+      "subject": "[CALM Timelapse] feat(timelapse): add interactive SVG player, CLI, and calm-ai skill",
+      "summaryLine": "[CALM Timelapse] +2 node(s), ~1 node(s), +2 rel(s), controls(+1/~0/-0)",
+      "changes": [
+        "[CALM Timelapse] Added node HTML Timelapse Renderer (calm-timelapse--timelapse-renderer)",
+        "[CALM Timelapse] Added node Architect / Reviewer (calm-timelapse--architect-user)",
+        "[CALM Timelapse] Modified node CALM Timeline Emitter (calm-timelapse--timeline-emitter) [description]",
+        "[CALM Timelapse] Added relationship calm-timelapse--rel-cluster-to-renderer",
+        "[CALM Timelapse] Added relationship calm-timelapse--rel-user-views-timelapse",
+        "[CALM Timelapse] Added architecture control calm-timelapse--zero-network-execution"
+      ],
+      "coChangedAdrs": [],
+      "sourceId": "calm-timelapse",
+      "sourceLabel": "CALM Timelapse",
+      "repoName": "fall-hackathon-2026-mu"
+    },
+    {
+      "index": 8,
+      "sha": "d89fe61a1896852692f29ff14262b0c96c24c592",
+      "shortSha": "d89fe61",
+      "date": "2026-11-13",
+      "author": "Akshar Prabhu Desai",
+      "subject": "[CALM Timelapse] feat(federation): synchronize multi-repo CALM timelines and resolve detailed-architecture",
+      "summaryLine": "[CALM Timelapse] +1 node(s), ~1 node(s), +2 rel(s), -1 rel(s), controls(+1/~0/-0)",
+      "changes": [
+        "[CALM Timelapse] Added node Multi-Repo Federation Engine (calm-timelapse--federation-engine)",
+        "[CALM Timelapse] Modified node Git History Extractor (calm-timelapse--git-history-extractor) [description]",
+        "[CALM Timelapse] Added relationship calm-timelapse--rel-extractor-to-federation",
+        "[CALM Timelapse] Added relationship calm-timelapse--rel-federation-to-diff",
+        "[CALM Timelapse] Removed relationship calm-timelapse--rel-extractor-to-diff",
+        "[CALM Timelapse] Added architecture control calm-timelapse--strict-peer-namespace-isolation"
+      ],
+      "coChangedAdrs": [],
+      "sourceId": "calm-timelapse",
+      "sourceLabel": "CALM Timelapse",
+      "repoName": "fall-hackathon-2026-mu"
+    }
+  ]
+}
