@@ -62,6 +62,7 @@
       "author": "Mark Scott",
       "subject": "docs(calm): Define CALM in CALM",
       "summaryLine": "Initial baseline with 8 node(s), 8 relationship(s)",
+      "snapshotSha256": "296c44d1450f024d446d9d7c211288fa254232123b80784f8f8033d25d297ee0",
       "changes": [
         "Added node CALM User (calm-user)",
         "Added node CALM CLI (calm-cli)",
@@ -90,6 +91,7 @@
       "author": "Mark Scott",
       "subject": "docs(calm): remove unwanted hallucinations",
       "summaryLine": "~4 node(s), ~3 rel(s)",
+      "snapshotSha256": "540708fe3de3780bb03c8f778f24d5af95f1f8747786438122694b9687929cc3",
       "changes": [
         "Modified node CALM CLI (calm-cli) [interfaces]",
         "Modified node VSCode Extension (calm-vscode) [interfaces]",
@@ -109,6 +111,7 @@
       "author": "Thels",
       "subject": "chore: hide --ants from docify help and clean up ant farm template",
       "summaryLine": "flows(+3/~0/-0)",
+      "snapshotSha256": "9b1f8762a821f7ac2ba26f3aca4f8991eb28a68e48da9179b3b93b8d154a406b",
       "changes": [
         "Added flow Publish Architecture",
         "Added flow Browse Architectures",
@@ -124,6 +127,7 @@
       "author": "Mark Scott",
       "subject": "fix(calm-hub): make mongo initialization log consistent (#2286)",
       "summaryLine": "flows(+0/~1/-0)",
+      "snapshotSha256": "fc148b2ac655e107309544b4b35d211fa5b7d3d801d4eec12d8c08e610fe07fb",
       "changes": [
         "Modified flow Browse Architectures"
       ],
@@ -137,6 +141,7 @@
       "author": "Mark Scott",
       "subject": "docs: add third timeline moment for CalmStudio and CALM Server (#2882)",
       "summaryLine": "+2 node(s), ~1 node(s), +2 rel(s), ~3 rel(s), flows(+2/~0/-0)",
+      "snapshotSha256": "d2d879958040bbefdf3410463e01d4e57a0412db9a69dfa3dae51b93f0ad487c",
       "changes": [
         "Added node CalmStudio (calm-studio)",
         "Added node CALM Server (calm-server)",

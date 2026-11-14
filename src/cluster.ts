@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { computeStructuralDelta } from './calm-diff.js';
+import { computeSnapshotSha256, serializeCalmSnapshot } from './timeline-emitter.js';
 import type {
     ClusteringEngine,
     ClusterSpec,
@@ -284,6 +285,7 @@ function buildClusterFromRange(
         commits: slice,
         mergedChangeItems: net.changeItems.filter((i) => i.category !== 'metadata'),
         snapshotDocument: last.commit.document,
+        snapshotSha256: computeSnapshotSha256(serializeCalmSnapshot(last.commit.document)),
         ...(last.commit.nodeProvenance ? { nodeProvenance: last.commit.nodeProvenance } : {}),
     };
 }
@@ -385,14 +387,64 @@ export function validateClusterSpecs(raw: unknown, totalCount: number): ClusterS
     return specs;
 }
 
+export function diagnoseClusterSpecsError(raw: unknown, totalCount: number): string {
+    const maxIdx = Math.max(0, totalCount - 1);
+    const basePrefix = `Invalid cluster definitions (expected a non-empty JSON array covering commit indices 0..${maxIdx} contiguously without gaps or overlaps)`;
+    const record = raw && typeof raw === 'object' ? (raw as Record<string, unknown>) : null;
+    const arr = Array.isArray(raw)
+        ? raw
+        : record && Array.isArray(record['clusters'])
+          ? (record['clusters'] as unknown[])
+          : record && Array.isArray(record['moments'])
+            ? (record['moments'] as unknown[])
+            : null;
+
+    if (!arr || arr.length === 0) {
+        return `${basePrefix}: input must be a non-empty array of cluster objects.`;
+    }
+
+    let expectedStart = 0;
+    for (let i = 0; i < arr.length; i++) {
+        const item = arr[i];
+        if (!item || typeof item !== 'object') {
+            return `${basePrefix}: clusters[${i}] must be an object.`;
+        }
+        const obj = item as Record<string, unknown>;
+        const startIndex = Number(obj['startIndex']);
+        const endIndex = Number(obj['endIndex']);
+        if (!Number.isInteger(startIndex) || !Number.isInteger(endIndex)) {
+            return `${basePrefix}: clusters[${i}] must specify integer startIndex and endIndex.`;
+        }
+        if (startIndex !== expectedStart) {
+            const detail =
+                startIndex > expectedStart
+                    ? `gap skipping commit index ${expectedStart}`
+                    : `overlap at commit index ${startIndex}`;
+            return `${basePrefix}: clusters[${i}].startIndex is ${startIndex}, expected ${expectedStart} (${detail}).`;
+        }
+        if (endIndex < startIndex) {
+            return `${basePrefix}: clusters[${i}].endIndex (${endIndex}) precedes startIndex (${startIndex}).`;
+        }
+        if (endIndex >= totalCount) {
+            return `${basePrefix}: clusters[${i}].endIndex (${endIndex}) exceeds maximum commit index ${maxIdx}.`;
+        }
+        expectedStart = endIndex + 1;
+    }
+
+    if (expectedStart !== totalCount) {
+        const lastEnd = expectedStart - 1;
+        return `${basePrefix}: final endIndex is ${lastEnd}, expected ${maxIdx} (commit indices ${expectedStart}..${maxIdx} uncovered).`;
+    }
+
+    return `${basePrefix}.`;
+}
+
 export function applyClusterSpecs(deltas: StructuralCommitDelta[], rawSpecs: unknown): MomentCluster[] {
     if (deltas.length === 0) return [];
 
     const validated = validateClusterSpecs(rawSpecs, deltas.length);
     if (!validated) {
-        throw new Error(
-            `Invalid cluster definitions: expected a non-empty JSON array covering commit indices 0..${deltas.length - 1} contiguously without gaps or overlaps.`,
-        );
+        throw new Error(diagnoseClusterSpecsError(rawSpecs, deltas.length));
     }
 
     return validated.map((spec) =>
@@ -458,6 +510,7 @@ export function buildCommitHistoryDigest(
             author: d.commit.author,
             subject: d.commit.subject,
             summaryLine: d.summaryLine,
+            snapshotSha256: computeSnapshotSha256(serializeCalmSnapshot(d.commit.document)),
             changes: d.changeItems.map((c) => c.text),
             coChangedAdrs: [...d.commit.coChangedAdrs],
             ...(d.commit.sourceId ? { sourceId: d.commit.sourceId } : {}),

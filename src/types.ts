@@ -94,6 +94,7 @@ export interface CommitDigestEntry {
     author: string;
     subject: string;
     summaryLine: string;
+    snapshotSha256: string;
     changes: string[];
     coChangedAdrs: string[];
     sourceId?: string;
@@ -128,6 +129,7 @@ export interface MomentCluster {
     commits: StructuralCommitDelta[];
     mergedChangeItems: DeltaChangeItem[];
     snapshotDocument: Record<string, unknown>;
+    snapshotSha256?: string;
     nodeProvenance?: Record<string, FederatedNodeProvenance>;
 }
 

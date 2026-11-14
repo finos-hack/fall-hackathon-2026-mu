@@ -11,6 +11,7 @@
         "detailed-architecture": "snapshots/01-4095156-moment-01-platform-edge-bootstrap.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "313a0d5c9acadb390c5f344f50d11958aad130da5dc57368e8fbd209f0d5c3ba",
         "commits": [
           "4095156"
         ],
@@ -65,6 +66,7 @@
         "detailed-architecture": "snapshots/02-b373268-moment-02-isolated-finra-surveillance.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "30c35f0c1ed84c08d4f8493688286d29fceb826ea252efb85c28caa7a207b9a2",
         "commits": [
           "b373268"
         ],
@@ -139,6 +141,7 @@
         "detailed-architecture": "snapshots/03-786cc9d-moment-03-federated-execution-composition.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "fcccffba88ade2ee31d5004add49ee343eaf7b77b5fcf40ccc84283a438eaed8",
         "commits": [
           "addf93b",
           "786cc9d"
@@ -272,6 +275,7 @@
         "detailed-architecture": "snapshots/04-6272de7-moment-04-execution-pretrade-risk-mtls.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "2dc4851873ace83794419b5a572dc2f7995c499f83e7436c10edfd42cdf7246b",
         "commits": [
           "6272de7"
         ],
@@ -413,6 +417,7 @@
         "detailed-architecture": "snapshots/05-e2204e8-moment-05-surveillance-spoofing-worm-vault.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "61ba59ffe874d780b76ffa09c7fa891ec92d208ecacbc73c474a620f667c4c45",
         "commits": [
           "e2204e8"
         ],

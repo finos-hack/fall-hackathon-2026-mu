@@ -62,6 +62,7 @@
       "author": "Matthew Bain",
       "subject": "Major refactor - migrating CALM to a specific JSON vocabulary (#15)",
       "summaryLine": "Initial baseline with 4 node(s), 3 relationship(s)",
+      "snapshotSha256": "0fd6aa6fc1f450bfe30a910a153781c834a7b5f14f2aee3e49d6b956a18efc4e",
       "changes": [
         "Added node API Gateway (api-gateway)",
         "Added node Python Based API Consumer (api-consumer)",
@@ -81,6 +82,7 @@
       "author": "jpgough-ms",
       "subject": "Fixes #26 (#27)",
       "summaryLine": "~3 rel(s)",
+      "snapshotSha256": "c28282dfbdcfce1f9a2e03eea5b194910e63da6ba7067d40e0be235090a0aca5",
       "changes": [
         "Modified relationship api-consumer-api-gateway",
         "Modified relationship api-gateway-idp",
@@ -96,6 +98,7 @@
       "author": "Budlee",
       "subject": "Issue#29 New Specification for 2024-03 (#44)",
       "summaryLine": "~3 rel(s)",
+      "snapshotSha256": "7447ddbdb23c43cf451a7dbb2f48dc047cb5f85d3072b96588896b33f7005783",
       "changes": [
         "Modified relationship api-consumer-api-gateway",
         "Modified relationship api-gateway-idp",
@@ -111,6 +114,7 @@
       "author": "Matthew Bain",
       "subject": "Ensure consistent naming convention in CALM (#46)",
       "summaryLine": "~4 node(s), ~3 rel(s)",
+      "snapshotSha256": "607b6b2be14b07441ca8a396a65c91c53c8724a313e39b388ab2ffd6fa748ce2",
       "changes": [
         "Modified node API Gateway (api-gateway) [unique-id]",
         "Modified node Python Based API Consumer (api-consumer) [unique-id]",
@@ -130,6 +134,7 @@
       "author": "Luigi Bulanti",
       "subject": "#74 - Updating the api-gateway.json pattern to use prefixItems (#79)",
       "summaryLine": "~4 node(s), ~3 rel(s)",
+      "snapshotSha256": "e8694ec42a532951881be20e5866477bc62c24b2f1ee8db39e60f24ba78d583b",
       "changes": [
         "Modified node API Gateway (api-gateway) [pattern-schema]",
         "Modified node Python Based API Consumer (api-consumer) [pattern-schema]",
@@ -149,6 +154,7 @@
       "author": "Will Osborne",
       "subject": "Pattern flag and fixing api-gateway pattern sample (#91)",
       "summaryLine": "~4 node(s)",
+      "snapshotSha256": "2a35ca940b6286810326d90d927c13806154a649743f0020f2e672c492ea4355",
       "changes": [
         "Modified node API Gateway (api-gateway) [node-type, type]",
         "Modified node Python Based API Consumer (api-consumer) [node-type, type]",
@@ -165,6 +171,7 @@
       "author": "jpgough-ms",
       "subject": "Update API Gateway Pattern to Add Interface (#109)",
       "summaryLine": "~2 node(s), ~2 rel(s)",
+      "snapshotSha256": "58c0c472bd7acccc2176dacbca9a550a78d0a764291eddcf626eba67a86783e0",
       "changes": [
         "Modified node API Gateway (api-gateway) [interfaces, pattern-schema]",
         "Modified node Java Based API Producer (api-producer) [interfaces, pattern-schema]",
@@ -181,6 +188,7 @@
       "author": "Will Osborne",
       "subject": "Lint and insert missing properties block",
       "summaryLine": "~1 node(s)",
+      "snapshotSha256": "1ba0b9ed75d781cba3f4a6514904f841681a9751b1e052327718a51bffa442c1",
       "changes": [
         "Modified node Java Based API Producer (api-producer) [interfaces]"
       ],
@@ -194,6 +202,7 @@
       "author": "Aidan McPhelim",
       "subject": "#100 visualizer works with patterns",
       "summaryLine": "~1 rel(s)",
+      "snapshotSha256": "49d92036935c1ed693c6e8738b6d34e3b09ce1f02f57a50612562c732f148d3a",
       "changes": [
         "Modified relationship api-gateway-idp"
       ],
@@ -207,6 +216,7 @@
       "author": "Will Osborne",
       "subject": "Update spectral rules to use new interface format",
       "summaryLine": "~2 rel(s)",
+      "snapshotSha256": "4a524e6e6ade15ea64d9f98875fa79b031ecdb35318a09808ec492c23071ffb3",
       "changes": [
         "Modified relationship api-consumer-api-gateway",
         "Modified relationship api-gateway-api-producer"
@@ -221,6 +231,7 @@
       "author": "Juan Estrella",
       "subject": "replace finos-labs with finos (#195)",
       "summaryLine": "~2 node(s)",
+      "snapshotSha256": "d10493c999ef33c8229e7261ae65d089c24d631c23d2aabef557e2a2b3b14151",
       "changes": [
         "Modified node API Gateway (api-gateway) [interfaces]",
         "Modified node Java Based API Producer (api-producer) [interfaces]"
@@ -235,6 +246,7 @@
       "author": "Aidan McPhelim",
       "subject": "Visualizer improvments (#278)",
       "summaryLine": "~2 node(s), +1 rel(s), ~3 rel(s)",
+      "snapshotSha256": "a141ce076f411eb940b7a8e0203ba6aee246e80abf8cb113696f94c9e242140f",
       "changes": [
         "Modified node API Consumer (api-consumer) [name]",
         "Modified node API Producer (api-producer) [name]",
@@ -253,6 +265,7 @@
       "author": "Thels",
       "subject": "#446 - Upgrade CLI to 2024-10. (#696)",
       "summaryLine": "~2 node(s)",
+      "snapshotSha256": "33680e3cb2bdcf6db4d08b730f24c91958aab8db5a62f79e3ee1e5315bbe50a0",
       "changes": [
         "Modified node API Gateway (api-gateway) [interfaces]",
         "Modified node API Producer (api-producer) [interfaces]"
@@ -267,6 +280,7 @@
       "author": "LeighF",
       "subject": "Ensure SchemaDirectory works with latest CALM draft",
       "summaryLine": "~2 node(s)",
+      "snapshotSha256": "62fb8dc9d414c909603befa3a77b8917ddab2e4a7566c176b85347e920636e1f",
       "changes": [
         "Modified node API Gateway (api-gateway) [interfaces]",
         "Modified node API Producer (api-producer) [interfaces]"
@@ -281,6 +295,7 @@
       "author": "LeighF",
       "subject": "Update endpoints and test files related to validate/generate endpoints to use release RC-1 candidate schema (finos#1284)",
       "summaryLine": "~2 node(s)",
+      "snapshotSha256": "d50fd665faa4e38cb60a77835de974590c7e05907374a5a08bb803753f0f050f",
       "changes": [
         "Modified node API Gateway (api-gateway) [interfaces]",
         "Modified node API Producer (api-producer) [interfaces]"
@@ -295,6 +310,7 @@
       "author": "Mark Scott",
       "subject": "fix(cli): fix test pattern to consistent use a single schema version",
       "summaryLine": "~1 node(s)",
+      "snapshotSha256": "87b17fa6e497f22be4f85d4e6ed147f5645a058bd21ca4df01a0beeef753abba",
       "changes": [
         "Modified node API Producer (api-producer) [interfaces]"
       ],
@@ -308,6 +324,7 @@
       "author": "Matthew Bain",
       "subject": "feat(calm-server): stop bundling the CALM 1.0 release candidates and the 2025-03 draft",
       "summaryLine": "~1 node(s)",
+      "snapshotSha256": "c93846b6131f2b919daf7625749fdbc6c12f4c4bfd061dffc9ae6bfdb66ac099",
       "changes": [
         "Modified node API Gateway (api-gateway) [interfaces]"
       ],

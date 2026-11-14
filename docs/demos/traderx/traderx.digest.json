@@ -62,6 +62,7 @@
       "author": "Elena Rostova",
       "subject": "feat(arch): capture initial TraderX legacy order desk baseline",
       "summaryLine": "Initial baseline with 4 node(s), 3 relationship(s)",
+      "snapshotSha256": "47f920fb76fb7e4ee81e4866f74cd8e4172d5caee35f6719da56ff21c7621fc6",
       "changes": [
         "Added node Institutional Equity Trader (trader-actor)",
         "Added node TraderX Blotter Web UI (traderx-web)",
@@ -81,6 +82,7 @@
       "author": "Marcus Vance",
       "subject": "feat(security): introduce edge API gateway and OIDC identity provider",
       "summaryLine": "+2 node(s)",
+      "snapshotSha256": "26374bc94b6f5058acef944588773ab597d3e01ea39bd880db87e413bb95749e",
       "changes": [
         "Added node Zero-Trust Edge API Gateway (edge-api-gateway)",
         "Added node Enterprise OIDC Identity Provider (ping-oidc-idp)"
@@ -97,6 +99,7 @@
       "author": "Marcus Vance",
       "subject": "refactor(ingress): route traderx-web traffic exclusively through edge-api-gateway",
       "summaryLine": "+2 rel(s), -1 rel(s)",
+      "snapshotSha256": "28da00c10969d978f75115ca41b650b540eb0e71e85412d0a32e3b2c313312f2",
       "changes": [
         "Added relationship web-to-gateway",
         "Added relationship gateway-to-monolith",
@@ -112,6 +115,7 @@
       "author": "Marcus Vance",
       "subject": "feat(auth): wire OIDC PKCE and JWKS validation links",
       "summaryLine": "+2 rel(s)",
+      "snapshotSha256": "770956e4bb0f8f1e6530bde94544c94df21d2331cbb563f460940d6ac1ae5089",
       "changes": [
         "Added relationship web-to-oidc",
         "Added relationship gateway-to-oidc"
@@ -126,6 +130,7 @@
       "author": "Elena Rostova",
       "subject": "feat(controls): upgrade east-west gateway hop to mTLS and enforce mtls-everywhere",
       "summaryLine": "~1 rel(s), controls(+1/~0/-0)",
+      "snapshotSha256": "df2f2f68f39f822a619f99cf4db98eeeca60a7c6432ffd592723b685c836c2fc",
       "changes": [
         "Modified relationship gateway-to-monolith",
         "Added architecture control mtls-everywhere"
@@ -140,6 +145,7 @@
       "author": "Priya Nair",
       "subject": "feat(messaging): provision Kafka order event backbone",
       "summaryLine": "+1 node(s)",
+      "snapshotSha256": "116ab1d7631ff07d375ecc3f0d2beab80e6c2864d48b6e1b7984f269804dabad",
       "changes": [
         "Added node Kafka Order Event Backbone (kafka-event-bus)"
       ],
@@ -155,6 +161,7 @@
       "author": "Priya Nair",
       "subject": "feat(routing): extract stateless order-router-svc behind API gateway",
       "summaryLine": "+1 node(s), +1 rel(s), -1 rel(s)",
+      "snapshotSha256": "04ef21ec003cb04d5431779d4419b9b3451a36470b4a1c13db23228f07456e24",
       "changes": [
         "Added node Stateless Order Router (order-router-svc)",
         "Added relationship gateway-to-router",
@@ -170,6 +177,7 @@
       "author": "Priya Nair",
       "subject": "feat(routing): stream router events through kafka-event-bus into monolith consumer",
       "summaryLine": "+2 rel(s)",
+      "snapshotSha256": "ce3d61f806fc21351dfcc42b66e20160bcdf4277c82ad9d1b97c81a9cc115d4c",
       "changes": [
         "Added relationship router-to-kafka",
         "Added relationship kafka-to-monolith"
@@ -184,6 +192,7 @@
       "author": "Elena Rostova",
       "subject": "feat(flows): codify order-submission-flow across ingress pipeline",
       "summaryLine": "flows(+1/~0/-0)",
+      "snapshotSha256": "7b0b343a1f9e8de3a5d9e3a0335410b656341a365bb608ba56a5d8f19688df61",
       "changes": [
         "Added flow Client Order Submission Flow"
       ],
@@ -197,6 +206,7 @@
       "author": "Devon Brooks",
       "subject": "feat(risk): add SEC 15c3-5 pretrade-risk-svc node",
       "summaryLine": "+1 node(s)",
+      "snapshotSha256": "d2fb8b4addadee8eacaa52cc00d61d582fb370f266ca7eac49f3f105cdef1f02",
       "changes": [
         "Added node Pre-Trade Risk Engine (pretrade-risk-svc)"
       ],
@@ -212,6 +222,7 @@
       "author": "Devon Brooks",
       "subject": "feat(risk): back pretrade-risk-svc with redis-position-cache",
       "summaryLine": "+1 node(s), +1 rel(s)",
+      "snapshotSha256": "5653f28dc6cc2f972880d70054d6a42ee6478561427a823338c3bb0c4bed3dd7",
       "changes": [
         "Added node In-Memory Intraday Position Cache (redis-position-cache)",
         "Added relationship risk-to-redis"
@@ -226,6 +237,7 @@
       "author": "Devon Brooks",
       "subject": "feat(risk): wire synchronous gRPC/mTLS pre-trade risk gate from order-router-svc",
       "summaryLine": "+1 rel(s)",
+      "snapshotSha256": "1764d44dc8768b26325d21c830952ca083fc0a153f98885dffcde894274e2f3e",
       "changes": [
         "Added relationship router-to-risk"
       ],
@@ -239,6 +251,7 @@
       "author": "Devon Brooks",
       "subject": "feat(flows): insert pre-trade risk verification steps into order-submission-flow",
       "summaryLine": "flows(+0/~1/-0)",
+      "snapshotSha256": "21ef4bebabec63b2e3b63d10d9948e927be554737888157d8c3fb567bf5da995",
       "changes": [
         "Modified flow Risk-Gated Client Order Submission Flow"
       ],
@@ -252,6 +265,7 @@
       "author": "Priya Nair",
       "subject": "feat(execution): introduce fix-execution-gateway and external-liquidity-venue",
       "summaryLine": "+2 node(s)",
+      "snapshotSha256": "f5ed1d1f19f3d3935fc5477d6b3de7827ed0d7a3cb40c0b48e57f1369ad881ec",
       "changes": [
         "Added node FIX 4.4 Venue Execution Gateway (fix-execution-gateway)",
         "Added node External Equity Exchange Venue (external-liquidity-venue)"
@@ -266,6 +280,7 @@
       "author": "Priya Nair",
       "subject": "feat(execution): connect Kafka approved order topic through FIX gateway to venue",
       "summaryLine": "+2 rel(s)",
+      "snapshotSha256": "dcf4453ad12fb2ac8daf2ce490567e42981ff501f1aa7ccd105ef62baa67b601",
       "changes": [
         "Added relationship kafka-to-fix",
         "Added relationship fix-to-venue"
@@ -280,6 +295,7 @@
       "author": "Devon Brooks",
       "subject": "feat(marketdata): wire live NBBO market-data-feed into risk and position cache",
       "summaryLine": "+1 node(s), +2 rel(s)",
+      "snapshotSha256": "ca57d0b6bba27c1459cada0e02b8653289338f1f2bcfeff5cd3d66ed9dcad8d1",
       "changes": [
         "Added node Consolidated NBBO Market Data Ticker (market-data-feed)",
         "Added relationship marketdata-to-redis",
@@ -295,6 +311,7 @@
       "author": "Priya Nair",
       "subject": "feat(execution): publish venue ExecutionReports to Kafka and add execution-fill-flow",
       "summaryLine": "+1 rel(s), flows(+1/~0/-0)",
+      "snapshotSha256": "af67b8f1cff52e5f6f4fd3b15554d01e73f8e7d000e67cf37df3c0548237caec",
       "changes": [
         "Added relationship fix-to-kafka",
         "Added flow Exchange Execution Fill Capture Flow"
@@ -309,6 +326,7 @@
       "author": "Priya Nair",
       "subject": "feat(execution): expose dedicated fix-dropcopy-session interface on FIX gateway",
       "summaryLine": "~1 node(s)",
+      "snapshotSha256": "e0df5747db2f0e5b9846dadbc13107bff669dfd79173a66797ec27dcb2976075",
       "changes": [
         "Modified node FIX 4.4 Venue Execution Gateway (fix-execution-gateway) [description, interfaces]"
       ],
@@ -322,6 +340,7 @@
       "author": "Elena Rostova",
       "subject": "feat(ledger): deploy trade-ledger-svc and postgres-trades-db alongside legacy monolith",
       "summaryLine": "+2 node(s)",
+      "snapshotSha256": "ef6321e3a97e32df65be11952f8e11e4757c8f5db79e271279a538d889a5f924",
       "changes": [
         "Added node Canonical Trade Ledger Service (trade-ledger-svc)",
         "Added node Cloud-Native PostgreSQL Trade Store (postgres-trades-db)"
@@ -336,6 +355,7 @@
       "author": "Elena Rostova",
       "subject": "feat(ledger): wire Kafka fill consumer through trade-ledger-svc to PostgreSQL",
       "summaryLine": "+2 rel(s)",
+      "snapshotSha256": "a02ca8abb9bf299228e462e9b681cdf8b905b72e379b509a837b9ce766bbc844",
       "changes": [
         "Added relationship kafka-to-ledger",
         "Added relationship ledger-to-postgres"
@@ -350,6 +370,7 @@
       "author": "Elena Rostova",
       "subject": "feat(clearing): add T+1 settlement-clearing-svc backed by PostgreSQL trade store",
       "summaryLine": "+1 node(s), +2 rel(s)",
+      "snapshotSha256": "2c6973b066da402b1ab26d540f6903b380f9d096d32cb06e437dc4ad67868f6c",
       "changes": [
         "Added node DTCC Clearing & Settlement Adapter (settlement-clearing-svc)",
         "Added relationship kafka-to-clearing",
@@ -365,6 +386,7 @@
       "author": "Elena Rostova",
       "subject": "refactor(decommission): retire legacy monolith-order-svc and oracle-trades-db",
       "summaryLine": "-2 node(s), -2 rel(s)",
+      "snapshotSha256": "ca9752eb192dd4dae04b7d260214210156d10b83c8ac505554ec6a3962333547",
       "changes": [
         "Removed node Legacy Order Monolith (monolith-order-svc)",
         "Removed node Legacy Oracle Trades DB (oracle-trades-db)",
@@ -381,6 +403,7 @@
       "author": "Marcus Vance",
       "subject": "feat(compliance): introduce worm-audit-archiver and s3-object-lock-vault",
       "summaryLine": "+2 node(s)",
+      "snapshotSha256": "3ba23abb9f7d3fddaa2d6cae6992385e47bfa90ae17b2c9ae66a73b8d09bab04",
       "changes": [
         "Added node Immutable Audit Archiver (worm-audit-archiver)",
         "Added node SEC 17a-4 WORM Object-Lock Vault (s3-object-lock-vault)"
@@ -397,6 +420,7 @@
       "author": "Marcus Vance",
       "subject": "feat(compliance): stream Kafka lifecycle events into WORM Object-Lock vault",
       "summaryLine": "+2 rel(s)",
+      "snapshotSha256": "d22bdbef8a217a92b456b9c0df1b2e60be2c4600ce565243f8ea9a12a4f06bf3",
       "changes": [
         "Added relationship kafka-to-archiver",
         "Added relationship archiver-to-worm"
@@ -411,6 +435,7 @@
       "author": "Marcus Vance",
       "subject": "feat(controls): bind sec-17a4-worm 7-year compliance retention control",
       "summaryLine": "controls(+1/~0/-0)",
+      "snapshotSha256": "10f1cdfa21779f2b34a1ad97d923f259093a6f803a14c9c1c1ba64113397a4d8",
       "changes": [
         "Added architecture control sec-17a4-worm"
       ],
@@ -424,6 +449,7 @@
       "author": "Marcus Vance",
       "subject": "feat(compliance): model compliance-officer supervisory access to worm-audit-archiver",
       "summaryLine": "+1 node(s), +1 rel(s)",
+      "snapshotSha256": "38b5bcc210c144a70d083a085f7e6de480eed5cc65fbdabe4793d7775e787cce",
       "changes": [
         "Added node Surveillance & Compliance Officer (compliance-officer)",
         "Added relationship compliance-queries-archiver"
@@ -438,6 +464,7 @@
       "author": "Devon Brooks",
       "subject": "feat(resilience): add otel-observability-hub and dr-standby-cluster",
       "summaryLine": "+2 node(s)",
+      "snapshotSha256": "b15de0c9306dd0b7f882abeb839de6dbb0611cd72a4c66691d0fce94a3ce3c1c",
       "changes": [
         "Added node OpenTelemetry Tracing & SLO Hub (otel-observability-hub)",
         "Added node Warm-Standby Secondary Region Cluster (dr-standby-cluster)"
@@ -454,6 +481,7 @@
       "author": "Devon Brooks",
       "subject": "feat(resilience): enable cross-region WAL and Kafka replication to dr-standby-cluster",
       "summaryLine": "+2 rel(s)",
+      "snapshotSha256": "eba78e6423df9be4ba211d9166c287125e1103bb96dfe331f1fd26d4f80af312",
       "changes": [
         "Added relationship postgres-to-dr",
         "Added relationship kafka-to-dr"
@@ -468,6 +496,7 @@
       "author": "Devon Brooks",
       "subject": "feat(observability): stream OTLP telemetry from router, risk, and FIX gateway",
       "summaryLine": "+3 rel(s)",
+      "snapshotSha256": "37559557cb98286cd0f0f96c6208da82c40566be76377bac8a028b4bfdf20b45",
       "changes": [
         "Added relationship router-to-otel",
         "Added relationship risk-to-otel",
@@ -483,6 +512,7 @@
       "author": "Elena Rostova",
       "subject": "feat(controls): add dora-ict-resilience control for multi-region failover readiness",
       "summaryLine": "controls(+1/~0/-0)",
+      "snapshotSha256": "697ee67b8cc58301851ee119845b49af78138b086df68b22e72813536265e527",
       "changes": [
         "Added architecture control dora-ict-resilience"
       ],
@@ -496,6 +526,7 @@
       "author": "Marcus Vance",
       "subject": "feat(cat): introduce cat-regulatory-reporter and external finra-cat-portal",
       "summaryLine": "+2 node(s)",
+      "snapshotSha256": "4a0be56ab848883d492936db0b18cdf4db298796936fe3fa9e11bef72eaf935e",
       "changes": [
         "Added node FINRA CAT Regulatory Reporter (cat-regulatory-reporter)",
         "Added node FINRA CAT Central Repository (finra-cat-portal)"
@@ -510,6 +541,7 @@
       "author": "Marcus Vance",
       "subject": "feat(cat): reconcile cat-regulatory-reporter against WORM vault and trade ledger",
       "summaryLine": "+2 rel(s)",
+      "snapshotSha256": "46aee56b0f54fb2987a8ad9280570b693e76c6b7324d490d0d9a75a4ae6cd57c",
       "changes": [
         "Added relationship reporter-reads-worm",
         "Added relationship reporter-reads-ledger"
@@ -524,6 +556,7 @@
       "author": "Marcus Vance",
       "subject": "feat(cat): wire SFTP/mTLS submission channel to finra-cat-portal",
       "summaryLine": "+1 rel(s)",
+      "snapshotSha256": "62262023000cba517be48f021abd4a63c8e397b0d871599a4f4d7cc3244922b1",
       "changes": [
         "Added relationship reporter-to-finra"
       ],
@@ -537,6 +570,7 @@
       "author": "Marcus Vance",
       "subject": "feat(flows): define regulatory-cat-submission-flow across WORM, ledger, and FINRA CAT",
       "summaryLine": "flows(+1/~0/-0)",
+      "snapshotSha256": "7ed6bbf55fccc06df300cdf6a806186f83376490481bc162ed62fa86a6f664c1",
       "changes": [
         "Added flow FINRA CAT T+1 Regulatory Submission Flow"
       ],
@@ -550,6 +584,7 @@
       "author": "Elena Rostova",
       "subject": "feat(controls): enforce finra-cat-sla T+1 08:00 ET reporting control",
       "summaryLine": "controls(+1/~0/-0)",
+      "snapshotSha256": "eed155e93f8700ceab5865e875c5836fc37bee234a2251dd304078199519eaca",
       "changes": [
         "Added architecture control finra-cat-sla"
       ],

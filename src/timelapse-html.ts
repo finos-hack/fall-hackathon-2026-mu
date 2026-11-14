@@ -4,6 +4,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { computeStructuralDelta, summarizeCounts } from './calm-diff.js';
 import { synchronizeSavedTimelines } from './federation.js';
+import { computeSnapshotSha256, serializeCalmSnapshot } from './timeline-emitter.js';
 import type {
   DeltaChangeItem,
   FederatedNodeProvenance,
@@ -76,6 +77,7 @@ export interface TimelapseFrame {
   commitCount: number;
   commits: string[];
   commitMessages: string[];
+  snapshotSha256?: string;
   adrs: string[];
   summary: string;
   changes: DeltaChangeItem[];
@@ -914,6 +916,8 @@ export function buildTimelapsePayloadFromClusters(
       commitCount: cluster.commits.length,
       commits: cluster.commits.map((d) => d.commit.shortSha),
       commitMessages: cluster.commits.map((d) => d.commit.subject),
+      snapshotSha256:
+        cluster.snapshotSha256 ?? computeSnapshotSha256(serializeCalmSnapshot(doc)),
       adrs: cluster.adrs,
       summary,
       changes: cluster.mergedChangeItems,
@@ -989,10 +993,15 @@ export function buildTimelapsePayloadFromTimelineFile(
       );
     }
     const snapshotPath = path.resolve(timelineDir, snapshotRel);
-    const doc = JSON.parse(fs.readFileSync(snapshotPath, 'utf8')) as Record<string, unknown>;
+    const snapshotRawBuffer = fs.readFileSync(snapshotPath);
+    const doc = JSON.parse(snapshotRawBuffer.toString('utf8')) as Record<string, unknown>;
     const delta = computeStructuralDelta(prevDoc, doc);
 
     const entryMeta = asRecord((entry as unknown as Record<string, unknown>)['metadata']);
+    const metaSha256 =
+      typeof entryMeta?.['snapshot-sha256'] === 'string' && entryMeta['snapshot-sha256'].trim()
+        ? entryMeta['snapshot-sha256'].trim()
+        : computeSnapshotSha256(snapshotRawBuffer);
     const rawProvenance = asRecord(entryMeta?.['node-provenance']) as
       | Record<string, FederatedNodeProvenance>
       | null;
@@ -1045,6 +1054,7 @@ export function buildTimelapsePayloadFromTimelineFile(
       commitCount,
       commits,
       commitMessages,
+      snapshotSha256: metaSha256,
       adrs: entry.adrs ?? [],
       summary: summarizeCounts(delta.counts, i === 0),
       changes: delta.changeItems,
@@ -1160,6 +1170,7 @@ export function buildTimelapsePayloadFromTimelineFiles(
       commitCount: sf.commitCount,
       commits: sf.commits,
       commitMessages: sf.commitMessages,
+      snapshotSha256: computeSnapshotSha256(serializeCalmSnapshot(sf.document)),
       adrs: sf.adrs,
       summary: summarizeCounts(delta.counts, i === 0),
       changes: delta.changeItems,
@@ -2434,6 +2445,20 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
         validDiv.appendChild(validVal);
         governanceBody.appendChild(validDiv);
 
+        if (frame.snapshotSha256) {
+          const shaDiv = document.createElement('div');
+          shaDiv.style.marginTop = '3px';
+          shaDiv.style.fontSize = '12px';
+          const shaLabel = document.createElement('strong');
+          shaLabel.textContent = 'Snapshot SHA-256: ';
+          const shaVal = document.createElement('code');
+          shaVal.textContent = String(frame.snapshotSha256).slice(0, 16) + '…';
+          shaVal.title = 'SHA-256: ' + String(frame.snapshotSha256);
+          shaDiv.appendChild(shaLabel);
+          shaDiv.appendChild(shaVal);
+          governanceBody.appendChild(shaDiv);
+        }
+
         if (auditPrecedesFirst) {
           const warnDiv = document.createElement('div');
           warnDiv.style.color = '#fde68a';
@@ -3413,6 +3438,7 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
             f.name,
             f.description,
             f.validFrom,
+            f.snapshotSha256 || '',
             ...(f.commits || []),
             ...(f.commitMessages || []),
             ...(f.adrs || []),
@@ -3490,9 +3516,13 @@ export function renderTimelapseHtml(payload: TimelapsePayload): string {
             : 'Curated snapshot';
           metaSub.textContent =
             commitInfo +
+            (f.snapshotSha256 ? ' · sha256:' + String(f.snapshotSha256).slice(0, 12) : '') +
             ((f.adrs && f.adrs.length) ? ' · ' + f.adrs.length + ' ADR(s)' : '') +
             ((f.controls && f.controls.length) ? ' · ' + f.controls.length + ' active control(s)' : '') +
             ((f.flows && f.flows.length) ? ' · ' + f.flows.length + ' CALM flow(s)' : '');
+          if (f.snapshotSha256) {
+            metaSub.title = 'Snapshot SHA-256: ' + String(f.snapshotSha256);
+          }
 
           metaTextWrap.appendChild(metaTitle);
           metaTextWrap.appendChild(metaSub);

@@ -11,6 +11,7 @@
         "required-pattern": "snapshots/01-0cf60641-legacy-items-to-prefixitems-migration.pattern.json"
       },
       "metadata": {
+        "snapshot-sha256": "e8694ec42a532951881be20e5866477bc62c24b2f1ee8db39e60f24ba78d583b",
         "commits": [
           "3ace47c9",
           "53346add",
@@ -38,6 +39,7 @@
         "required-pattern": "snapshots/02-97ae376f-typed-interfaces-and-finos-namespace.pattern.json"
       },
       "metadata": {
+        "snapshot-sha256": "d10493c999ef33c8229e7261ae65d089c24d631c23d2aabef557e2a2b3b14151",
         "commits": [
           "ba39ab47",
           "a1c8e580",
@@ -67,6 +69,7 @@
         "required-pattern": "snapshots/03-f7f7ee7b-direct-consumer-identity-handshake.pattern.json"
       },
       "metadata": {
+        "snapshot-sha256": "a141ce076f411eb940b7a8e0203ba6aee246e80abf8cb113696f94c9e242140f",
         "commits": [
           "f7f7ee7b"
         ],
@@ -86,6 +89,7 @@
         "required-pattern": "snapshots/04-472e5e34-calm-release-schema-standardization.pattern.json"
       },
       "metadata": {
+        "snapshot-sha256": "c93846b6131f2b919daf7625749fdbc6c12f4c4bfd061dffc9ae6bfdb66ac099",
         "commits": [
           "7e2a7178",
           "fd445f23",

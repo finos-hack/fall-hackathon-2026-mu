@@ -11,6 +11,7 @@
         "detailed-architecture": "snapshots/01-cafb27c5-2024-08-29-initial-architecture-domains-example.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "ad81fbc033652cce4cb4a931543a636d4b0c0a2018ba6897cce0a67d40090b7d",
         "commits": [
           "cafb27c5"
         ],
@@ -30,6 +31,7 @@
         "detailed-architecture": "snapshots/02-a13f51d7-2025-04-10-fixes-calm-generate-to-support-generi.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "1ed1fed0377f923298f7789d3c91cf297bfa527cc01840052db2a795f5954350",
         "commits": [
           "936d86ba",
           "4beddb01",
@@ -57,6 +59,7 @@
         "detailed-architecture": "snapshots/03-717350be-2025-07-20-update-types-models-and-tooling-to-me.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "816bbbad4513f6c5d85c7de9bb1e0069eefc05ef8111a7b7577f33ebe295e62b",
         "commits": [
           "717350be"
         ],
@@ -76,6 +79,7 @@
         "detailed-architecture": "snapshots/04-fc3a4f66-2025-07-25-add-support-for-flows-inside-pattern.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "18b4e7dc5f904c167ef6808437238a579fb64fe809c79e0f7bb6a4e003fef837",
         "commits": [
           "fc3a4f66"
         ],
@@ -95,6 +99,7 @@
         "detailed-architecture": "snapshots/05-e449e63d-2025-08-04-create-new-business-model-that-allows.architecture.json"
       },
       "metadata": {
+        "snapshot-sha256": "e5f92cddab19b7bdcfda014a889321c15f6d18f4cc8f3ab38acb699924e00696",
         "commits": [
           "e449e63d"
         ],

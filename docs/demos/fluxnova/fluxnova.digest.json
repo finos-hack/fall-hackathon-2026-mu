@@ -62,6 +62,7 @@
       "author": "Matthew Bain",
       "subject": "feat(calm-suite): add CALM Guard and CALM Studio projects",
       "summaryLine": "Initial baseline with 7 node(s), 11 relationship(s), 2 control(s)",
+      "snapshotSha256": "9a6ce3b83eaf62f619cfe3e45c68024e6107ea1475a2cb8199d4cf4794ac34a7",
       "changes": [
         "Added node FluxNova Platform (fluxnova-platform)",
         "Added node FluxNova BPM Engine (fluxnova-engine)",
@@ -94,6 +95,7 @@
       "author": "Gourav J. Shah",
       "subject": "fix(calm-suite): align calm-studio with canonical CALM nested relationship form (#2550) (#2553)",
       "summaryLine": "~1 node(s), ~11 rel(s), controls(+0/~2/-0)",
+      "snapshotSha256": "148408df98071d91c77f31b28402c1380d7fbc7b337eeab48b66ee7bce3314af",
       "changes": [
         "Modified node FluxNova BPM Engine (fluxnova-engine) [controls]",
         "Modified relationship engine-to-process-db",
@@ -120,6 +122,7 @@
       "author": "jpgough-ms",
       "subject": "feat(calm-hub): seed FluxNova example architectures into read-only hub (#2914)",
       "summaryLine": "~1 node(s), ~1 rel(s), controls(+0/~2/-0)",
+      "snapshotSha256": "fce0d2104bad50b88ab3a25af9354255fd51c7f9afb5e313fe8e723ea8611205",
       "changes": [
         "Modified node FluxNova BPM Engine (fluxnova-engine) [controls]",
         "Modified relationship engine-to-process-db",

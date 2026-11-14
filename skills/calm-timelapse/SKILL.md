@@ -45,7 +45,7 @@ npx calm-timelapse \
 
 This immediately produces a working deterministic timeline + HTML player **and** writes `system.digest.json` containing:
 - `stats`: total commits scanned, noise commits filtered, and `structuralCommitsRetained` (`N`).
-- `commits`: indexed `0` through `N - 1`, each with `sha`, `shortSha`, `date`, `subject`, `summaryLine`, concrete structural `changes`, and `coChangedAdrs`.
+- `commits`: indexed `0` through `N - 1`, each with `sha`, `shortSha`, `date`, `subject`, `summaryLine`, `snapshotSha256`, concrete structural `changes`, and `coChangedAdrs`.
 
 ---
 
@@ -109,5 +109,5 @@ npx calm-timelapse \
 
 What `calm-timelapse` guarantees deterministically:
 - Every architecture snapshot JSON is extracted **verbatim from Git** at the cluster's `endIndex` commit SHA — an AI assistant can never hallucinate nodes, relationships, or controls.
-- Co-changed ADRs and commit provenance (`metadata.commits`, `metadata.commit-messages`, `metadata.commit-count`) are attached automatically from Git.
+- Co-changed ADRs, `SHA-256` snapshot digests (`metadata["snapshot-sha256"]`), and commit provenance (`metadata.commits`, `metadata.commit-messages`, `metadata.commit-count`) are attached automatically from Git.
 - Commit `<arch>.clusters.json` alongside `<arch>.timeline.json` in Git so CI/CD reproduces the exact enriched timeline offline in milliseconds.

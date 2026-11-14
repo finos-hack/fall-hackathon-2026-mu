@@ -85,6 +85,7 @@
       "author": "FINOS Architecture Guild",
       "subject": "[TraderX Platform] feat(platform): bootstrap edge gateway and execution core subsystem",
       "summaryLine": "[TraderX Platform] Initial baseline with 3 node(s), 2 relationship(s)",
+      "snapshotSha256": "313a0d5c9acadb390c5f344f50d11958aad130da5dc57368e8fbd209f0d5c3ba",
       "changes": [
         "[TraderX Platform] Added node Institutional Desk (traderx-platform--institutional-client)",
         "[TraderX Platform] Added node TraderX Edge Gateway (traderx-platform--edge-gateway)",
@@ -107,6 +108,7 @@
       "author": "FINOS Architecture Guild",
       "subject": "[FINRA Surveillance] feat(surveillance): launch independent FINRA CAT drop-copy ingestor and compliance DB",
       "summaryLine": "[FINRA Surveillance] +2 node(s), +1 rel(s)",
+      "snapshotSha256": "30c35f0c1ed84c08d4f8493688286d29fceb826ea252efb85c28caa7a207b9a2",
       "changes": [
         "[FINRA Surveillance] Added node CAT Drop-Copy Ingestor (finra-surveillance--cat-ingestor)",
         "[FINRA Surveillance] Added node Surveillance Trades DB (finra-surveillance--postgres-trades-db)",
@@ -127,6 +129,7 @@
       "author": "FINOS Architecture Guild",
       "subject": "[TraderX Execution] feat(execution): publish execution-detail sub-architecture with SOR, matcher, and Kafka fills",
       "summaryLine": "[TraderX Execution] +4 node(s), +3 rel(s)",
+      "snapshotSha256": "c82e68f0a83c940eecbf0a2b215e9929348dad17a239d7756f6efb981fb2fce3",
       "changes": [
         "[TraderX Execution] Added node Smart Order Router (traderx-execution--sor-router)",
         "[TraderX Execution] Added node Internal Crossing Engine (traderx-execution--matching-engine)",
@@ -151,6 +154,7 @@
       "author": "FINOS Architecture Guild",
       "subject": "[TraderX Platform] feat(platform): link execution-core via detailed-architecture and attach T+1 settlement adapter",
       "summaryLine": "[TraderX Platform] +2 node(s), ~1 node(s), -1 node(s), +3 rel(s), ~1 rel(s)",
+      "snapshotSha256": "fcccffba88ade2ee31d5004add49ee343eaf7b77b5fcf40ccc84283a438eaed8",
       "changes": [
         "[TraderX Platform] Added node Shared Execution Event Bus (traderx-platform--kafka-event-bus)",
         "[TraderX Platform] Added node T+1 Settlement Adapter (traderx-platform--settlement-adapter)",
@@ -176,6 +180,7 @@
       "author": "FINOS Architecture Guild",
       "subject": "[TraderX Execution] feat(execution): enforce SEC 15c3-5 pre-trade risk gate and mTLS internal transport",
       "summaryLine": "[TraderX Execution] +1 node(s), +1 rel(s), ~2 rel(s), controls(+1/~0/-0)",
+      "snapshotSha256": "2dc4851873ace83794419b5a572dc2f7995c499f83e7436c10edfd42cdf7246b",
       "changes": [
         "[TraderX Execution] Added node SEC 15c3-5 Risk Gate (traderx-execution--pretrade-risk)",
         "[TraderX Execution] Added relationship traderx-execution--sor-to-risk",
@@ -198,6 +203,7 @@
       "author": "FINOS Architecture Guild",
       "subject": "[FINRA Surveillance] feat(surveillance): deploy spoofing detector and SEC 17a-4 WORM archive",
       "summaryLine": "[FINRA Surveillance] +2 node(s), +2 rel(s), controls(+1/~0/-0)",
+      "snapshotSha256": "61ba59ffe874d780b76ffa09c7fa891ec92d208ecacbc73c474a620f667c4c45",
       "changes": [
         "[FINRA Surveillance] Added node Spoofing & Layering Detector (finra-surveillance--finra-alert-engine)",
         "[FINRA Surveillance] Added node SEC 17a-4 WORM Archive (finra-surveillance--worm-audit-vault)",

@@ -1,10 +1,12 @@
 # CALM Timelapse (`calm-timelapse`)
 
-**Hackathon Track:** Track 3: Features
+**Hackathon Track:** Track 3: Features · **Live GitHub Pages Gallery:** [**finos-hack.github.io/fall-hackathon-2026-mu**](https://finos-hack.github.io/fall-hackathon-2026-mu/)
 
-Reviewers and auditors regularly ask what an architecture—or an ecosystem of interacting architectures across repositories—looked like on a specific past date and why it changed. Answering that today means reading raw Git diffs by hand or manually pre-saving versioned JSON snapshots. In upstream `@finos/calm-cli`, `calm timeline -a` builds an implied timeline only from pre-saved versioned files on disk (such as `arch-1.0.0.json`, `arch-2.0.0.json`), and `calm diff --timeline` outputs text or Markdown tables. **CALM Timelapse** bridges **FINOS CALM** with **Git** directly: it walks `git log --follow` across one or multiple Git repositories and CALM files simultaneously, filters out pure JSON formatting and key-reordering noise, emits schema-validated `calm-timeline` (`1.2` and `1.3`, validated against `@finos/calm-schema` `1.3.0`) artifacts plus historical snapshot files, and renders a zero-dependency interactive HTML/SVG player with both a single-viewport **Timelapse Stage** and a reverse-chronological **Architecture Feed**—with zero runtime network calls.
+[![CALM Timelapse 72-Second Interactive Walkthrough](docs/assets/calm-timelapse-demo.gif)](https://finos-hack.github.io/fall-hackathon-2026-mu/)
 
-> **Interactive Demo Gallery:** Open `docs/index.html` locally (or visit `https://finos-hack.github.io/fall-hackathon-2026-mu/` when GitHub Pages is enabled on `docs/`) to explore 10 pre-built single-repo, multi-repo, and upstream FINOS architectures in either **Timelapse Stage** or **Architecture Feed** (`#feed`) mode without building from source.
+> **Try Live in Browser (Zero Install):** [**Demo Gallery**](https://finos-hack.github.io/fall-hackathon-2026-mu/) · [**Upstream FINOS TraderX Stage**](https://finos-hack.github.io/fall-hackathon-2026-mu/demos/finos-traderx/finos-traderx.timelapse.html) · [**3-Repo Federated Stage**](https://finos-hack.github.io/fall-hackathon-2026-mu/demos/multi-repo/multi-repo.timelapse.html) · [**Reverse-Chronological Feed (`#feed`)**](https://finos-hack.github.io/fall-hackathon-2026-mu/demos/finos-traderx/finos-traderx.timelapse.html#feed) · [**72s HD Walkthrough Video (`.mp4`)**](https://finos-hack.github.io/fall-hackathon-2026-mu/assets/calm-timelapse-demo.mp4)
+
+Reviewers and auditors regularly ask what an architecture—or an ecosystem of interacting architectures across repositories—looked like on a specific past date and why it changed. Answering that today means reading raw Git diffs by hand or manually pre-saving versioned JSON snapshots. In upstream `@finos/calm-cli`, `calm timeline -a` builds an implied timeline only from pre-saved versioned files on disk (such as `arch-1.0.0.json`, `arch-2.0.0.json`), and `calm diff --timeline` outputs text or Markdown tables. **CALM Timelapse** bridges **FINOS CALM** with **Git** directly: it walks `git log --follow` across one or multiple Git repositories and CALM files simultaneously, filters out pure JSON formatting and key-reordering noise, emits schema-validated `calm-timeline` (`1.2` and `1.3`, validated against `@finos/calm-schema` `1.3.0`) artifacts plus SHA-256-attested historical snapshot files, and renders a zero-dependency interactive HTML/SVG player with both a single-viewport **Timelapse Stage** and a reverse-chronological **Architecture Feed**—with zero runtime network calls.
 
 ## Installation
 
@@ -104,11 +106,102 @@ Example `clusters.json` covering structural commit indices `0..2`:
 ]
 ```
 
-**Safeguards if assistant output is malformed:** `validateClusterSpecs` enforces contiguous, non-overlapping coverage from `0` to `N - 1` (`startIndex = 0`, each next `startIndex = prev.endIndex + 1`, final `endIndex = N - 1`). Any gap, overlap, reversed range, or empty title/description aborts immediately with an explicit validation error, and every architecture snapshot is still written verbatim from Git blobs—never synthesized by an assistant.
+**Safeguards if assistant output is malformed:** `validateClusterSpecs` enforces contiguous, non-overlapping coverage from `0` to `N - 1` (`startIndex = 0`, each next `startIndex = prev.endIndex + 1`, final `endIndex = N - 1`). Any gap, overlap, reversed range, or uncovered trailing commit aborts immediately with a diagnostic validation error, and every architecture snapshot is written verbatim from Git blobs with its `SHA-256` digest recorded in both `digest.commits[].snapshotSha256` and `moment.metadata["snapshot-sha256"]`—never synthesized by an assistant.
 
-### 4. Upstream FINOS TraderX + FINOS FDC3 Import (`--from-traderx <repoDir>`)
+#### AI Workflow Evidence
 
-Import a local clone of [`finos/traderx`](https://github.com/finos/traderx) directly into CALM `1.3` snapshots, a Spectral-clean `calm-timeline`, and an interactive player—translating **FINOS TraderX** Spec-Kit artifacts (`catalog/state-catalog.json`, `specs/*/system/architecture.model.json`, `system-requirements.md`, `requirements/nonfunctional-delta.md`, `docs/adr/*.md`) and **FINOS FDC3 2.2 / AppD 2.0** specs (`specs/014-fdc3-intent-interoperability/contracts/contract-delta.md` + `appd.v2.json`) into typed CALM `interfaces`, `flows`, and `controls`:
+Below is an actual end-to-end run against FINOS CALM's own self-architecture (`calm/architecture/calm-3.json` in `finos/architecture-as-code`, stored in [`docs/demos/calm-self/`](./docs/demos/calm-self/)):
+
+1. **Sample Digest ([`calm-self.digest.json`](./docs/demos/calm-self/calm-self.digest.json), abbreviated to commits `0..1` of `0..4`):**
+
+```json
+{
+  "schemaVersion": "1.0",
+  "sourceFile": "calm-3.json",
+  "latestCommitDate": "2026-07-25",
+  "stats": {
+    "totalCommitsScanned": 8,
+    "validSnapshotsParsed": 7,
+    "noiseCommitsFiltered": 2,
+    "structuralCommitsRetained": 5
+  },
+  "commits": [
+    {
+      "index": 0,
+      "shortSha": "f1486acb",
+      "date": "2025-12-23",
+      "subject": "docs(calm): Define CALM in CALM",
+      "summaryLine": "Initial baseline with 8 node(s), 8 relationship(s)",
+      "snapshotSha256": "296c44d1450f024d446d9d7c211288fa254232123b80784f8f8033d25d297ee0",
+      "changes": ["Added node CALM CLI (calm-cli)", "Added node CALM Hub API (calm-hub)", "..."]
+    },
+    {
+      "index": 1,
+      "shortSha": "784858e7",
+      "date": "2025-12-23",
+      "subject": "docs(calm): remove unwanted hallucinations",
+      "summaryLine": "~4 node(s), ~3 rel(s)",
+      "snapshotSha256": "540708fe3de3780bb03c8f778f24d5af95f1f8747786438122694b9687929cc3",
+      "changes": ["Modified node CALM CLI (calm-cli) [interfaces]", "Modified relationship cli-to-hub", "..."]
+    }
+  ]
+}
+```
+
+2. **Prompt Handed to the Approved IDE Assistant (with [`skills/calm-timelapse/SKILL.md`](./skills/calm-timelapse/SKILL.md)):**
+
+```text
+Read docs/demos/calm-self/calm-self.digest.json and follow skills/calm-timelapse/SKILL.md to write
+docs/demos/calm-self/calm-self.clusters.json. Cover structural commit indices 0..4 contiguously with
+zero gaps or overlaps, use 3-7 word executive phase names (no conventional-commit prefixes), and write
+concise narratives citing concrete CALM node, relationship, and flow IDs without mechanical count tokens.
+```
+
+3. **Assistant's Accepted Output ([`calm-self.clusters.json`](./docs/demos/calm-self/calm-self.clusters.json)):**
+
+```json
+[
+  {
+    "startIndex": 0,
+    "endIndex": 1,
+    "uniqueId": "core-cli-hub-and-vscode-baseline",
+    "name": "Core CLI, Hub, and VSCode Baseline",
+    "description": "Models FINOS CALM in CALM with calm-cli, calm-vscode, calm-hub, calm-hub-ui, and mongodb inside calm-hub-system and vscode, then refines interface bindings across cli-to-hub, hub-to-db, and hub-ui-to-hub."
+  },
+  {
+    "startIndex": 2,
+    "endIndex": 3,
+    "uniqueId": "operational-publish-and-ide-flows",
+    "name": "Operational Publish and IDE Flows",
+    "description": "Introduces end-to-end behavioral flows—Publish Architecture, Browse Architectures, and Validate Architecture in IDE—capturing sequenced transitions from calm-user through calm-cli and calm-hub-ui to mongodb."
+  },
+  {
+    "startIndex": 4,
+    "endIndex": 4,
+    "uniqueId": "calm-studio-and-validation-server",
+    "name": "CalmStudio and Validation Server Expansion",
+    "description": "Expands the platform with browser-based calm-studio and standalone calm-server exposing calm-server-validate-api, while linking calm-hub to its internal layered architecture specification."
+  }
+]
+```
+
+4. **Rejected Malformed Output & Exact Validator Error:** If the assistant omits commit index `2` (`77749fa4`), `calm-timelapse` aborts before writing any timeline or snapshots:
+
+```json
+[
+  { "startIndex": 0, "endIndex": 1, "uniqueId": "core-cli-hub-and-vscode-baseline", "name": "Core CLI, Hub, and VSCode Baseline" },
+  { "startIndex": 3, "endIndex": 4, "uniqueId": "calm-studio-and-validation-server", "name": "CalmStudio and Validation Server Expansion" }
+]
+```
+
+```text
+$ node dist/cli.js --from-git ../finos/calm/architecture/calm-3.json --clusters calm-self.bad.clusters.json
+Error: Invalid cluster definitions (expected a non-empty JSON array covering commit indices 0..4 contiguously without gaps or overlaps): clusters[1].startIndex is 3, expected 2 (gap skipping commit index 2).
+```
+
+### 4. Upstream FINOS TraderX Import (`--from-traderx <repoDir>`) — Translates FDC3 Contracts into Validated CALM
+
+Import a local clone of [`finos/traderx`](https://github.com/finos/traderx) directly into CALM `1.3` snapshots, a Spectral-clean `calm-timeline`, and an interactive player—converting **FINOS TraderX** Spec-Kit artifacts (`catalog/state-catalog.json`, `specs/*/system/architecture.model.json`, `system-requirements.md`, `requirements/nonfunctional-delta.md`, `docs/adr/*.md`) and **translating FDC3 contracts into validated CALM** (`specs/014-fdc3-intent-interoperability/contracts/contract-delta.md` + `appd.v2.json` → CALM `1.3` `interfaces` and `flows`):
 
 ```sh
 node dist/cli.js \
@@ -121,7 +214,7 @@ node dist/cli.js \
   --validate-snapshots
 ```
 
-- **FDC3 2.2 Intents, Contexts & AppD → CALM `interfaces` & `flows`:** Parses `contract-delta.md` and `appd.v2.json` (`traderx-intent-launcher-1`) into CALM `1.3` node `interfaces` wired across `connects` relationships (`listens-for`: `ViewOrders`, `TraderX.CreateTradeTicket`, `TraderX.CreateOrderTicket`; `raises`: `ViewChart`, `ViewQuote`; contexts: `fdc3.instrument`, `fdc3.account`) plus 3 schema-validated CALM `flows` (`flow-fdc3-outbound-instrument-and-chart-intent`, `flow-fdc3-inbound-ticket-launch-to-execution`, `flow-fdc3-view-orders-and-realtime-blotter`).
+- **Translates FDC3 Contracts into Validated CALM:** Parses `contract-delta.md` and `appd.v2.json` (`traderx-intent-launcher-1`) into CALM `1.3` node `interfaces` wired across `connects` relationships (`listens-for`: `ViewOrders`, `TraderX.CreateTradeTicket`, `TraderX.CreateOrderTicket`; `raises`: `ViewChart`, `ViewQuote`; contexts: `fdc3.instrument`, `fdc3.account`) plus 3 schema- and Spectral-validated CALM `flows` (`flow-fdc3-outbound-instrument-and-chart-intent`, `flow-fdc3-inbound-ticket-launch-to-execution`, `flow-fdc3-view-orders-and-realtime-blotter`).
 - **Real Spec-Kit Governance → 22 Progressive CALM `controls`:** Parses `system-requirements.md` and `nonfunctional-delta.md` across States `001`–`014` into architecture-level and node-level CALM `1.3` `controls` (pre-publish trade validation, NATS account-scoped subject isolation, `C1`/`C2`/`C3` GHCR release provenance, auditable order-matcher logs, FDC3 public-symbol data minimization, Sail sidecar ingress isolation, and `GHSA-w5hq-g745-h8pq` dependency override).
 
 ### 5. Visual Player for Existing Hand-Curated Timelines (`--timeline <files...>`)
@@ -142,23 +235,23 @@ node dist/cli.js \
 | **Dual Views: Stage & Architecture Feed** | Toggle between **Timelapse Stage** (single-viewport scrubber) and **Architecture Feed** (`--feed` or `#feed`), which presents moments in **reverse chronological order** (`Latest First`, `N → 1`) as scrollable posts pairing an auto-cropped architecture diagram, narrative summary, change/ADR chips, `⬇ Save SVG`, and `Inspect in Stage →` |
 | **Project & Subsystem Filtering** | Filter multi-repo graphs and feed posts by repository (`Project`), keyword search, or node (`Subsystem`), with optional `1-hop only` blast-radius isolation |
 | **As-Of Date & Baseline Diff** | Jump to the authoritative architecture effective on any `YYYY-MM-DD` date or diff any baseline moment against the current frame |
-| **Governance & ADR Posture** | Inspect active CALM `1.3` `controls` requirements, cumulative co-changed ADRs, and `detailed-architecture` merge provenance per moment |
+| **Governance, Flows & SHA-256 Integrity** | Inspect active CALM `1.3` `controls` requirements, `flows`, cumulative co-changed ADRs, `detailed-architecture` merge provenance, and tamper-evident `snapshot-sha256` digests per moment |
 | **Offline Single-File HTML** | Self-contained SVG player with zoom/pan, keyboard transport (`Space`, `←`/`→`), and zero external CDN, font, or script requests |
 
 | CLI Flag | Description |
 |---|---|
 | `--from-git <files...>` | Extract and synchronize one or more Git-tracked CALM files (supports `Label=path`) |
-| `--from-traderx <repoDir>` | Import upstream [`finos/traderx`](https://github.com/finos/traderx) progressive state catalog (`001`–`014` + FINOS FDC3), ADRs, and Git commits into CALM `1.3` |
+| `--from-traderx <repoDir>` | Import upstream [`finos/traderx`](https://github.com/finos/traderx) state catalog (`001`–`014`), Spec-Kit controls, ADRs, and Git commits, and translate FDC3 contracts into validated CALM `1.3` |
 | `--resolve-details` | Auto-discover and synchronize same-repo `details.detailed-architecture` child files |
 | `--max-commits <n>` / `--first-parent` | Optional commit cap (unlimited by default) and optional first-parent mainline walk |
 | `--timeline <files...>` | Validate or synchronize one or more existing `calm-timeline` JSON files |
-| `--emit-digest <file>` / `--clusters <file>` | Export deterministic diff digests and apply validated `0..N-1` phase clusters |
+| `--emit-digest <file>` / `--clusters <file>` | Export deterministic diff digests (with `snapshotSha256`) and apply validated `0..N-1` phase clusters |
 | `--timelapse [html]` / `--feed` | Render standalone HTML/SVG player (pass `--feed` to open in Architecture Feed mode by default) |
-| `--validate` / `--validate-snapshots` | Validate `calm-timeline` structure and every emitted CALM `1.3` snapshot |
+| `--validate` / `--validate-snapshots` | Validate `calm-timeline` structure + `snapshot-sha256` file integrity and every emitted CALM `1.3` snapshot |
 
 ### 6. Interactive Demo Gallery (`docs/demos/`)
 
-- **Upstream `finos/traderx` + FINOS FDC3 (`docs/demos/finos-traderx/`):** Imported directly from [`finos/traderx`](https://github.com/finos/traderx) via `--from-traderx`—converts **13 progressive architectural states (`001`–`014`), 22 real Spec-Kit CALM `1.3` controls, 8 real ADRs, and 135 commit references**, culminating in **FINOS FDC3 2.2** `interfaces` and **3 FDC3 CALM `flows`** (`014-fdc3-intent-interoperability`).
+- **Upstream `finos/traderx` (`docs/demos/finos-traderx/`):** Imported directly from [`finos/traderx`](https://github.com/finos/traderx) via `--from-traderx`—converts **13 progressive architectural states (`001`–`014`), 22 real Spec-Kit CALM `1.3` controls, 8 real ADRs, and 135 commit references**, and **translates FDC3 contracts into validated CALM** (`interfaces` and 3 CALM `flows` for `014-fdc3-intent-interoperability`).
 - **Multi-Repo Trading & FINRA Surveillance (`docs/demos/multi-repo/`):** Reproducible via `npm run demo:multi-repo`—synchronizes **3 independent Git repositories** (`traderx-platform`, `traderx-execution`, `finra-surveillance`) across 5 moments, demonstrating `details.detailed-architecture` boundary merging alongside strict peer isolation.
 - **Federated FINOS CALM Core + CALM Timelapse (`docs/demos/finos-federated/`):** Synchronizes `calm-3.json` + auto-discovered `calm-hub-detail.architecture.json` (`--resolve-details`) from `finos/architecture-as-code` with this repository's own `architecture.calm.json` (**19 commits → 8 moments**, 4 formatting commits filtered).
 - **Simulated 40-Commit Compliance Benchmark (`docs/demos/traderx/`):** Synthetic stress-test benchmark reproducible via `npm run demo:traderx` (`scripts/seed-traderx-demo.sh`)—**40 Git commits collapse to 9 moments** (5 formatting-only commits filtered, 5 co-changed ADRs, and 4 CALM `1.3` controls).
@@ -203,11 +296,12 @@ This repository models its own zero-network architecture in `architecture.calm.j
 
 This project was built during a time-boxed FINOS hackathon.
 
-1. Contribute `--from-git` single-repo and multi-repo history extraction upstream to `@finos/calm-cli` (`calm timeline`).
-2. Contribute the zero-network diff digest and cluster skill (`skills/calm-timelapse/SKILL.md`) to `@finos/calm-ai`.
-3. Embed the single-viewport SVG timelapse scrubber and Project filter as a webview panel inside `calm-plugins/vscode`.
-4. Add historical moment comparison and as-of date playback to `calm-hub` and `calm-hub-ui`.
-5. Resolve remote CALM Hub `detailed-architecture` URIs via an optional local cache directory while preserving offline execution.
+1. **Signed-commit verification & cryptographic author attestation:** Extend snapshot `SHA-256` provenance (`moment.metadata["snapshot-sha256"]` and `digest.commits[].snapshotSha256`) with offline Git GPG, SSH, and Sigstore (`gitsign`) commit-signature verification (`git verify-commit`) so audit moments record verified signer status alongside snapshot hashes.
+2. Contribute `--from-git` single-repo and multi-repo history extraction upstream to `@finos/calm-cli` (`calm timeline`).
+3. Contribute the zero-network diff digest and cluster skill (`skills/calm-timelapse/SKILL.md`) to `@finos/calm-ai`.
+4. Embed the single-viewport SVG timelapse scrubber and Project filter as a webview panel inside `calm-plugins/vscode`.
+5. Add historical moment comparison and as-of date playback to `calm-hub` and `calm-hub-ui`.
+6. Resolve remote CALM Hub `detailed-architecture` URIs via an optional local cache directory while preserving offline execution.
 
 ## Contributing
 

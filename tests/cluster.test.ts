@@ -143,6 +143,9 @@ describe('deterministicClusterCommits, digest generation, and cluster specs', ()
             author: 'Alice',
             subject: 'feat: add service A',
         });
+        expect(digest.commits[0].snapshotSha256).toMatch(/^[a-f0-9]{64}$/);
+        expect(digest.commits[1].snapshotSha256).toMatch(/^[a-f0-9]{64}$/);
+        expect(digest.commits[0].snapshotSha256).not.toBe(digest.commits[1].snapshotSha256);
         expect(digest.commits[1].coChangedAdrs).toEqual(['adrs/001-storage.md']);
         expect(noiseCommitsFiltered).toBe(0);
 
@@ -171,8 +174,19 @@ describe('deterministicClusterCommits, digest generation, and cluster specs', ()
         expect(partialSpec[0].description).toContain('Establishes the initial architecture baseline');
 
         expect(() => applyClusterSpecs(deltas, [{ startIndex: 0, endIndex: 0 }])).toThrow(
-            /covering commit indices 0\.\.1 contiguously/,
+            /covering commit indices 0\.\.1 contiguously.*final endIndex is 0, expected 1/,
         );
+        expect(() =>
+            applyClusterSpecs(deltas, [
+                { startIndex: 1, endIndex: 1 },
+            ]),
+        ).toThrow(/gap skipping commit index 0/);
+        expect(() =>
+            applyClusterSpecs(deltas, [
+                { startIndex: 0, endIndex: 0 },
+                { startIndex: 0, endIndex: 1 },
+            ]),
+        ).toThrow(/overlap at commit index 0/);
     });
 
     it('strips leading 1-3 digit step numbers after conventional-commit prefixes', () => {
