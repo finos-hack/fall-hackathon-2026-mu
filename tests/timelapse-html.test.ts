@@ -6,6 +6,7 @@ import * as path from 'node:path';
 import * as vm from 'node:vm';
 import { afterEach, describe, expect, it } from 'vitest';
 import { computeStructuralDelta } from '../src/calm-diff.js';
+import { assembleCalmTimeline, formatCalmSourceDisplay } from '../src/timeline-emitter.js';
 import {
   buildTimelapsePayloadFromClusters,
   buildTimelapsePayloadFromTimelineFile,
@@ -619,5 +620,132 @@ describe('timelapse-html', () => {
     const scriptMatch = feedHtml.match(/<script>([\s\S]*?)<\/script>/);
     expect(scriptMatch).not.toBeNull();
     expect(() => new Function(scriptMatch![1])).not.toThrow();
+  });
+
+  it('balances large 160+ node graphs, scopes inline controls without duplicating top-level IDs, and qualifies generic filenames', () => {
+    const largeNodes = Array.from({ length: 162 }, (_, i) => ({
+      id: `n-${i}`,
+      name: `Node ${i}`,
+      nodeType: i < 4 ? 'actor' : i < 120 ? 'service' : 'database',
+    }));
+    const largeEdges = Array.from({ length: 158 }, (_, i) => ({
+      id: `e-${i}`,
+      source: `n-${i % 4}`,
+      target: `n-${i + 4}`,
+      label: 'HTTPS',
+      relType: i < 80 ? 'composed-of' : 'connects',
+    }));
+
+    const largeLayout = computeSuperGraphLayout(largeNodes, largeEdges);
+    expect(Object.keys(largeLayout.positions)).toHaveLength(162);
+    const aspect = largeLayout.canvasWidth / largeLayout.canvasHeight;
+    expect(aspect).toBeGreaterThan(0.9);
+    expect(aspect).toBeLessThan(2.6);
+
+    const scopedControls = extractActiveControls({
+      controls: {
+        'shared-top-ctrl': {
+          description: 'Top-level policy',
+          requirements: [{ 'requirement-url': 'https://example.org/req' }],
+        },
+      },
+      nodes: [
+        {
+          'unique-id': 'stream-a',
+          name: 'Stream A',
+          'node-type': 'service',
+          controls: {
+            ownership: { description: 'Single writer A', requirements: [{ 'requirement-url': 'u1' }] },
+            'shared-top-ctrl': { description: 'Mirrored on node', requirements: [{ 'requirement-url': 'u2' }] },
+          },
+        },
+        {
+          'unique-id': 'stream-b',
+          name: 'Stream B',
+          'node-type': 'service',
+          controls: {
+            ownership: { description: 'Single writer B', requirements: [{ 'requirement-url': 'u3' }] },
+          },
+        },
+      ],
+      relationships: [
+        {
+          'unique-id': 'rel-ab',
+          'relationship-type': { connects: { source: { node: 'stream-a' }, destination: { node: 'stream-b' } } },
+          controls: {
+            ownership: { description: 'Transport ownership', requirements: [{ 'requirement-url': 'u4' }] },
+          },
+        },
+      ],
+    });
+    expect(scopedControls.map((c) => c.id)).toEqual([
+      'shared-top-ctrl',
+      'stream-a:ownership',
+      'stream-b:ownership',
+      'rel-ab:ownership',
+    ]);
+
+    expect(formatCalmSourceDisplay('/tmp/vexa/architecture.calm.json', '/tmp/vexa')).toBe(
+      'vexa/architecture.calm.json',
+    );
+    expect(formatCalmSourceDisplay('vexa/architecture.calm.json')).toBe(
+      'vexa/architecture.calm.json',
+    );
+    expect(formatCalmSourceDisplay('/some/local/path/arch.json')).toBe('arch.json');
+
+    const tmpOut = fs.mkdtempSync(path.join(os.tmpdir(), 'calm-tl-qual-'));
+    tempDirs.push(tmpOut);
+    const doc = {
+      nodes: [{ 'unique-id': 'svc', name: 'Svc', 'node-type': 'service', description: 'Svc' }],
+      relationships: [],
+    };
+    const d1 = computeStructuralDelta(null, doc);
+    const tlPath = path.join(tmpOut, 'vexa.timeline.json');
+    const { timeline } = assembleCalmTimeline(
+      [
+        {
+          startIndex: 0,
+          endIndex: 0,
+          uniqueId: 'm1',
+          name: 'M1',
+          description: 'M1',
+          validFrom: '2026-07-01',
+          adrs: [],
+          commits: [
+            {
+              commit: {
+                sha: 'abcdef1234567890',
+                shortSha: 'abcdef1',
+                date: '2026-07-01',
+                author: 'Dev',
+                subject: 'init',
+                body: '',
+                historicalPath: 'architecture.calm.json',
+                coChangedAdrs: [],
+                document: doc,
+              },
+              isInitial: true,
+              changeItems: d1.changeItems,
+              counts: d1.counts,
+              summaryLine: 'Init',
+            },
+          ],
+          mergedChangeItems: d1.changeItems,
+          snapshotDocument: doc,
+        },
+      ],
+      {
+        sourceFilePath: '/tmp/vexa/architecture.calm.json',
+        repoRoot: '/tmp/vexa',
+        outputPath: tlPath,
+        snapshotsDir: path.join(tmpOut, 'snapshots'),
+      },
+    );
+    fs.writeFileSync(tlPath, JSON.stringify(timeline, null, 2));
+    expect(timeline.metadata?.title).toBe('Git Architecture Timeline — vexa/architecture.calm.json');
+
+    const fromTlPayload = buildTimelapsePayloadFromTimelineFile(tlPath);
+    expect(fromTlPayload.sourceFile).toBe('vexa/architecture.calm.json');
+    expect(fromTlPayload.title).toBe('CALM Architecture Timelapse — vexa/architecture.calm.json');
   });
 });

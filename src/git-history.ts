@@ -8,6 +8,8 @@ import type { GitCommandRunner, GitCommitSnapshot, StructuralCommitDelta } from 
 
 const ADR_PATH_PATTERN =
     /(?:^|\/)(?:adrs?|decisions?)\/[^/]+\.(?:md|mdx|adoc)$|(?:^|\/)adr[-_0-9][^/]*\.(?:md|mdx|adoc)$/i;
+const MAX_CHANGED_FILES_FOR_ADR_COCHANGE = 250;
+const MAX_COCHANGED_ADRS_PER_COMMIT = 10;
 
 export const defaultGitRunner: GitCommandRunner = (args: string[], cwd: string): string => {
     return execFileSync('git', args, {
@@ -148,9 +150,9 @@ export function extractGitHistory(
                     if (lines.length === 0) continue;
                     const commitSha = lines[0];
                     const changedFiles = lines.slice(1);
-                    if (changedFiles.length <= 20) {
+                    if (changedFiles.length <= MAX_CHANGED_FILES_FOR_ADR_COCHANGE) {
                         const adrs = changedFiles.filter((filePath) => ADR_PATH_PATTERN.test(filePath));
-                        if (adrs.length > 0) {
+                        if (adrs.length > 0 && adrs.length <= MAX_COCHANGED_ADRS_PER_COMMIT) {
                             adrMap.set(commitSha, adrs);
                         }
                     }

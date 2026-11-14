@@ -44,6 +44,46 @@ export function computeSnapshotSha256(content: string | Buffer): string {
     return createHash('sha256').update(content).digest('hex');
 }
 
+const GENERIC_CALM_BASENAME_RE =
+    /^(?:architecture(?:\.calm|\.arch)?|calm(?:\.architecture|\.arch)?|system(?:\.calm|\.arch)?)\.json$/i;
+
+export function formatCalmSourceDisplay(filePath: string, repoRoot?: string): string {
+    const trimmed = filePath.trim();
+    if (!trimmed) return 'architecture.json';
+
+    const normalized = trimmed.replace(/\\/g, '/');
+    const base = path.posix.basename(normalized);
+    if (!GENERIC_CALM_BASENAME_RE.test(base)) {
+        return base;
+    }
+
+    if (repoRoot && repoRoot.trim()) {
+        const repoBase = path.basename(path.resolve(repoRoot));
+        if (repoBase && repoBase !== '/' && repoBase !== '.') {
+            return `${repoBase}/${base}`;
+        }
+    }
+
+    const parts = normalized.split('/').filter((p) => p.length > 0 && p !== '.');
+    if (
+        !normalized.startsWith('/') &&
+        !/^[a-zA-Z]:/.test(normalized) &&
+        parts.length === 2 &&
+        parts[0] !== '..'
+    ) {
+        return `${parts[0]}/${base}`;
+    }
+
+    if (normalized.includes('/') || existsSync(trimmed)) {
+        const parentName = path.basename(path.dirname(path.resolve(trimmed)));
+        if (parentName && parentName !== '/' && parentName !== '.') {
+            return `${parentName}/${base}`;
+        }
+    }
+
+    return base;
+}
+
 export function validateCalmArchitectureSnapshot(doc: Record<string, unknown>, label?: string): string[] {
     const errors: string[] = [];
     const prefix = label ? `${label}: ` : '';
@@ -138,6 +178,7 @@ export function assembleCalmTimeline(
     clusters: MomentCluster[],
     options: {
         sourceFilePath: string;
+        repoRoot?: string;
         outputPath?: string;
         snapshotsDir?: string;
         sources?: FederatedSourceDescriptor[];
@@ -232,13 +273,14 @@ export function assembleCalmTimeline(
     const sourceDisplay =
         options.sources && options.sources.length > 1
             ? options.sources.map((s) => s.sourceLabel).join(' + ')
-            : path.basename(options.sourceFilePath);
+            : formatCalmSourceDisplay(options.sourceFilePath, options.repoRoot);
     const timeline: GeneratedGitTimeline = {
         $schema: CALM_TIMELINE_SCHEMA,
         moments,
         metadata: {
             title: `Git Architecture Timeline — ${sourceDisplay}`,
             description: `Automatically synthesized from Git commit history of ${sourceDisplay}`,
+            'source-file': sourceDisplay,
             generator: 'calm-timelapse',
             ...(options.sources && options.sources.length > 1 ? { sources: options.sources } : {}),
         },

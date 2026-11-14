@@ -123,8 +123,9 @@
     }
   ],
   "metadata": {
-    "title": "Git Architecture Timeline — architecture.calm.json",
-    "description": "Automatically synthesized from Git commit history of architecture.calm.json",
+    "title": "Git Architecture Timeline — fall-hackathon-2026-mu/architecture.calm.json",
+    "description": "Automatically synthesized from Git commit history of fall-hackathon-2026-mu/architecture.calm.json",
+    "source-file": "fall-hackathon-2026-mu/architecture.calm.json",
     "generator": "calm-timelapse",
     "clustering-engine": "clusters-file",
     "total-commits-scanned": "6",
