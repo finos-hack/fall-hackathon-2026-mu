@@ -1,0 +1,749 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm.json",
+  "nodes": [
+    {
+      "unique-id": "trader-actor",
+      "node-type": "actor",
+      "name": "Institutional Equity Trader",
+      "description": "Executes equity block and algorithmic orders through TraderX Workstation."
+    },
+    {
+      "unique-id": "traderx-web",
+      "node-type": "webclient",
+      "name": "TraderX Blotter Web UI",
+      "description": "Browser order blotter for institutional equity trading desks."
+    },
+    {
+      "unique-id": "edge-api-gateway",
+      "node-type": "network",
+      "name": "Zero-Trust Edge API Gateway",
+      "description": "Envoy-based ingress gateway terminating TLS 1.3 and enforcing OIDC bearer tokens.",
+      "interfaces": [
+        {
+          "unique-id": "gateway-https",
+          "host": "api.traderx.internal",
+          "port": 443
+        }
+      ]
+    },
+    {
+      "unique-id": "ping-oidc-idp",
+      "node-type": "system",
+      "name": "Enterprise OIDC Identity Provider",
+      "description": "Issues short-lived FAPI-compliant OAuth 2.1 / OIDC tokens for trading desks."
+    },
+    {
+      "unique-id": "kafka-event-bus",
+      "node-type": "queue",
+      "name": "Kafka Order Event Backbone",
+      "description": "Partitioned low-latency event log carrying order commands, risk approvals, and execution fills."
+    },
+    {
+      "unique-id": "order-router-svc",
+      "node-type": "service",
+      "name": "Stateless Order Router",
+      "description": "Validates FIX/REST order payloads, assigns clOrdId, and orchestrates routing.",
+      "interfaces": [
+        {
+          "unique-id": "router-grpc",
+          "host": "order-router.internal",
+          "port": 9443
+        }
+      ]
+    },
+    {
+      "unique-id": "pretrade-risk-svc",
+      "node-type": "service",
+      "name": "Pre-Trade Risk Engine",
+      "description": "Evaluates SEC 15c3-5 market-access credit thresholds, fat-finger collars, and restricted lists.",
+      "interfaces": [
+        {
+          "unique-id": "risk-grpc",
+          "host": "risk.internal",
+          "port": 9444
+        }
+      ]
+    },
+    {
+      "unique-id": "redis-position-cache",
+      "node-type": "database",
+      "name": "In-Memory Intraday Position Cache",
+      "description": "Low-latency Redis Enterprise cluster tracking desk gross/net exposure in real time."
+    },
+    {
+      "unique-id": "fix-execution-gateway",
+      "node-type": "service",
+      "name": "FIX 4.4 Venue Execution Gateway",
+      "description": "Manages persistent QuickFIX sessions, drop-copy listeners, and child-order routing to exchanges.",
+      "interfaces": [
+        {
+          "unique-id": "fix-dropcopy-session",
+          "host": "fix-gw.internal",
+          "port": 9876
+        }
+      ]
+    },
+    {
+      "unique-id": "external-liquidity-venue",
+      "node-type": "system",
+      "name": "External Equity Exchange Venue",
+      "description": "Regulated matching engine accepting institutional FIX order flow and returning ExecutionReports."
+    },
+    {
+      "unique-id": "market-data-feed",
+      "node-type": "service",
+      "name": "Consolidated NBBO Market Data Ticker",
+      "description": "Normalizes SIP/direct-feed NBBO quotes for fat-finger collar and mark-to-market valuation."
+    },
+    {
+      "unique-id": "trade-ledger-svc",
+      "node-type": "service",
+      "name": "Canonical Trade Ledger Service",
+      "description": "Idempotent double-entry trade booking service consuming execution fills.",
+      "interfaces": [
+        {
+          "unique-id": "ledger-grpc",
+          "host": "ledger.internal",
+          "port": 9445
+        }
+      ]
+    },
+    {
+      "unique-id": "postgres-trades-db",
+      "node-type": "database",
+      "name": "Cloud-Native PostgreSQL Trade Store",
+      "description": "High-availability PostgreSQL cluster storing canonical trade bookings and allocations."
+    },
+    {
+      "unique-id": "settlement-clearing-svc",
+      "node-type": "service",
+      "name": "DTCC Clearing & Settlement Adapter",
+      "description": "Generates T+1 institutional trade affirmations and clearing instructions."
+    },
+    {
+      "unique-id": "worm-audit-archiver",
+      "node-type": "service",
+      "name": "Immutable Audit Archiver",
+      "description": "Hashes order/fill event envelopes into Merkle batches and seals them into WORM storage.",
+      "interfaces": [
+        {
+          "unique-id": "audit-verify-api",
+          "host": "audit.internal",
+          "port": 8443
+        }
+      ]
+    },
+    {
+      "unique-id": "s3-object-lock-vault",
+      "node-type": "database",
+      "name": "SEC 17a-4 WORM Object-Lock Vault",
+      "description": "Compliance-mode S3 Object Lock bucket preventing deletion or mutation for 7 years."
+    },
+    {
+      "unique-id": "compliance-officer",
+      "node-type": "actor",
+      "name": "Surveillance & Compliance Officer",
+      "description": "Inspects trade reconstruction evidence and cryptographic WORM proofs during supervisory reviews."
+    },
+    {
+      "unique-id": "otel-observability-hub",
+      "node-type": "system",
+      "name": "OpenTelemetry Tracing & SLO Hub",
+      "description": "Collects distributed trace spans, latency histograms, and breaker state across trading services."
+    },
+    {
+      "unique-id": "dr-standby-cluster",
+      "node-type": "system",
+      "name": "Warm-Standby Secondary Region Cluster",
+      "description": "Cross-region failover environment maintaining synchronized trade state and Kafka offsets."
+    },
+    {
+      "unique-id": "cat-regulatory-reporter",
+      "node-type": "service",
+      "name": "FINRA CAT Regulatory Reporter",
+      "description": "Assembles clock-synchronized order, route, and fill events into daily Consolidated Audit Trail submissions."
+    },
+    {
+      "unique-id": "finra-cat-portal",
+      "node-type": "system",
+      "name": "FINRA CAT Central Repository",
+      "description": "External regulatory intake system validating broker-dealer T+1 order lifecycle reports."
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "trader-uses-web",
+      "description": "Trader submits and monitors orders via web blotter.",
+      "relationship-type": {
+        "interacts": {
+          "actor": "trader-actor",
+          "nodes": [
+            "traderx-web"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "web-to-gateway",
+      "description": "Web blotter sends authenticated order requests over HTTPS.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "traderx-web"
+          },
+          "destination": {
+            "node": "edge-api-gateway",
+            "interfaces": [
+              "gateway-https"
+            ]
+          }
+        }
+      },
+      "protocol": "HTTPS"
+    },
+    {
+      "unique-id": "web-to-oidc",
+      "description": "Web blotter performs OAuth 2.1 PKCE login handshake.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "traderx-web"
+          },
+          "destination": {
+            "node": "ping-oidc-idp"
+          }
+        }
+      },
+      "protocol": "HTTPS"
+    },
+    {
+      "unique-id": "gateway-to-oidc",
+      "description": "Gateway validates JWT signatures via OIDC JWKS endpoint.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "edge-api-gateway"
+          },
+          "destination": {
+            "node": "ping-oidc-idp"
+          }
+        }
+      },
+      "protocol": "HTTPS"
+    },
+    {
+      "unique-id": "gateway-to-router",
+      "description": "Gateway dispatches validated client orders to stateless router over mTLS.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "edge-api-gateway"
+          },
+          "destination": {
+            "node": "order-router-svc",
+            "interfaces": [
+              "router-grpc"
+            ]
+          }
+        }
+      },
+      "protocol": "mTLS"
+    },
+    {
+      "unique-id": "router-to-kafka",
+      "description": "Order router publishes normalized OrderSubmitted events.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "order-router-svc"
+          },
+          "destination": {
+            "node": "kafka-event-bus"
+          }
+        }
+      },
+      "protocol": "AMQP"
+    },
+    {
+      "unique-id": "risk-to-redis",
+      "description": "Risk engine reads intraday net exposure counters over TLS.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "pretrade-risk-svc"
+          },
+          "destination": {
+            "node": "redis-position-cache"
+          }
+        }
+      },
+      "protocol": "TLS"
+    },
+    {
+      "unique-id": "router-to-risk",
+      "description": "Order router invokes synchronous pre-trade limit check over mTLS.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "order-router-svc"
+          },
+          "destination": {
+            "node": "pretrade-risk-svc",
+            "interfaces": [
+              "risk-grpc"
+            ]
+          }
+        }
+      },
+      "protocol": "mTLS"
+    },
+    {
+      "unique-id": "kafka-to-fix",
+      "description": "FIX gateway consumes risk-approved orders from Kafka.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "kafka-event-bus"
+          },
+          "destination": {
+            "node": "fix-execution-gateway"
+          }
+        }
+      },
+      "protocol": "mTLS"
+    },
+    {
+      "unique-id": "fix-to-venue",
+      "description": "FIX gateway transmits NewOrderSingle messages over leased TLS session.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "fix-execution-gateway"
+          },
+          "destination": {
+            "node": "external-liquidity-venue"
+          }
+        }
+      },
+      "protocol": "TLS"
+    },
+    {
+      "unique-id": "marketdata-to-redis",
+      "description": "Ticker streams live NBBO reference prices into Redis cache.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "market-data-feed"
+          },
+          "destination": {
+            "node": "redis-position-cache"
+          }
+        }
+      },
+      "protocol": "TLS"
+    },
+    {
+      "unique-id": "marketdata-to-risk",
+      "description": "Ticker pushes volatility circuit-breaker halts to pre-trade risk.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "market-data-feed"
+          },
+          "destination": {
+            "node": "pretrade-risk-svc",
+            "interfaces": [
+              "risk-grpc"
+            ]
+          }
+        }
+      },
+      "protocol": "mTLS"
+    },
+    {
+      "unique-id": "fix-to-kafka",
+      "description": "FIX gateway publishes ExecutionReport fills and busts back to Kafka.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "fix-execution-gateway"
+          },
+          "destination": {
+            "node": "kafka-event-bus"
+          }
+        }
+      },
+      "protocol": "mTLS"
+    },
+    {
+      "unique-id": "kafka-to-ledger",
+      "description": "Trade ledger consumes execution fills and lifecycle transitions from Kafka.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "kafka-event-bus"
+          },
+          "destination": {
+            "node": "trade-ledger-svc"
+          }
+        }
+      },
+      "protocol": "mTLS"
+    },
+    {
+      "unique-id": "ledger-to-postgres",
+      "description": "Trade ledger writes ACID trade records over JDBC.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "trade-ledger-svc"
+          },
+          "destination": {
+            "node": "postgres-trades-db"
+          }
+        }
+      },
+      "protocol": "JDBC"
+    },
+    {
+      "unique-id": "kafka-to-clearing",
+      "description": "Clearing adapter consumes booked trade events from Kafka.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "kafka-event-bus"
+          },
+          "destination": {
+            "node": "settlement-clearing-svc"
+          }
+        }
+      },
+      "protocol": "mTLS"
+    },
+    {
+      "unique-id": "clearing-to-postgres",
+      "description": "Clearing adapter reconciles allocation state against PostgreSQL.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "settlement-clearing-svc"
+          },
+          "destination": {
+            "node": "postgres-trades-db"
+          }
+        }
+      },
+      "protocol": "JDBC"
+    },
+    {
+      "unique-id": "kafka-to-archiver",
+      "description": "Archiver streams all order, risk, and fill topics from Kafka.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "kafka-event-bus"
+          },
+          "destination": {
+            "node": "worm-audit-archiver"
+          }
+        }
+      },
+      "protocol": "mTLS"
+    },
+    {
+      "unique-id": "archiver-to-worm",
+      "description": "Archiver writes SHA-256 chained Parquet batches into WORM vault.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "worm-audit-archiver"
+          },
+          "destination": {
+            "node": "s3-object-lock-vault"
+          }
+        }
+      },
+      "protocol": "HTTPS"
+    },
+    {
+      "unique-id": "compliance-queries-archiver",
+      "description": "Compliance officer verifies immutable order-trail proofs.",
+      "relationship-type": {
+        "interacts": {
+          "actor": "compliance-officer",
+          "nodes": [
+            "worm-audit-archiver"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "postgres-to-dr",
+      "description": "PostgreSQL streams WAL replication over encrypted cross-region link.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "postgres-trades-db"
+          },
+          "destination": {
+            "node": "dr-standby-cluster"
+          }
+        }
+      },
+      "protocol": "TLS"
+    },
+    {
+      "unique-id": "kafka-to-dr",
+      "description": "MirrorMaker 2 replicates order and fill topics to warm-standby region.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "kafka-event-bus"
+          },
+          "destination": {
+            "node": "dr-standby-cluster"
+          }
+        }
+      },
+      "protocol": "mTLS"
+    },
+    {
+      "unique-id": "router-to-otel",
+      "description": "Order router exports OTLP trace spans and latency metrics.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "order-router-svc"
+          },
+          "destination": {
+            "node": "otel-observability-hub"
+          }
+        }
+      },
+      "protocol": "HTTPS"
+    },
+    {
+      "unique-id": "risk-to-otel",
+      "description": "Pre-trade risk exports collar breach telemetry.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "pretrade-risk-svc"
+          },
+          "destination": {
+            "node": "otel-observability-hub"
+          }
+        }
+      },
+      "protocol": "HTTPS"
+    },
+    {
+      "unique-id": "fix-to-otel",
+      "description": "FIX gateway exports venue heartbeat and drop-copy lag metrics.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "fix-execution-gateway"
+          },
+          "destination": {
+            "node": "otel-observability-hub"
+          }
+        }
+      },
+      "protocol": "HTTPS"
+    },
+    {
+      "unique-id": "reporter-reads-worm",
+      "description": "CAT reporter reads sealed audit event batches from WORM vault.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "cat-regulatory-reporter"
+          },
+          "destination": {
+            "node": "s3-object-lock-vault"
+          }
+        }
+      },
+      "protocol": "HTTPS"
+    },
+    {
+      "unique-id": "reporter-reads-ledger",
+      "description": "CAT reporter reconciles order allocations with canonical trade ledger.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "cat-regulatory-reporter"
+          },
+          "destination": {
+            "node": "trade-ledger-svc",
+            "interfaces": [
+              "ledger-grpc"
+            ]
+          }
+        }
+      },
+      "protocol": "mTLS"
+    },
+    {
+      "unique-id": "reporter-to-finra",
+      "description": "CAT reporter transmits encrypted T+1 submission files to FINRA CAT.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "cat-regulatory-reporter"
+          },
+          "destination": {
+            "node": "finra-cat-portal"
+          }
+        }
+      },
+      "protocol": "SFTP"
+    }
+  ],
+  "controls": {
+    "mtls-everywhere": {
+      "description": "Requires SPIFFE/SPIRE mTLS certificates across internal service-to-service trading hops.",
+      "requirements": [
+        {
+          "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+          "config": {
+            "control-id": "mtls-everywhere",
+            "name": "East-West Mutual TLS Enforcement",
+            "description": "Requires SPIFFE/SPIRE mTLS certificates across internal service-to-service trading hops.",
+            "tlsVersion": "1.3",
+            "identityFramework": "SPIFFE"
+          }
+        }
+      ]
+    },
+    "sec-17a4-worm": {
+      "description": "Enforces compliance-mode Object Lock with 7-year retention and cryptographic hash verification on trade audit records.",
+      "requirements": [
+        {
+          "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+          "config": {
+            "control-id": "sec-17a4-worm",
+            "name": "SEC Rule 17a-4 Immutable Recordkeeping",
+            "description": "Enforces compliance-mode Object Lock with 7-year retention and cryptographic hash verification on trade audit records.",
+            "retentionYears": 7,
+            "lockMode": "COMPLIANCE"
+          }
+        }
+      ]
+    },
+    "dora-ict-resilience": {
+      "description": "Mandates continuous cross-region replication with RPO under 60 seconds and quarterly automated failover drills.",
+      "requirements": [
+        {
+          "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+          "config": {
+            "control-id": "dora-ict-resilience",
+            "name": "DORA ICT Operational Resilience & Failover",
+            "description": "Mandates continuous cross-region replication with RPO under 60 seconds and quarterly automated failover drills.",
+            "targetRpoSeconds": 60,
+            "drillCadence": "QUARTERLY"
+          }
+        }
+      ]
+    },
+    "finra-cat-sla": {
+      "description": "Requires NTP/PTP clock-synchronized lifecycle linkage and T+1 08:00 ET submission completeness.",
+      "requirements": [
+        {
+          "requirement-url": "https://calm.finos.org/release/1.3/meta/control-requirement.json",
+          "config": {
+            "control-id": "finra-cat-sla",
+            "name": "FINRA Rule 6800 CAT T+1 Reporting SLA",
+            "description": "Requires NTP/PTP clock-synchronized lifecycle linkage and T+1 08:00 ET submission completeness.",
+            "deadlineEt": "08:00",
+            "clockSyncToleranceMs": 50
+          }
+        }
+      ]
+    }
+  },
+  "flows": [
+    {
+      "unique-id": "order-submission-flow",
+      "name": "Risk-Gated Client Order Submission Flow",
+      "description": "Client order ingress gated by synchronous SEC 15c3-5 pre-trade risk verification prior to Kafka publication.",
+      "transitions": [
+        {
+          "relationship-unique-id": "trader-uses-web",
+          "sequence-number": 1,
+          "description": "Trader submits equity order ticket."
+        },
+        {
+          "relationship-unique-id": "web-to-gateway",
+          "sequence-number": 2,
+          "description": "Blotter posts HTTPS order to edge gateway."
+        },
+        {
+          "relationship-unique-id": "gateway-to-router",
+          "sequence-number": 3,
+          "description": "Gateway routes order to stateless order router."
+        },
+        {
+          "relationship-unique-id": "router-to-risk",
+          "sequence-number": 4,
+          "description": "Order router executes synchronous SEC 15c3-5 risk check."
+        },
+        {
+          "relationship-unique-id": "risk-to-redis",
+          "sequence-number": 5,
+          "description": "Risk engine verifies intraday exposure in Redis cache."
+        },
+        {
+          "relationship-unique-id": "router-to-kafka",
+          "sequence-number": 6,
+          "description": "Approved order event commits to Kafka."
+        }
+      ]
+    },
+    {
+      "unique-id": "execution-fill-flow",
+      "name": "Exchange Execution Fill Capture Flow",
+      "description": "Streams exchange FIX ExecutionReport fills back onto the Kafka event backbone.",
+      "transitions": [
+        {
+          "relationship-unique-id": "kafka-to-fix",
+          "sequence-number": 1,
+          "description": "FIX gateway reads risk-approved order command."
+        },
+        {
+          "relationship-unique-id": "fix-to-venue",
+          "sequence-number": 2,
+          "description": "Gateway routes FIX 4.4 order to external exchange."
+        },
+        {
+          "relationship-unique-id": "fix-to-kafka",
+          "sequence-number": 3,
+          "description": "Gateway publishes normalized fill event to Kafka."
+        }
+      ]
+    },
+    {
+      "unique-id": "regulatory-cat-submission-flow",
+      "name": "FINRA CAT T+1 Regulatory Submission Flow",
+      "description": "Reconciles immutable WORM lifecycle events with booked trades and transmits validated CAT files.",
+      "transitions": [
+        {
+          "relationship-unique-id": "reporter-reads-worm",
+          "sequence-number": 1,
+          "description": "Reporter loads sealed WORM lifecycle batches."
+        },
+        {
+          "relationship-unique-id": "reporter-reads-ledger",
+          "sequence-number": 2,
+          "description": "Reporter cross-checks allocations against trade ledger."
+        },
+        {
+          "relationship-unique-id": "reporter-to-finra",
+          "sequence-number": 3,
+          "description": "Reporter uploads signed CAT file over SFTP/mTLS."
+        }
+      ]
+    }
+  ]
+}

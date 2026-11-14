@@ -1,0 +1,76 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm-timeline.json",
+  "moments": [
+    {
+      "unique-id": "core-cli-hub-and-vscode-baseline",
+      "node-type": "moment",
+      "name": "Core CLI, Hub, and VSCode Baseline",
+      "description": "Models FINOS CALM in CALM with calm-cli, calm-vscode, calm-hub, calm-hub-ui, and mongodb inside calm-hub-system and vscode, then refines interface bindings across cli-to-hub, hub-to-db, and hub-ui-to-hub.",
+      "valid-from": "2025-12-23",
+      "details": {
+        "detailed-architecture": "snapshots/01-784858e7-core-cli-hub-and-vscode-baseline.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "f1486acb",
+          "784858e7"
+        ],
+        "commit-messages": [
+          "docs(calm): Define CALM in CALM",
+          "docs(calm): remove unwanted hallucinations"
+        ],
+        "commit-count": 2
+      }
+    },
+    {
+      "unique-id": "operational-publish-and-ide-flows",
+      "node-type": "moment",
+      "name": "Operational Publish and IDE Flows",
+      "description": "Introduces end-to-end behavioral flows—Publish Architecture, Browse Architectures, and Validate Architecture in IDE—capturing sequenced transitions from calm-user through calm-cli and calm-hub-ui to mongodb.",
+      "valid-from": "2026-03-31",
+      "details": {
+        "detailed-architecture": "snapshots/02-78a48ab8-operational-publish-and-ide-flows.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "77749fa4",
+          "78a48ab8"
+        ],
+        "commit-messages": [
+          "chore: hide --ants from docify help and clean up ant farm template",
+          "fix(calm-hub): make mongo initialization log consistent (#2286)"
+        ],
+        "commit-count": 2
+      }
+    },
+    {
+      "unique-id": "calm-studio-and-validation-server",
+      "node-type": "moment",
+      "name": "CalmStudio and Validation Server Expansion",
+      "description": "Expands the platform with browser-based calm-studio and standalone calm-server exposing calm-server-validate-api, while linking calm-hub to its internal layered architecture specification.",
+      "valid-from": "2026-07-25",
+      "details": {
+        "detailed-architecture": "snapshots/03-d95a3bbe-calm-studio-and-validation-server.architecture.json"
+      },
+      "metadata": {
+        "commits": [
+          "d95a3bbe"
+        ],
+        "commit-messages": [
+          "docs: add third timeline moment for CalmStudio and CALM Server (#2882)"
+        ],
+        "commit-count": 1
+      }
+    }
+  ],
+  "metadata": {
+    "title": "Git Architecture Timeline — calm-3.json",
+    "description": "Automatically synthesized from Git commit history of calm-3.json",
+    "generator": "calm-timelapse",
+    "clustering-engine": "clusters-file",
+    "total-commits-scanned": "8",
+    "noise-commits-filtered": "2",
+    "structural-commits-retained": "5"
+  },
+  "current-moment": "calm-studio-and-validation-server"
+}

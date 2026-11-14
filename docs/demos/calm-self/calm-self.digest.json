@@ -1,0 +1,155 @@
+{
+  "schemaVersion": "1.0",
+  "sourceFile": "calm-3.json",
+  "latestCommitDate": "2026-07-25",
+  "stats": {
+    "totalCommitsScanned": 8,
+    "validSnapshotsParsed": 7,
+    "noiseCommitsFiltered": 2,
+    "structuralCommitsRetained": 5
+  },
+  "instructions": [
+    "Group the 5 structural commits below (indices 0..4) into cohesive architectural moments (phases).",
+    "Every commit index from 0 to 4 MUST be covered contiguously with zero gaps or overlaps: first startIndex=0, each next startIndex = previous endIndex + 1, final endIndex=4.",
+    "Group multi-commit sprints, node-addition + relationship-wiring sequences, protocol hardening, and coupled control/ADR rollouts into unified phases while keeping pivotal milestones distinct.",
+    "Write an executive `name` (3-7 words; no leading step numbers and no conventional-commit prefixes such as \"feat:\" or \"chore:\").",
+    "Write a 2-3 sentence narrative `description` explaining WHAT changed architecturally, HOW connectivity or security boundaries shifted, and WHY, citing concrete node IDs, protocols, controls, or ADRs. Do not output mechanical count strings such as \"+1 node(s)\".",
+    "Save the resulting JSON array to a `<name>.clusters.json` file and pass `--clusters <name>.clusters.json` back to `calm-timelapse`."
+  ],
+  "expectedClusterSchema": {
+    "type": "array",
+    "items": {
+      "type": "object",
+      "required": [
+        "startIndex",
+        "endIndex",
+        "uniqueId",
+        "name",
+        "description"
+      ],
+      "properties": {
+        "startIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "endIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "uniqueId": {
+          "type": "string",
+          "description": "kebab-case moment identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "Executive phase title (3-7 words)"
+        },
+        "description": {
+          "type": "string",
+          "description": "2-3 sentence architectural narrative"
+        }
+      }
+    }
+  },
+  "commits": [
+    {
+      "index": 0,
+      "sha": "f1486acb99a6545f65b17729edd830cdd7f4178b",
+      "shortSha": "f1486acb",
+      "date": "2025-12-23",
+      "author": "Mark Scott",
+      "subject": "docs(calm): Define CALM in CALM",
+      "summaryLine": "Initial baseline with 8 node(s), 8 relationship(s)",
+      "changes": [
+        "Added node CALM User (calm-user)",
+        "Added node CALM CLI (calm-cli)",
+        "Added node VSCode Extension (calm-vscode)",
+        "Added node CALM Hub API (calm-hub)",
+        "Added node CALM Hub UI (calm-hub-ui)",
+        "Added node MongoDB (mongodb)",
+        "Added node CALM Hub System (calm-hub-system)",
+        "Added node Visual Studio Code (vscode)",
+        "Added relationship user-interacts-with-ui",
+        "Added relationship user-interacts-with-cli",
+        "Added relationship user-interacts-with-vscode",
+        "Added relationship cli-to-hub",
+        "Added relationship hub-to-db",
+        "Added relationship hub-ui-to-hub",
+        "Added relationship hub-system-composition",
+        "Added relationship vscode-composition"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 1,
+      "sha": "784858e7cc7b486e30e089c1e86992268cee7758",
+      "shortSha": "784858e7",
+      "date": "2025-12-23",
+      "author": "Mark Scott",
+      "subject": "docs(calm): remove unwanted hallucinations",
+      "summaryLine": "~4 node(s), ~3 rel(s)",
+      "changes": [
+        "Modified node CALM CLI (calm-cli) [interfaces]",
+        "Modified node VSCode Extension (calm-vscode) [interfaces]",
+        "Modified node CALM Hub API (calm-hub) [interfaces]",
+        "Modified node CALM Hub UI (calm-hub-ui) [interfaces]",
+        "Modified relationship cli-to-hub",
+        "Modified relationship hub-to-db",
+        "Modified relationship hub-ui-to-hub"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 2,
+      "sha": "77749fa4477a592e24cce5855f6752a5ea775a82",
+      "shortSha": "77749fa4",
+      "date": "2026-03-30",
+      "author": "Thels",
+      "subject": "chore: hide --ants from docify help and clean up ant farm template",
+      "summaryLine": "flows(+3/~0/-0)",
+      "changes": [
+        "Added flow Publish Architecture",
+        "Added flow Browse Architectures",
+        "Added flow Validate Architecture in IDE"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 3,
+      "sha": "78a48ab8a831fda26004977f4755c8a95251beb0",
+      "shortSha": "78a48ab8",
+      "date": "2026-03-31",
+      "author": "Mark Scott",
+      "subject": "fix(calm-hub): make mongo initialization log consistent (#2286)",
+      "summaryLine": "flows(+0/~1/-0)",
+      "changes": [
+        "Modified flow Browse Architectures"
+      ],
+      "coChangedAdrs": []
+    },
+    {
+      "index": 4,
+      "sha": "d95a3bbe6ff777d89d63481ca96a508e9575f7d8",
+      "shortSha": "d95a3bbe",
+      "date": "2026-07-25",
+      "author": "Mark Scott",
+      "subject": "docs: add third timeline moment for CalmStudio and CALM Server (#2882)",
+      "summaryLine": "+2 node(s), ~1 node(s), +2 rel(s), ~3 rel(s), flows(+2/~0/-0)",
+      "changes": [
+        "Added node CalmStudio (calm-studio)",
+        "Added node CALM Server (calm-server)",
+        "Modified node CALM Hub API (calm-hub) [details]",
+        "Added relationship user-interacts-with-studio",
+        "Added relationship user-interacts-with-calm-server",
+        "Modified relationship cli-to-hub",
+        "Modified relationship hub-to-db",
+        "Modified relationship hub-ui-to-hub",
+        "Added flow Edit Architecture in CalmStudio",
+        "Added flow Validate Architecture via CALM Server"
+      ],
+      "coChangedAdrs": []
+    }
+  ]
+}

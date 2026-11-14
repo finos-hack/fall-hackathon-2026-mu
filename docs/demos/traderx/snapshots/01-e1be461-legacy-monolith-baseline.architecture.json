@@ -1,0 +1,83 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm.json",
+  "nodes": [
+    {
+      "unique-id": "trader-actor",
+      "node-type": "actor",
+      "name": "Institutional Equity Trader",
+      "description": "Executes equity block and algorithmic orders through TraderX Workstation."
+    },
+    {
+      "unique-id": "traderx-web",
+      "node-type": "webclient",
+      "name": "TraderX Blotter Web UI",
+      "description": "Browser order blotter for institutional equity trading desks."
+    },
+    {
+      "unique-id": "monolith-order-svc",
+      "node-type": "service",
+      "name": "Legacy Order Monolith",
+      "description": "Java EE monolithic order capture, booking, and position engine.",
+      "interfaces": [
+        {
+          "unique-id": "monolith-http",
+          "host": "monolith.internal",
+          "port": 8080
+        }
+      ]
+    },
+    {
+      "unique-id": "oracle-trades-db",
+      "node-type": "database",
+      "name": "Legacy Oracle Trades DB",
+      "description": "Single-region relational store holding orders, fills, and EOD blotters."
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "trader-uses-web",
+      "description": "Trader submits and monitors orders via web blotter.",
+      "relationship-type": {
+        "interacts": {
+          "actor": "trader-actor",
+          "nodes": [
+            "traderx-web"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "web-to-monolith",
+      "description": "Browser posts order tickets directly to legacy monolith over plain HTTP.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "traderx-web"
+          },
+          "destination": {
+            "node": "monolith-order-svc",
+            "interfaces": [
+              "monolith-http"
+            ]
+          }
+        }
+      },
+      "protocol": "HTTP"
+    },
+    {
+      "unique-id": "monolith-to-oracle",
+      "description": "Monolith persists orders and fills in Oracle.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "monolith-order-svc"
+          },
+          "destination": {
+            "node": "oracle-trades-db"
+          }
+        }
+      },
+      "protocol": "JDBC"
+    }
+  ]
+}

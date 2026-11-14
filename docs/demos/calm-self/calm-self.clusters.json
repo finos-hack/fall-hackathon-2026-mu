@@ -1,0 +1,23 @@
+[
+  {
+    "startIndex": 0,
+    "endIndex": 1,
+    "uniqueId": "core-cli-hub-and-vscode-baseline",
+    "name": "Core CLI, Hub, and VSCode Baseline",
+    "description": "Models FINOS CALM in CALM with calm-cli, calm-vscode, calm-hub, calm-hub-ui, and mongodb inside calm-hub-system and vscode, then refines interface bindings across cli-to-hub, hub-to-db, and hub-ui-to-hub."
+  },
+  {
+    "startIndex": 2,
+    "endIndex": 3,
+    "uniqueId": "operational-publish-and-ide-flows",
+    "name": "Operational Publish and IDE Flows",
+    "description": "Introduces end-to-end behavioral flows—Publish Architecture, Browse Architectures, and Validate Architecture in IDE—capturing sequenced transitions from calm-user through calm-cli and calm-hub-ui to mongodb."
+  },
+  {
+    "startIndex": 4,
+    "endIndex": 4,
+    "uniqueId": "calm-studio-and-validation-server",
+    "name": "CalmStudio and Validation Server Expansion",
+    "description": "Expands the platform with browser-based calm-studio and standalone calm-server exposing calm-server-validate-api, while linking calm-hub to its internal layered architecture specification."
+  }
+]

@@ -1,0 +1,65 @@
+[
+  {
+    "startIndex": 0,
+    "endIndex": 0,
+    "uniqueId": "legacy-monolith-baseline",
+    "name": "Legacy Monolithic Order Desk Baseline",
+    "description": "Captures the initial TraderX equities desk where traderx-web posts orders over plain HTTP directly into monolith-order-svc backed by oracle-trades-db without gateway isolation or transport encryption."
+  },
+  {
+    "startIndex": 1,
+    "endIndex": 4,
+    "uniqueId": "zero-trust-gateway-and-oidc",
+    "name": "Zero-Trust API Gateway & OIDC Enforcement",
+    "description": "Introduces edge-api-gateway and ping-oidc-idp per ADR-001, severing direct browser-to-monolith access, enforcing PKCE token introspection, and mandating the mtls-everywhere control on internal hops."
+  },
+  {
+    "startIndex": 5,
+    "endIndex": 8,
+    "uniqueId": "kafka-backbone-and-order-router",
+    "name": "Order Router Extraction & Kafka Backbone",
+    "description": "Extracts stateless order-router-svc ahead of kafka-event-bus per ADR-002 and defines order-submission-flow so ingress order capture decouples cleanly from downstream trade booking."
+  },
+  {
+    "startIndex": 9,
+    "endIndex": 12,
+    "uniqueId": "pretrade-risk-and-position-cache",
+    "name": "Pre-Trade Risk Circuit Breaker & Cache",
+    "description": "Deploys pretrade-risk-svc backed by redis-position-cache per ADR-003, gating order-router-svc over synchronous gRPC/mTLS credit and fat-finger checks before orders reach kafka-event-bus."
+  },
+  {
+    "startIndex": 13,
+    "endIndex": 17,
+    "uniqueId": "fix-venue-connectivity-and-market-data",
+    "name": "FIX Venue Execution & Live Market Data",
+    "description": "Adds fix-execution-gateway connected to external-liquidity-venue over FIX-4.4/TLS alongside market-data-feed and execution-fill-flow for real-time mark-to-market exposure and drop-copy fills."
+  },
+  {
+    "startIndex": 18,
+    "endIndex": 21,
+    "uniqueId": "monolith-retirement-and-clearing-split",
+    "name": "Legacy Monolith Retirement & Clearing Split",
+    "description": "Migrates trade persistence and clearing to trade-ledger-svc, settlement-clearing-svc, and postgres-trades-db over TLS, permanently decommissioning monolith-order-svc and oracle-trades-db."
+  },
+  {
+    "startIndex": 22,
+    "endIndex": 25,
+    "uniqueId": "sec-17a4-immutable-worm-archive",
+    "name": "SEC 17a-4 Immutable WORM Audit Archive",
+    "description": "Streams Kafka execution events through worm-audit-archiver into s3-object-lock-vault per ADR-004, binding the sec-17a4-worm retention control and exposing audit verification to compliance-officer."
+  },
+  {
+    "startIndex": 26,
+    "endIndex": 29,
+    "uniqueId": "dora-multi-region-resilience",
+    "name": "DORA Multi-Region Failover & Telemetry",
+    "description": "Adds dr-standby-cluster replication and otel-observability-hub distributed tracing per ADR-005, codifying operational failover readiness under the dora-ict-resilience control."
+  },
+  {
+    "startIndex": 30,
+    "endIndex": 34,
+    "uniqueId": "finra-cat-regulatory-reporting",
+    "name": "FINRA CAT T+1 Regulatory Reporting Pipeline",
+    "description": "Launches cat-regulatory-reporter reconciled against s3-object-lock-vault and trade-ledger-svc to transmit SFTP/mTLS reports to finra-cat-portal under regulatory-cat-submission-flow and finra-cat-sla."
+  }
+]

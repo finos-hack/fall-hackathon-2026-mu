@@ -1,0 +1,23 @@
+[
+  {
+    "startIndex": 0,
+    "endIndex": 0,
+    "uniqueId": "initial-fluxnova-bpm-platform",
+    "name": "Initial FluxNova BPM Platform",
+    "description": "Establishes the seven-node FluxNova workflow platform composing fluxnova-engine, fluxnova-rest-api, fluxnova-cockpit, fluxnova-admin, fluxnova-tasklist, and fluxnova-process-db with audit-logging and encryption-in-transit controls."
+  },
+  {
+    "startIndex": 1,
+    "endIndex": 1,
+    "uniqueId": "canonical-nested-relationship-alignment",
+    "name": "Canonical Nested Relationship Alignment",
+    "description": "Refactors all eleven platform composition and connectivity relationships into canonical nested CALM 1.2 relationship-type structures while updating control bindings on fluxnova-engine and engine-to-process-db."
+  },
+  {
+    "startIndex": 2,
+    "endIndex": 2,
+    "uniqueId": "calm-hub-curated-control-seeding",
+    "name": "CALM Hub Curated Control Seeding",
+    "description": "Hardens control requirement metadata on fluxnova-engine and engine-to-process-db so the FluxNova reference architecture validates cleanly when seeded into read-only CALM Hub deployments."
+  }
+]
